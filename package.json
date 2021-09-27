@@ -1,0 +1,17 @@
+{
+  "name": "truth-or-dare",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "interaction-kit": "^0.1.2"
+  }
+}
