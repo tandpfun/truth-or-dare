@@ -250,6 +250,13 @@ discord-api-types@^0.22.0:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.22.0.tgz#34dc57fe8e016e5eaac5e393646cd42a7e1ccc2a"
   integrity sha512-l8yD/2zRbZItUQpy7ZxBJwaLX/Bs2TGaCthRppk8Sw24LOIWg12t9JEreezPoYD0SQcC2htNNo27kYEpYW/Srg==
 
+discord-interactions@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/discord-interactions/-/discord-interactions-2.3.0.tgz#f83a025056250a19876274a983277b884bb3d51b"
+  integrity sha512-PboDGXOUYVKfVvFo5nMr1FbGJGeYOvC3ZB1UllQmLHLoifc5kmY7PHM5hm6QeYOkdoot+/eKcwXxfki3Mh+IHg==
+  dependencies:
+    tweetnacl "^1.0.3"
+
 discord-request@^0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/discord-request/-/discord-request-0.0.3.tgz#662ac318d5502007b83746bf9053f7d9ff827132"
@@ -672,6 +679,11 @@ pino@^6.13.0:
     pino-std-serializers "^3.1.0"
     quick-format-unescaped "^4.0.3"
     sonic-boom "^1.0.2"
+
+prettier@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.4.1.tgz#671e11c89c14a4cfc876ce564106c4a6726c9f5c"
+  integrity sha512-9fbDAXSBcc6Bs1mZrDYb3XKzDLm4EXXL9sC1LqKP5rZkT6KRr/rf9amVUcODVXgguK/isJz0d0hP72WeaKWsvA==
 
 proxy-addr@^2.0.7, proxy-addr@~2.0.5:
   version "2.0.7"

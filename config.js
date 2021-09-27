@@ -1,3 +1,3 @@
 export default {
-  port: 1000
-}
+  port: 1000,
+};

@@ -5,13 +5,18 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "format": "prettier . --write"
   },
   "dependencies": {
     "chalk": "^4.1.2",
+    "discord-interactions": "^2.3.0",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "interaction-kit": "^0.1.2"
+  },
+  "devDependencies": {
+    "prettier": "^2.4.1"
   }
 }
