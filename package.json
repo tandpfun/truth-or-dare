@@ -1,11 +1,11 @@
 {
   "name": "truth-or-dare",
   "version": "1.0.0",
-  "main": "build/index.js",
+  "main": "build/src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsc; node .",
-    "dev": "tsc; node .",
+    "start": "tsc && node .",
+    "dev": "tsc && node .",
     "format": "prettier . --write"
   },
   "dependencies": {
@@ -13,8 +13,7 @@
     "discord-interactions": "^2.3.0",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
-    "express": "^4.17.1",
-    "interaction-kit": "^0.1.2"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

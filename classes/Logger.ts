@@ -23,18 +23,18 @@ export default class Logger {
   log = this.info;
 
   info(content: any) {
-    this.print(content, 'cyan.bold', 'INFO', 'bgCyan.black');
+    this.print(content, 'cyan.bold', ' INFO ', 'bgCyan.black');
   }
 
   success(content: any) {
-    this.print(content, 'greed.bold', 'INFO', 'bgGreen.black');
+    this.print(content, 'green.bold', ' INFO ', 'bgGreen.black');
   }
 
   error(content: any) {
-    this.print(content, 'red.bold', 'ERROR', 'bgRed.black');
+    this.print(content, 'red.bold', ' ERROR ', 'bgRed.black');
   }
 
   warn(content: any) {
-    this.print(content, 'yellow.bold', 'WARN', 'bgYellow.black');
+    this.print(content, 'yellow.bold', ' WARN ', 'bgYellow.black');
   }
 }
