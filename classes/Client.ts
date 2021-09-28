@@ -3,6 +3,10 @@ import Logger from './Logger.js';
 import Server from './Server.js';
 import Command from './Command.js';
 import * as functions from './Functions.js';
+import dare from '../src/questions/dare.json';
+import nhie from '../src/questions/nhie.json';
+import truth from '../src/questions/truth.json';
+import wyr from '../src/questions/wyr.json';
 
 export default class Client {
   token: string;
@@ -13,7 +17,12 @@ export default class Client {
   console: Logger;
   functions: typeof functions;
   server: Server;
-  questions: any;
+  questions: {
+    readonly dare: { r: string[]; pg13: string[]; pg: string[] };
+    readonly nhie: { r: string[]; pg13: string[]; pg: string[] };
+    readonly truth: { r: string[]; pg13: string[]; pg: string[] };
+    readonly wyr: { r: string[]; pg13: string[]; pg: string[] };
+  };
 
   static COLORS = {
     WHITE: 0xffffff,
@@ -55,7 +64,7 @@ export default class Client {
     this.functions = functions;
     this.server = new Server(this.port, this);
 
-    this.questions = {};
+    this.questions = { dare, nhie, truth, wyr } as const;
   }
 
   get COLORS() {
@@ -82,5 +91,10 @@ export default class Client {
       const commandFile: Command = (await import(`../src/commands/${commandFileName}`)).default;
       this.commands.push(commandFile);
     }
+  }
+
+  randomQuestion(type: keyof Client['questions'], rating: keyof Client['questions'][typeof type]) {
+    const questions = this.questions[type][rating];
+    return questions[Math.floor(Math.random() * questions.length)];
   }
 }
