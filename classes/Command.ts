@@ -36,7 +36,7 @@ export default class Command {
       .reduce((a, c) => a & c, 0n);
 
     if ((BigInt(context.member.permissions) & required) !== required) {
-      await context.reply(`:x: you need more perms`); // TODO: better message
+      await context.reply(`${this.client.EMOTES.xmark} you need more perms`); // TODO: better message
       return false;
     }
     return true;

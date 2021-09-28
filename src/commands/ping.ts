@@ -10,12 +10,10 @@ export default class PingCommand extends Command {
   }
 
   async run(ctx: Context) {
-    //const embed = new MessageEmbed().setTitle('⏱️ **Pong!** 00ms Latency!').setColor('GREEN');
-
     await ctx.reply({
       embeds: [
         {
-          title: '⏱️ **Pong!** IDK the Latency!',
+          title: `${this.client.EMOTES.time} **Pong!** IDK the Latency!`,
           color: this.client.COLORS.GREEN,
         },
       ],

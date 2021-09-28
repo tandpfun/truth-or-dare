@@ -15,17 +15,22 @@ export default class Client {
   server: Server;
   questions: any;
   COLORS: {
-    WHITE: number;
-    BLURPLE: number;
-    GREYPLE: number;
-    DARK_BUT_NOT_BLACK: number;
-    NOT_QUITE_BLACK: number;
-    GREEN: number;
-    YELLOW: number;
-    FUSCHIA: number;
-    RED: number;
-    BLACK: number;
-    BLUE: number;
+    readonly WHITE: 16777215;
+    readonly BLURPLE: 5793266;
+    readonly GREYPLE: 10070709;
+    readonly DARK_BUT_NOT_BLACK: 2895667;
+    readonly NOT_QUITE_BLACK: 2303786;
+    readonly GREEN: 5763719;
+    readonly YELLOW: 1044092;
+    readonly FUSCHIA: 15418782;
+    readonly RED: 15548997;
+    readonly BLACK: 16777215;
+    readonly BLUE: 3447003;
+  };
+  EMOTES: {
+    readonly checkmark: ':white_check_mark:';
+    readonly xmark: ':x:';
+    readonly time: ':stopwatch:';
   };
 
   constructor({
@@ -62,6 +67,11 @@ export default class Client {
       RED: 0xed4245,
       BLACK: 0xffffff,
       BLUE: 0x3498db,
+    } as const;
+    this.EMOTES = {
+      checkmark: ':white_check_mark:',
+      xmark: ':x:',
+      time: ':stopwatch:',
     } as const;
   }
 
