@@ -93,8 +93,12 @@ export default class Client {
     }
   }
 
-  randomQuestion(type: keyof Client['questions'], rating: keyof Client['questions'][typeof type]) {
-    const questions = this.questions[type][rating];
+  randomQuestion(
+    type: keyof Client['questions'],
+    ratings?: (keyof Client['questions'][typeof type])[]
+  ) {
+    const rates = ratings ?? ['pg', 'pg13', 'r'];
+    const questions = this.questions[type][rates[Math.floor(Math.random() * rates.length)]];
     return questions[Math.floor(Math.random() * questions.length)];
   }
 }
