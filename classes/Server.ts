@@ -27,7 +27,7 @@ export default class Server {
   async handleRequest(req: Request, res: Response) {
     const interaction = req.body;
     if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-      const ctx = new Context(interaction, res);
+      const ctx = new Context(interaction, this.client, res);
       await this.handleCommand(ctx);
     }
   }
@@ -38,7 +38,7 @@ export default class Server {
       return this.client.console.error(
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
-    if (!(await command.validate(ctx))) return;
+    if (!(await this.client.functions.checkPerms(command, ctx))) return;
     await command.run(ctx);
   }
 }

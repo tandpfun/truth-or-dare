@@ -12,11 +12,13 @@ import {
   ApplicationCommandType,
 } from 'discord-api-types/v9';
 import { Response } from 'express';
+import Client from './Client';
 
 export default class Context {
   rawInteraction: APIApplicationCommandInteraction;
   rawData: APIChatInputApplicationCommandInteractionData;
   response: Response;
+  client: Client;
   command: { id: string; name: string; type: ApplicationCommandType };
   options: APIApplicationCommandInteractionDataOption[];
   args: (string | number | boolean)[];
@@ -27,10 +29,15 @@ export default class Context {
   member: APIInteractionGuildMember;
   user: APIUser;
 
-  constructor(interaction: APIChatInputApplicationCommandInteraction, response: Response) {
+  constructor(
+    interaction: APIChatInputApplicationCommandInteraction,
+    client: Client,
+    response: Response
+  ) {
     this.rawInteraction = interaction;
     this.rawData = interaction.data;
     this.response = response;
+    this.client = client;
 
     this.command = {
       id: interaction.data.id,
@@ -52,7 +59,7 @@ export default class Context {
     this.guildId = interaction.guild_id;
 
     this.member = interaction.member;
-    this.user = interaction.member.user;
+    this.user = interaction.user;
   }
 
   async reply(data: string | APIInteractionResponseCallbackData) {
