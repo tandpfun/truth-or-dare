@@ -7,7 +7,7 @@ const ping: Command = {
   options: [],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    await ctx.reply({
+    ctx.reply({
       embeds: [
         {
           title: `${ctx.client.EMOTES.time} **Pong!** IDK the Latency!`,

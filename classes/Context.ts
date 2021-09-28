@@ -66,9 +66,9 @@ export default class Context {
     return this.options.find(o => o.name === name);
   }
 
-  async reply(data: string | APIInteractionResponseCallbackData) {
+  reply(data: string | APIInteractionResponseCallbackData) {
     if (typeof data === 'string') data = { content: data };
-    await this.response.send({
+    this.response.send({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data,
     });

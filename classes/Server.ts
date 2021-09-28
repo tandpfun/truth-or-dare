@@ -28,9 +28,9 @@ export default class Server {
           })
           .status(400);
       if (!rating)
-        return res.send({
-          question: this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr'),
-        });
+        return res.send(
+          this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr')
+        );
       if (!['pg', 'pg13', 'r'].includes(rating as string))
         return res
           .send({
@@ -38,11 +38,11 @@ export default class Server {
             message: 'The rating must be one of the following: "pg" "pg13" "r"',
           })
           .status(400);
-      res.send({
-        question: this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr', [
+      res.send(
+        this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr', [
           rating as 'pg' | 'pg13' | 'r',
-        ]),
-      });
+        ])
+      );
     });
   }
 
@@ -66,7 +66,7 @@ export default class Server {
       return this.client.console.error(
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
-    if (!(await this.client.functions.checkPerms(command, ctx))) return;
+    if (!this.client.functions.checkPerms(command, ctx)) return;
     await command.run(ctx);
   }
 }
