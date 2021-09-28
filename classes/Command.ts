@@ -33,7 +33,7 @@ export default class Command {
   async validate(context: Context) {
     const required = this.perms
       .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
-      .reduce((a, c) => a & c, 0n)
+      .reduce((a, c) => a & c, 0n);
 
     if ((BigInt(context.member.permissions) & required) !== required) {
       await context.reply(`:x: you need more perms`); // TODO: better message
