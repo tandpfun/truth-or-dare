@@ -1,11 +1,11 @@
 {
   "name": "truth-or-dare",
   "version": "1.0.0",
-  "main": "src/index.js",
-  "type": "module",
+  "main": "build/index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "node src/index.js",
+    "start": "tsc; node .",
+    "dev": "tsc; node .",
     "format": "prettier . --write"
   },
   "dependencies": {
@@ -17,6 +17,8 @@
     "interaction-kit": "^0.1.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
+    "discord-api-types": "^0.23.1",
     "prettier": "^2.4.1"
   }
 }

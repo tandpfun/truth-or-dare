@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "target": "ES2021",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
