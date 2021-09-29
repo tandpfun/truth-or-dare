@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { verifyKeyMiddleware, InteractionType } from 'discord-interactions';
+import rateLimiter from 'express-rate-limit';
 import Context from './Context';
 import type Client from './Client';
 
@@ -12,6 +13,23 @@ export default class Server {
     this.port = port;
     this.client = client;
     this.router = express();
+
+    this.router.use(
+      '/api/questions/',
+      rateLimiter({
+        windowMs: 10 * 1000,
+        max: 5,
+        skipFailedRequests: true,
+        handler: (_: Request, res: Response) => {
+          res
+            .send({
+              error: true,
+              message: 'Too many requests, please try again later.',
+            })
+            .status(429);
+        },
+      })
+    );
 
     this.router.post('/interactions', verifyKeyMiddleware(this.client.publicKey), (req, res) =>
       this.handleRequest(req, res)
