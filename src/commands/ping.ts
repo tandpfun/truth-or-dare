@@ -10,7 +10,7 @@ const ping: Command = {
     ctx.reply({
       embeds: [
         {
-          title: `${ctx.client.EMOTES.time} **Pong!** IDK the Latency!`,
+          description: `${ctx.client.EMOTES.time} **Pong!** IDK the Latency!`,
           color: ctx.client.COLORS.GREEN,
         },
       ],
