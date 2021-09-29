@@ -7,7 +7,8 @@ import Context from '../classes/Context';
 
 const nhie: Command = {
   name: 'nhie',
-  description: 'Gives a random Never Have I Ever question to be answered!',
+  description: 'Gives a random Never Have I Ever question to be answered.',
+  category: 'question',
   options: [
     {
       type: ApplicationCommandOptionType.String,

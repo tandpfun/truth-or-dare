@@ -7,7 +7,8 @@ import Context from '../classes/Context';
 
 const wyr: Command = {
   name: 'wyr',
-  description: 'Gives a random Would You Rather question to be answered!',
+  description: 'Gives a random Would You Rather question to be answered.',
+  category: 'question',
   options: [
     {
       type: ApplicationCommandOptionType.String,

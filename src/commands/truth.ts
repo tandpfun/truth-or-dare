@@ -7,7 +7,8 @@ import Context from '../classes/Context';
 
 const truth: Command = {
   name: 'truth',
-  description: 'Gives a random question that has to be answered truthfully!',
+  description: 'Gives a random question that has to be answered truthfully.',
+  category: 'question',
   options: [
     {
       type: ApplicationCommandOptionType.String,

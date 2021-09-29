@@ -45,6 +45,8 @@ export default class Client {
     checkmark: ':white_check_mark:',
     xmark: ':x:',
     time: ':stopwatch:',
+    question: ':question:',
+    gear: ':gear:',
   } as const;
 
   constructor({
@@ -72,6 +74,10 @@ export default class Client {
     this.questions = { dare, nhie, truth, wyr } as const;
   }
 
+  get inviteUrl() {
+    return `https://discordapp.com/oauth2/authorize?client_id=${this.id}&permissions=19456&scope=bot%20applications.commands`;
+  }
+
   get COLORS() {
     return Client.COLORS;
   }
@@ -89,11 +95,9 @@ export default class Client {
   }
 
   async loadCommands() {
-    const commandFileNames = readdirSync(`${__dirname}/../src/commands`).filter(f =>
-      f.endsWith('.js')
-    );
+    const commandFileNames = readdirSync(`${__dirname}/../commands`).filter(f => f.endsWith('.js'));
     for (const commandFileName of commandFileNames) {
-      const commandFile: Command = (await import(`../src/commands/${commandFileName}`)).default;
+      const commandFile: Command = (await import(`../commands/${commandFileName}`)).default;
       this.commands.push(commandFile);
     }
   }

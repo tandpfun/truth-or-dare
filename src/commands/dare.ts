@@ -7,7 +7,8 @@ import Context from '../classes/Context';
 
 const dare: Command = {
   name: 'dare',
-  description: 'Gives a dare that has to be completed!',
+  description: 'Gives a dare that has to be completed.',
+  category: 'question',
   options: [
     {
       type: ApplicationCommandOptionType.String,

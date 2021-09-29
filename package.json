@@ -1,7 +1,7 @@
 {
   "name": "truth-or-dare",
   "version": "1.0.0",
-  "main": "build/src/index.js",
+  "main": "build/index.js",
   "license": "MIT",
   "prisma": {
     "schema": "./src/prisma/schema.prisma"
