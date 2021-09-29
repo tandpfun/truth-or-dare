@@ -5,8 +5,8 @@ A reincarnation of the truth or dare bot, this time with HTTP slash commands. Mo
 ### To-do List
 
 - [x] HTTP interactions handler
-- [ ] Questions API
-- [ ] Slash Command Posting
+- [x] Questions API
+- [x] Slash Command Posting
 - [ ] Commands
   - [ ] Settings
   - [ ] Questions

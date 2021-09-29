@@ -7,6 +7,8 @@ import dare from '../src/questions/dare.json';
 import nhie from '../src/questions/nhie.json';
 import truth from '../src/questions/truth.json';
 import wyr from '../src/questions/wyr.json';
+import { APIApplicationCommand } from 'discord-api-types';
+import superagent from 'superagent';
 
 export default class Client {
   token: string;
@@ -77,9 +79,8 @@ export default class Client {
   async start() {
     this.console.log(`Starting Truth or Dare...`);
     await this.loadCommands();
+    await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);
-    // Eventually post slash commands
-    // await this.loadQuestions();
     this.server.start();
   }
 
@@ -105,7 +106,40 @@ export default class Client {
       type,
       rating,
       index,
-      question: questions[Math.floor(Math.random() * questions.length)],
+      question: questions[index],
     };
+  }
+
+  async compareCommands(): Promise<boolean> {
+    const commandList: APIApplicationCommand[] = await superagent
+      .get(`https://discord.com/api/v9/applications/${this.id}/commands`)
+      .set('Authorization', 'Bot ' + this.token)
+      .then(res => res.body);
+
+    return this.commands.some(com => {
+      const command: APIApplicationCommand | undefined = commandList.find(c => c.name === com.name);
+
+      return (
+        !command ||
+        com.description !== command.description ||
+        JSON.stringify(command.options || []) !== JSON.stringify(com.options)
+      );
+    });
+  }
+
+  async updateCommands() {
+    if (!(await this.compareCommands())) return;
+    this.console.log('Updating commands...');
+
+    await superagent
+      .put(`https://discord.com/api/v9/applications/${this.id}/commands`)
+      .set('Authorization', 'Bot ' + this.token)
+      .send(
+        this.commands.map(c => ({
+          ...c,
+          perms: undefined,
+        }))
+      );
+    this.console.success('Updated commands');
   }
 }

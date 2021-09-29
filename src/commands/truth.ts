@@ -13,7 +13,6 @@ const truth: Command = {
       type: ApplicationCommandOptionType.String,
       name: 'rating',
       description: 'The maturity level of the topics the question can relate to.',
-      required: false,
       choices: [
         { name: 'PG', value: 'pg' },
         { name: 'PG13', value: 'pg13' },

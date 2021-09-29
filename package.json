@@ -14,7 +14,8 @@
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "express-rate-limit": "^5.3.0"
+    "express-rate-limit": "^5.3.0",
+    "superagent": "^6.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
