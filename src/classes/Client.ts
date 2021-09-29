@@ -75,7 +75,7 @@ export default class Client {
   }
 
   get inviteUrl() {
-    return `https://discordapp.com/oauth2/authorize?client_id=${this.id}&permissions=19456&scope=bot%20applications.commands`;
+    return `https://discord.com/oauth2/authorize?client_id=${this.id}&permissions=19456&scope=bot%20applications.commands`;
   }
 
   get COLORS() {
@@ -148,6 +148,6 @@ export default class Client {
           perms: undefined,
         }))
       );
-    this.console.success('Updated commands');
+    this.console.success(`Updated ${this.commands.length} slash commands`);
   }
 }
