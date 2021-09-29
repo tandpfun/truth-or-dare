@@ -1,10 +1,10 @@
-import { APIApplicationCommandArgumentOptions, PermissionFlagsBits } from 'discord-api-types/v9';
+import { APIApplicationCommandOption, PermissionFlagsBits } from 'discord-api-types/v9';
 import Context from './Context';
 
 export default interface Command {
   name: string;
   description: string;
-  options: APIApplicationCommandArgumentOptions[];
+  options: APIApplicationCommandOption[];
   perms: (
     | keyof typeof PermissionFlagsBits
     | typeof PermissionFlagsBits[keyof typeof PermissionFlagsBits]
