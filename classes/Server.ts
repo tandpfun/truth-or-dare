@@ -68,5 +68,8 @@ export default class Server {
       );
     if (!this.client.functions.checkPerms(command, ctx)) return;
     await command.run(ctx);
+    this.client.console.log(
+      `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
+    );
   }
 }

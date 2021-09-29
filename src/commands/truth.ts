@@ -5,9 +5,9 @@ import {
 import Command from '../../classes/Command';
 import Context from '../../classes/Context';
 
-const dare: Command = {
-  name: 'dare',
-  description: 'Gives a dare that has to be completed!',
+const truth: Command = {
+  name: 'truth',
+  description: 'Gives a random question that has to be answered truthfully!',
   options: [
     {
       type: ApplicationCommandOptionType.String,
@@ -25,17 +25,17 @@ const dare: Command = {
   run: async (ctx: Context): Promise<void> => {
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
-    const dare = ctx.client.randomQuestion(
-      'dare',
+    const truth = ctx.client.randomQuestion(
+      'truth',
       rating ? [rating as 'pg' | 'pg13' | 'r'] : undefined
     );
     ctx.reply({
       embeds: [
         {
-          title: dare.question,
-          color: ctx.client.COLORS.RED,
+          title: truth.question,
+          color: ctx.client.COLORS.BLUE,
           footer: {
-            text: `${dare.type}-${dare.rating}-${dare.index}`,
+            text: `${truth.type}-${truth.rating}-${truth.index}`,
           },
         },
       ],
@@ -43,4 +43,4 @@ const dare: Command = {
   },
 };
 
-export default dare;
+export default truth;

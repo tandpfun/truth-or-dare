@@ -59,7 +59,7 @@ export default class Context {
     this.guildId = interaction.guild_id;
 
     this.member = interaction.member;
-    this.user = interaction.user;
+    this.user = interaction.member.user;
   }
 
   getOption(name: string) {
