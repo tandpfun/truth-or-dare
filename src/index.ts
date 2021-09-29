@@ -1,4 +1,4 @@
-import Client from '../classes/Client';
+import Client from './classes/Client';
 import 'dotenv/config.js';
 
 const { APPLICATION_ID, PUBLIC_KEY, TOKEN, PORT } = process.env;

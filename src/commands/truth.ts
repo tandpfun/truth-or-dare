@@ -2,8 +2,8 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
 } from 'discord-api-types';
-import Command from '../../classes/Command';
-import Context from '../../classes/Context';
+import Command from '../classes/Command';
+import Context from '../classes/Context';
 
 const truth: Command = {
   name: 'truth',

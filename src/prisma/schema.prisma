@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+enum Rating {
+  PG
+  PG13
+  R
+}
+
+model ChannelSettings {
+  id              String   @id @map("_id")
+  disabledRatings Rating[]
+}

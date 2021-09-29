@@ -3,12 +3,13 @@ import Logger from './Logger.js';
 import Server from './Server.js';
 import Command from './Command.js';
 import * as functions from './Functions.js';
-import dare from '../src/questions/dare.json';
-import nhie from '../src/questions/nhie.json';
-import truth from '../src/questions/truth.json';
-import wyr from '../src/questions/wyr.json';
+import dare from '../questions/dare.json';
+import nhie from '../questions/nhie.json';
+import truth from '../questions/truth.json';
+import wyr from '../questions/wyr.json';
 import { APIApplicationCommand } from 'discord-api-types';
 import superagent from 'superagent';
+import Database from './Database.js';
 
 export default class Client {
   token: string;
@@ -19,6 +20,7 @@ export default class Client {
   console: Logger;
   functions: typeof functions;
   server: Server;
+  database: Database;
   questions: {
     readonly dare: { r: string[]; pg13: string[]; pg: string[] };
     readonly nhie: { r: string[]; pg13: string[]; pg: string[] };
@@ -65,6 +67,7 @@ export default class Client {
     this.console = new Logger('ToD');
     this.functions = functions;
     this.server = new Server(this.port, this);
+    this.database = new Database(this);
 
     this.questions = { dare, nhie, truth, wyr } as const;
   }
@@ -81,6 +84,7 @@ export default class Client {
     await this.loadCommands();
     await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);
+    await this.database.start();
     this.server.start();
   }
 

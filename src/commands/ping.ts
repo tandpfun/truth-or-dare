@@ -1,5 +1,5 @@
-import Command from '../../classes/Command';
-import Context from '../../classes/Context';
+import Command from '../classes/Command';
+import Context from '../classes/Context';
 
 const ping: Command = {
   name: 'ping',
