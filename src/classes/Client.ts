@@ -21,11 +21,12 @@ export default class Client {
   functions: typeof functions;
   server: Server;
   database: Database;
+
   questions: {
-    readonly dare: { r: string[]; pg13: string[]; pg: string[] };
-    readonly nhie: { r: string[]; pg13: string[]; pg: string[] };
-    readonly truth: { r: string[]; pg13: string[]; pg: string[] };
-    readonly wyr: { r: string[]; pg13: string[]; pg: string[] };
+    readonly dare: { R: string[]; PG13: string[]; PG: string[] };
+    readonly nhie: { R: string[]; PG13: string[]; PG: string[] };
+    readonly truth: { R: string[]; PG13: string[]; PG: string[] };
+    readonly wyr: { R: string[]; PG13: string[]; PG: string[] };
   };
 
   static COLORS = {
@@ -106,13 +107,13 @@ export default class Client {
     type: keyof Client['questions'],
     ratings?: (keyof Client['questions'][typeof type])[]
   ) {
-    const rates = ratings ?? ['pg', 'pg13', 'r'];
+    const rates = ratings ?? ['PG', 'PG13', 'R'];
     if (!rates.length)
       return {
         type,
         rating: 'null',
         index: 'null',
-        question: 'This rating is currently disabled',
+        question: 'That rating is disabled here',
       };
     const rating = rates[Math.floor(Math.random() * rates.length)];
     const questions = this.questions[type][rating];

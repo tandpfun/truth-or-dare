@@ -15,6 +15,11 @@ export default class Database {
   async start() {
     await this.db.$connect();
     this.client.console.success('Connected to database!');
+    setInterval(() => {
+      const cacheSize = Object.keys(this.channelCache).length;
+      this.channelCache = {};
+      this.client.console.log(`Cleared ${cacheSize} entries from the channel cache`);
+    }, 6 * 60 * 60 * 1000);
   }
 
   defaultChannelSettings(id: string): ChannelSettings {

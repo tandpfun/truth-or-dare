@@ -15,19 +15,22 @@ const nhie: Command = {
       name: 'rating',
       description: 'The maturity level of the topics the question can relate to.',
       choices: [
-        { name: 'PG', value: 'pg' },
-        { name: 'PG13', value: 'pg13' },
-        { name: 'R', value: 'r' },
+        { name: 'PG', value: 'PG' },
+        { name: 'PG13', value: 'PG13' },
+        { name: 'R', value: 'R' },
       ],
     },
   ],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
+    const channelSettings = await ctx.channelSettings;
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
     const nhie = ctx.client.randomQuestion(
       'nhie',
-      rating ? [rating as 'pg' | 'pg13' | 'r'] : undefined
+      (rating ? [rating as 'PG' | 'PG13' | 'R'] : ['PG', 'PG13', 'R']).filter(
+        (r: 'PG' | 'PG13' | 'R') => !channelSettings.disabledRatings.includes(r)
+      ) as ('PG' | 'PG13' | 'R')[]
     );
     ctx.reply({
       embeds: [

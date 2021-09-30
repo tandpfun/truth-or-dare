@@ -73,4 +73,8 @@ export default class Context {
       data,
     });
   }
+
+  get channelSettings() {
+    return this.client.database.fetchChannelSettings(this.channelId);
+  }
 }

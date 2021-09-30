@@ -49,16 +49,16 @@ export default class Server {
         return res.send(
           this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr')
         );
-      if (!['pg', 'pg13', 'r'].includes(rating as string))
+      if (!['PG', 'PG13', 'R'].includes(rating as string))
         return res
           .send({
             error: true,
-            message: 'The rating must be one of the following: "pg" "pg13" "r"',
+            message: 'The rating must be one of the following: "PG" "PG13" "R"',
           })
           .status(400);
       res.send(
         this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr', [
-          rating as 'pg' | 'pg13' | 'r',
+          rating as 'PG' | 'PG13' | 'R',
         ])
       );
     });
