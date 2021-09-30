@@ -107,6 +107,13 @@ export default class Client {
     ratings?: (keyof Client['questions'][typeof type])[]
   ) {
     const rates = ratings ?? ['pg', 'pg13', 'r'];
+    if (!rates.length)
+      return {
+        type,
+        rating: 'null',
+        index: 'null',
+        question: 'This rating is currently disabled',
+      };
     const rating = rates[Math.floor(Math.random() * rates.length)];
     const questions = this.questions[type][rating];
     const index = Math.floor(Math.random() * questions.length);
