@@ -37,9 +37,11 @@ const nhie: Command = {
         {
           title: nhie.question,
           color: ctx.client.COLORS.BLUE,
-          footer: {
-            text: `${nhie.type}-${nhie.rating}-${nhie.index}`,
-          },
+          footer: isNaN(nhie.index)
+            ? null
+            : {
+                text: `${nhie.type}-${nhie.rating}-${nhie.index}`,
+              },
         },
       ],
     });

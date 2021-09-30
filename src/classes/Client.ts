@@ -111,8 +111,8 @@ export default class Client {
     if (!rates.length)
       return {
         type,
-        rating: 'null',
-        index: 'null',
+        rating: 'NONE',
+        index: NaN,
         question: 'That rating is disabled here',
       };
     const rating = rates[Math.floor(Math.random() * rates.length)];

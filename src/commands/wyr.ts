@@ -37,9 +37,11 @@ const wyr: Command = {
         {
           title: wyr.question,
           color: ctx.client.COLORS.BLUE,
-          footer: {
-            text: `${wyr.type}-${wyr.rating}-${wyr.index}`,
-          },
+          footer: isNaN(wyr.index)
+            ? null
+            : {
+                text: `${wyr.type}-${wyr.rating}-${wyr.index}`,
+              },
         },
       ],
     });

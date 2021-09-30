@@ -37,9 +37,11 @@ const truth: Command = {
         {
           title: truth.question,
           color: ctx.client.COLORS.BLUE,
-          footer: {
-            text: `${truth.type}-${truth.rating}-${truth.index}`,
-          },
+          footer: isNaN(truth.index)
+            ? null
+            : {
+                text: `${truth.type}-${truth.rating}-${truth.index}`,
+              },
         },
       ],
     });

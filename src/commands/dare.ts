@@ -37,9 +37,11 @@ const dare: Command = {
         {
           title: dare.question,
           color: ctx.client.COLORS.BLUE,
-          footer: {
-            text: `${dare.type}-${dare.rating}-${dare.index}`,
-          },
+          footer: isNaN(dare.index)
+            ? null
+            : {
+                text: `${dare.type}-${dare.rating}-${dare.index}`,
+              },
         },
       ],
     });
