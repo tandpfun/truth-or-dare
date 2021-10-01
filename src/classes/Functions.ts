@@ -7,9 +7,16 @@ export function checkPerms(command: Command, ctx: Context) {
   const required = command.perms
     .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
     .reduce((a, c) => a | c, 0n);
-
-  if ((BigInt(ctx.member.permissions) & required) !== required) {
-    ctx.reply(`${Client.EMOTES.xmark} you need more perms`); // TODO: better message
+  const missing = required & ~BigInt(ctx.member.permissions);
+  const missingNames = Object.keys(PermissionFlagsBits).filter(
+    key => PermissionFlagsBits[key] & missing
+  );
+  if (missing) {
+    ctx.reply(
+      `${Client.EMOTES.xmark} You are missing the following required permissions: ${missingNames
+        .map(p => '`' + p + '`')
+        .join(', ')}`
+    );
     return false;
   }
   return true;
