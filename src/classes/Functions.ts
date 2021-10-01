@@ -14,7 +14,7 @@ export function checkPerms(command: Command, ctx: Context) {
   if (missing) {
     ctx.reply(
       `${Client.EMOTES.xmark} You are missing the following required permissions: ${missingNames
-        .map(p => '`' + p + '`')
+        .map(p => '`' + p.replaceAll(/([a-z])([A-Z])/g, '$1 $2') + '`')
         .join(', ')}`
     );
     return false;
