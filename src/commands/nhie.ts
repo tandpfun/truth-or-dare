@@ -40,10 +40,10 @@ const nhie: Command = {
           color: ctx.client.COLORS.BLUE,
           footer:
             typeof nhie.id === 'string'
-              ? null
-              : {
+              ? {
                   text: `${nhie.type}-${nhie.rating}-${nhie.id}`,
-                },
+                }
+              : null,
         },
       ],
     });

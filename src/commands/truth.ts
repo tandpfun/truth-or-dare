@@ -40,10 +40,10 @@ const truth: Command = {
           color: ctx.client.COLORS.BLUE,
           footer:
             typeof truth.id === 'string'
-              ? null
-              : {
+              ? {
                   text: `${truth.type}-${truth.rating}-${truth.id}`,
-                },
+                }
+              : null,
         },
       ],
     });

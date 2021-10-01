@@ -110,4 +110,22 @@ export default class Database {
   async deleteQuestion(id: string) {
     return await this.db.question.delete({ where: { id } });
   }
+
+  async makeExampleQuestions() {
+    for (let i = 0; i < 100; i++) {
+      for (const type of ['DARE', 'NHIE', 'TRUTH', 'WYR'] as QuestionType[]) {
+        for (const rating of ['PG', 'PG13', 'R'] as Rating[]) {
+          await this.db.question.create({
+            data: {
+              id: this.generateId(),
+              type,
+              rating,
+              question: `${rating} ${type[0]}${type.slice(1).toLowerCase()} question ${i}`,
+            },
+          });
+          this.client.console.log(`${type}-${rating}-${i}`);
+        }
+      }
+    }
+  }
 }

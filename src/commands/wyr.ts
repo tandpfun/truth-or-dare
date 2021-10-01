@@ -40,10 +40,10 @@ const wyr: Command = {
           color: ctx.client.COLORS.BLUE,
           footer:
             typeof wyr.id === 'string'
-              ? null
-              : {
+              ? {
                   text: `${wyr.type}-${wyr.rating}-${wyr.id}`,
-                },
+                }
+              : null,
         },
       ],
     });

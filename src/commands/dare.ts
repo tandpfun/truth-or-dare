@@ -40,10 +40,10 @@ const dare: Command = {
           color: ctx.client.COLORS.BLUE,
           footer:
             typeof dare.id === 'string'
-              ? null
-              : {
+              ? {
                   text: `${dare.type}-${dare.rating}-${dare.id}`,
-                },
+                }
+              : null,
         },
       ],
     });
