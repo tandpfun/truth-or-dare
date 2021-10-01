@@ -55,6 +55,9 @@ const settings: Command = {
     },
   ],
   run: async (ctx: Context): Promise<void> => {
+    if (!ctx.guildId)
+      return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
+
     const channelSettings = await ctx.channelSettings;
 
     if (ctx.args[0] === 'view') {

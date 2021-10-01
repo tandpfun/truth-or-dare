@@ -4,6 +4,7 @@ import Command from './Command';
 import Context from './Context';
 
 export function checkPerms(command: Command, ctx: Context) {
+  if (!ctx.guildId) return true;
   const required = command.perms
     .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
     .reduce((a, c) => a | c, 0n);

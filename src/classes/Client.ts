@@ -3,10 +3,6 @@ import Logger from './Logger.js';
 import Server from './Server.js';
 import Command from './Command.js';
 import * as functions from './Functions.js';
-import dare from '../questions/dare.json';
-import nhie from '../questions/nhie.json';
-import truth from '../questions/truth.json';
-import wyr from '../questions/wyr.json';
 import { APIApplicationCommand } from 'discord-api-types';
 import superagent from 'superagent';
 import Database from './Database.js';
@@ -71,8 +67,6 @@ export default class Client {
     this.functions = functions;
     this.server = new Server(this.port, this);
     this.database = new Database(this);
-
-    this.questions = { dare, nhie, truth, wyr } as const;
   }
 
   get inviteUrl() {
