@@ -1,5 +1,5 @@
 import {
-  ApplicationCommandInteractionDataOptionString,
+  ApplicationCommandInteractionDataOptionSubCommand,
   ApplicationCommandOptionType,
 } from 'discord-api-types/v9';
 import Command from '../classes/Command';
@@ -9,6 +9,7 @@ const settings: Command = {
   name: 'settings',
   description: 'Show and configure the channel settings of a channel.',
   category: 'control',
+  perms: ['ManageChannels'],
   options: [
     {
       name: 'view',
@@ -52,7 +53,6 @@ const settings: Command = {
       ],
     },
   ],
-  perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
 
@@ -67,21 +67,17 @@ const settings: Command = {
         embeds: [
           {
             title: `${ctx.client.EMOTES.gear} Channel Settings`,
-            description: `__Ratings:__\nPG: ${ratingEmoji('PG')}\nPG13: ${ratingEmoji(
+            description: `__Ratings:__\n${ratingEmoji('PG')} PG Questions\n${ratingEmoji(
               'PG13'
-            )}\nR: ${ratingEmoji('R')}`,
+            )} PG13 Questions\n${ratingEmoji('R')} R Questions`,
             color: ctx.client.COLORS.BLUE,
           },
         ],
       });
     } else if (ctx.args[0] === 'disablerating') {
-      console.log(ctx.getOption('rating'));
-
       const ratingToDisable = (
-        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
-      )?.value as 'PG' | 'PG13' | 'R';
-
-      console.log(ratingToDisable);
+        ctx.getOption('disablerating') as ApplicationCommandInteractionDataOptionSubCommand
+      ).options[0].value as 'PG' | 'PG13' | 'R';
 
       if (channelSettings.disabledRatings.includes(ratingToDisable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is already disabled here!`);
@@ -90,7 +86,18 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(ctx.channelId, channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was disabled here!`);
     } else if (ctx.args[0] === 'enablerating') {
-      ctx.reply('enable rating');
+      const ratingToDisable = (
+        ctx.getOption('enablerating') as ApplicationCommandInteractionDataOptionSubCommand
+      ).options[0].value as 'PG' | 'PG13' | 'R';
+
+      if (!channelSettings.disabledRatings.includes(ratingToDisable))
+        return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is not disabled here!`);
+
+      channelSettings.disabledRatings = channelSettings.disabledRatings.filter(
+        type => type !== ratingToDisable
+      );
+      await ctx.client.database.updateChannelSettings(ctx.channelId, channelSettings);
+      ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was enabled here!`);
     }
   },
 };
