@@ -15,7 +15,7 @@ export default class Server {
     this.router = express();
 
     this.router.use(
-      '/api/questions/',
+      '/api/',
       rateLimiter({
         windowMs: 10 * 1000,
         max: 5,
@@ -35,7 +35,7 @@ export default class Server {
       this.handleRequest(req, res)
     );
 
-    this.router.get('/api/questions/:questionType', (req, res) => {
+    this.router.get('/api/:questionType', (req, res) => {
       const questionType = req.params.questionType;
       const rating = req.query.rating;
       if (!['dare', 'truth', 'nhie', 'wyr'].includes(questionType as string))
@@ -49,7 +49,7 @@ export default class Server {
         return res.send(
           this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr')
         );
-      if (!['PG', 'PG13', 'R'].includes(rating as string))
+      if (!['PG', 'PG13', 'R'].includes((rating as string).toUpperCase()))
         return res
           .send({
             error: true,
@@ -58,7 +58,7 @@ export default class Server {
           .status(400);
       res.send(
         this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr', [
-          rating as 'PG' | 'PG13' | 'R',
+          (rating as string).toUpperCase() as 'PG' | 'PG13' | 'R',
         ])
       );
     });

@@ -12,43 +12,43 @@ const settings: Command = {
   perms: ['ManageChannels'],
   options: [
     {
+      type: ApplicationCommandOptionType.Subcommand,
       name: 'view',
       description: "View a channel's settings.",
-      type: ApplicationCommandOptionType.Subcommand,
     },
     {
+      type: ApplicationCommandOptionType.Subcommand,
       name: 'disablerating',
       description: 'Disable a question rating for a channel.',
-      type: ApplicationCommandOptionType.Subcommand,
       options: [
         {
+          type: ApplicationCommandOptionType.String,
           name: 'rating',
           description: 'The rating to disable.',
-          type: ApplicationCommandOptionType.String,
+          required: true,
           choices: [
             { name: 'PG', value: 'PG' },
             { name: 'PG13', value: 'PG13' },
             { name: 'R', value: 'R' },
           ],
-          required: true,
         },
       ],
     },
     {
+      type: ApplicationCommandOptionType.Subcommand,
       name: 'enablerating',
       description: 'Enable a question rating for a channel.',
-      type: ApplicationCommandOptionType.Subcommand,
       options: [
         {
+          type: ApplicationCommandOptionType.String,
           name: 'rating',
           description: 'The rating to enable.',
-          type: ApplicationCommandOptionType.String,
+          required: true,
           choices: [
             { name: 'PG', value: 'PG' },
             { name: 'PG13', value: 'PG13' },
             { name: 'R', value: 'R' },
           ],
-          required: true,
         },
       ],
     },
