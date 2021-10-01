@@ -1,3 +1,4 @@
+import { Rating } from '.prisma/client';
 import {
   ApplicationCommandInteractionDataOptionSubCommand,
   ApplicationCommandOptionType,
@@ -57,7 +58,7 @@ const settings: Command = {
     const channelSettings = await ctx.channelSettings;
 
     if (ctx.args[0] === 'view') {
-      function ratingEmoji(rating: 'PG' | 'PG13' | 'R') {
+      function ratingEmoji(rating: Rating) {
         return channelSettings.disabledRatings.includes(rating)
           ? ctx.client.EMOTES.xmark
           : ctx.client.EMOTES.checkmark;
@@ -77,7 +78,7 @@ const settings: Command = {
     } else if (ctx.args[0] === 'disablerating') {
       const ratingToDisable = (
         ctx.getOption('disablerating') as ApplicationCommandInteractionDataOptionSubCommand
-      ).options[0].value as 'PG' | 'PG13' | 'R';
+      ).options[0].value as Rating;
 
       if (channelSettings.disabledRatings.includes(ratingToDisable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is already disabled here!`);
@@ -88,7 +89,7 @@ const settings: Command = {
     } else if (ctx.args[0] === 'enablerating') {
       const ratingToDisable = (
         ctx.getOption('enablerating') as ApplicationCommandInteractionDataOptionSubCommand
-      ).options[0].value as 'PG' | 'PG13' | 'R';
+      ).options[0].value as Rating;
 
       if (!channelSettings.disabledRatings.includes(ratingToDisable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is not disabled here!`);

@@ -1,3 +1,4 @@
+import { Rating } from '.prisma/client';
 import {
   ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
@@ -26,22 +27,23 @@ const nhie: Command = {
     const channelSettings = await ctx.channelSettings;
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
-    const nhie = ctx.client.randomQuestion(
-      'nhie',
-      (rating ? [rating as 'PG' | 'PG13' | 'R'] : ['PG', 'PG13', 'R']).filter(
-        (r: 'PG' | 'PG13' | 'R') => !channelSettings.disabledRatings.includes(r)
-      ) as ('PG' | 'PG13' | 'R')[]
+    const nhie = await ctx.client.database.getRandomQuestion(
+      'NHIE',
+      (rating ? [rating as Rating] : ['PG', 'PG13', 'R']).filter(
+        (r: Rating) => !channelSettings.disabledRatings.includes(r)
+      ) as Rating[]
     );
     ctx.reply({
       embeds: [
         {
           title: nhie.question,
           color: ctx.client.COLORS.BLUE,
-          footer: isNaN(nhie.index)
-            ? null
-            : {
-                text: `${nhie.type}-${nhie.rating}-${nhie.index}`,
-              },
+          footer:
+            typeof nhie.id === 'string'
+              ? null
+              : {
+                  text: `${nhie.type}-${nhie.rating}-${nhie.id}`,
+                },
         },
       ],
     });

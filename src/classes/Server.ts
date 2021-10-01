@@ -3,6 +3,7 @@ import { verifyKeyMiddleware, InteractionType } from 'discord-interactions';
 import rateLimiter from 'express-rate-limit';
 import Context from './Context';
 import type Client from './Client';
+import { QuestionType, Rating } from '.prisma/client';
 
 export default class Server {
   port: number;
@@ -31,37 +32,13 @@ export default class Server {
       })
     );
 
-    this.router.post('/interactions', verifyKeyMiddleware(this.client.publicKey), (req, res) =>
-      this.handleRequest(req, res)
+    this.router.post(
+      '/interactions',
+      verifyKeyMiddleware(this.client.publicKey),
+      this.handleRequest.bind(this)
     );
 
-    this.router.get('/api/:questionType', (req, res) => {
-      const questionType = req.params.questionType;
-      const rating = req.query.rating;
-      if (!['dare', 'truth', 'nhie', 'wyr'].includes(questionType as string))
-        return res
-          .send({
-            error: true,
-            message: 'The question type must be one of the following: "dare" "truth" "nhie" "wyr"',
-          })
-          .status(400);
-      if (!rating)
-        return res.send(
-          this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr')
-        );
-      if (!['PG', 'PG13', 'R'].includes((rating as string).toUpperCase()))
-        return res
-          .send({
-            error: true,
-            message: 'The rating must be one of the following: "PG" "PG13" "R"',
-          })
-          .status(400);
-      res.send(
-        this.client.randomQuestion(questionType as 'dare' | 'truth' | 'nhie' | 'wyr', [
-          (rating as string).toUpperCase() as 'PG' | 'PG13' | 'R',
-        ])
-      );
-    });
+    this.router.get('/api/:questionType', this.handleAPI.bind(this));
   }
 
   start() {
@@ -88,6 +65,34 @@ export default class Server {
     await command.run(ctx);
     this.client.console.log(
       `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
+    );
+  }
+
+  async handleAPI(req: Request, res: Response) {
+    const questionType = req.params.questionType;
+    const rating = req.query.rating;
+    if (!['DARE', 'TRUTH', 'NHIE', 'WYR'].includes((questionType as string).toUpperCase?.()))
+      return res
+        .send({
+          error: true,
+          message: 'The question type must be one of the following: "dare" "truth" "nhie" "wyr"',
+        })
+        .status(400);
+    if (!rating)
+      return res.send(
+        await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType)
+      );
+    if (!['PG', 'PG13', 'R'].includes((rating as string).toUpperCase?.()))
+      return res
+        .send({
+          error: true,
+          message: 'The rating must be one of the following: "PG" "PG13" "R"',
+        })
+        .status(400);
+    res.send(
+      await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType, [
+        (rating as string).toUpperCase() as Rating,
+      ])
     );
   }
 }

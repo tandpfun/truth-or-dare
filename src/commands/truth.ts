@@ -1,3 +1,4 @@
+import { Rating } from '.prisma/client';
 import {
   ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
@@ -26,22 +27,23 @@ const truth: Command = {
     const channelSettings = await ctx.channelSettings;
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
-    const truth = ctx.client.randomQuestion(
-      'truth',
-      (rating ? [rating as 'PG' | 'PG13' | 'R'] : ['PG', 'PG13', 'R']).filter(
-        (r: 'PG' | 'PG13' | 'R') => !channelSettings.disabledRatings.includes(r)
-      ) as ('PG' | 'PG13' | 'R')[]
+    const truth = await ctx.client.database.getRandomQuestion(
+      'TRUTH',
+      (rating ? [rating as Rating] : ['PG', 'PG13', 'R']).filter(
+        (r: Rating) => !channelSettings.disabledRatings.includes(r)
+      ) as Rating[]
     );
     ctx.reply({
       embeds: [
         {
           title: truth.question,
           color: ctx.client.COLORS.BLUE,
-          footer: isNaN(truth.index)
-            ? null
-            : {
-                text: `${truth.type}-${truth.rating}-${truth.index}`,
-              },
+          footer:
+            typeof truth.id === 'string'
+              ? null
+              : {
+                  text: `${truth.type}-${truth.rating}-${truth.id}`,
+                },
         },
       ],
     });

@@ -103,29 +103,6 @@ export default class Client {
     }
   }
 
-  randomQuestion(
-    type: keyof Client['questions'],
-    ratings?: (keyof Client['questions'][typeof type])[]
-  ) {
-    const rates = ratings ?? ['PG', 'PG13', 'R'];
-    if (!rates.length)
-      return {
-        type,
-        rating: 'NONE',
-        index: NaN,
-        question: 'That rating is disabled here',
-      };
-    const rating = rates[Math.floor(Math.random() * rates.length)];
-    const questions = this.questions[type][rating];
-    const index = Math.floor(Math.random() * questions.length);
-    return {
-      type,
-      rating,
-      index,
-      question: questions[index],
-    };
-  }
-
   async compareCommands(): Promise<boolean> {
     const commandList: APIApplicationCommand[] = await superagent
       .get(`https://discord.com/api/v9/applications/${this.id}/commands`)

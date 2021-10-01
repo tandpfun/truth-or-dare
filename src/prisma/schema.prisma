@@ -11,6 +11,13 @@ generator client {
   previewFeatures = ["mongoDb"]
 }
 
+enum QuestionType {
+  DARE
+  NHIE
+  TRUTH
+  WYR
+}
+
 enum Rating {
   PG
   PG13
@@ -20,4 +27,11 @@ enum Rating {
 model ChannelSettings {
   id              String   @id @map("_id")
   disabledRatings Rating[]
+}
+
+model Question {
+  id       String       @id @map("_id")
+  type     QuestionType
+  rating   Rating
+  question String
 }
