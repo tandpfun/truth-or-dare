@@ -34,7 +34,7 @@ export default class Database {
   defaultChannelSettings(id: string): ChannelSettings {
     return {
       id,
-      disabledRatings: [],
+      disabledRatings: ['R'],
     };
   }
 
