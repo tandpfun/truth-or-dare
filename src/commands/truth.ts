@@ -41,7 +41,7 @@ const truth: Command = {
           footer:
             typeof truth.id === 'string'
               ? {
-                  text: `${truth.type}-${truth.rating}-${truth.id}`,
+                  text: `Type: ${truth.type} | Rating: ${truth.rating} | ID: ${truth.id}`,
                 }
               : null,
         },
