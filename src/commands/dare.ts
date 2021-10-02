@@ -41,7 +41,7 @@ const dare: Command = {
           footer:
             typeof dare.id === 'string'
               ? {
-                  text: `${dare.type}-${dare.rating}-${dare.id}`,
+                  text: `Type: ${dare.type} | Rating: ${dare.rating} | ID: ${dare.id}`,
                 }
               : null,
         },

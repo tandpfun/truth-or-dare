@@ -41,7 +41,7 @@ const wyr: Command = {
           footer:
             typeof wyr.id === 'string'
               ? {
-                  text: `${wyr.type}-${wyr.rating}-${wyr.id}`,
+                  text: `Type: ${wyr.type} | Rating: ${wyr.rating} | ID: ${wyr.id}`,
                 }
               : null,
         },

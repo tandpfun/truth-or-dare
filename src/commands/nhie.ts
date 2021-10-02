@@ -41,7 +41,7 @@ const nhie: Command = {
           footer:
             typeof nhie.id === 'string'
               ? {
-                  text: `${nhie.type}-${nhie.rating}-${nhie.id}`,
+                  text: `Type: ${nhie.type} | Rating: ${nhie.rating} | ID: ${nhie.id}`,
                 }
               : null,
         },
