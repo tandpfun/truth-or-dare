@@ -38,12 +38,11 @@ const truth: Command = {
         {
           title: truth.question,
           color: ctx.client.COLORS.BLUE,
-          footer:
-            typeof truth.id === 'string'
-              ? {
-                  text: `Type: ${truth.type} | Rating: ${truth.rating} | ID: ${truth.id}`,
-                }
-              : null,
+          footer: truth.id
+            ? {
+                text: `Type: ${truth.type} | Rating: ${truth.rating} | ID: ${truth.id}`,
+              }
+            : null,
         },
       ],
     });

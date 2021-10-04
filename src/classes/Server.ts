@@ -71,11 +71,16 @@ export default class Server {
   async handleAPI(req: Request, res: Response) {
     const questionType = req.params.questionType;
     const rating = req.query.rating;
-    if (!['DARE', 'TRUTH', 'NHIE', 'WYR'].includes((questionType as string).toUpperCase?.()))
+    if (
+      !['DARE', 'TRUTH', 'NHIE', 'WYR', 'PARANOIA'].includes(
+        (questionType as string).toUpperCase?.()
+      )
+    )
       return res
         .send({
           error: true,
-          message: 'The question type must be one of the following: "dare" "truth" "nhie" "wyr"',
+          message:
+            'The question type must be one of the following: "dare" "truth" "nhie" "wyr" "paranoia"',
         })
         .status(400);
     if (!rating)

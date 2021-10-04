@@ -38,12 +38,11 @@ const nhie: Command = {
         {
           title: nhie.question,
           color: ctx.client.COLORS.BLUE,
-          footer:
-            typeof nhie.id === 'string'
-              ? {
-                  text: `Type: ${nhie.type} | Rating: ${nhie.rating} | ID: ${nhie.id}`,
-                }
-              : null,
+          footer: nhie.id
+            ? {
+                text: `Type: ${nhie.type} | Rating: ${nhie.rating} | ID: ${nhie.id}`,
+              }
+            : null,
         },
       ],
     });

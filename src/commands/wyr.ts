@@ -38,12 +38,11 @@ const wyr: Command = {
         {
           title: wyr.question,
           color: ctx.client.COLORS.BLUE,
-          footer:
-            typeof wyr.id === 'string'
-              ? {
-                  text: `Type: ${wyr.type} | Rating: ${wyr.rating} | ID: ${wyr.id}`,
-                }
-              : null,
+          footer: wyr.id
+            ? {
+                text: `Type: ${wyr.type} | Rating: ${wyr.rating} | ID: ${wyr.id}`,
+              }
+            : null,
         },
       ],
     });

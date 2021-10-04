@@ -38,12 +38,11 @@ const dare: Command = {
         {
           title: dare.question,
           color: ctx.client.COLORS.BLUE,
-          footer:
-            typeof dare.id === 'string'
-              ? {
-                  text: `Type: ${dare.type} | Rating: ${dare.rating} | ID: ${dare.id}`,
-                }
-              : null,
+          footer: dare.id
+            ? {
+                text: `Type: ${dare.type} | Rating: ${dare.rating} | ID: ${dare.id}`,
+              }
+            : null,
         },
       ],
     });

@@ -16,6 +16,7 @@ enum QuestionType {
   NHIE
   TRUTH
   WYR
+  PARANOIA
 }
 
 enum Rating {
