@@ -72,7 +72,7 @@ export default class Database {
         id: NaN,
         type,
         rating: 'NONE',
-        question: 'That rating is disabled here',
+        question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
     const rating = rates[Math.floor(Math.random() * rates.length)];
     const questions = await this.db.question.count({

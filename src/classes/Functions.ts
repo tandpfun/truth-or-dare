@@ -13,11 +13,17 @@ export function checkPerms(command: Command, ctx: Context) {
     key => PermissionFlagsBits[key] & missing
   );
   if (missing) {
-    ctx.reply(
-      `${Client.EMOTES.xmark} You are missing the following required permissions: ${missingNames
-        .map(p => '`' + p.replaceAll(/([a-z])([A-Z])/g, '$1 $2') + '`')
-        .join(', ')}`
-    );
+    ctx.reply({
+      embeds: [
+        embed(
+          `You are missing the following required permissions: ${missingNames
+            .map(p => '`' + p.replaceAll(/([a-z])([A-Z])/g, '$1 $2') + '`')
+            .join(', ')}`,
+          ctx.user,
+          true
+        ),
+      ],
+    });
     return false;
   }
   return true;
@@ -29,15 +35,17 @@ export function avatarURL({ id, avatar }: { id: string; avatar: string }) {
   }`;
 }
 
-export function fail(
+export function embed(
   description: string,
-  user?: { id: string; username: string; avatar: string },
-  fail?: boolean
+  user?: { id: string; username: string; avatar: string; discriminator: string },
+  fail: boolean = null
 ): APIEmbed {
   return {
-    description,
+    description: `${
+      fail ? Client.EMOTES.xmark : fail !== null ? Client.EMOTES.checkmark : ''
+    } ${description}`,
     author: {
-      name: user.username,
+      name: `${user.username}#${user.discriminator}`,
       icon_url: avatarURL(user),
     },
     color: fail ? Client.COLORS.RED : fail === null ? Client.COLORS.BLUE : Client.COLORS.GREEN,
