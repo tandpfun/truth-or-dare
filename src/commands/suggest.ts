@@ -48,7 +48,7 @@ const suggest: Command = {
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString).value;
     const question = (ctx.getOption('question') as ApplicationCommandInteractionDataOptionString)
       .value;
-    if (!process.env.suggestHook)
+    if (!process.env.SUGGEST_HOOK)
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
@@ -58,7 +58,7 @@ const suggest: Command = {
           ),
         ],
       });
-    await superagent.post(process.env.suggestHook).send({
+    await superagent.post(process.env.SUGGEST_HOOK).send({
       username: ctx.user.username,
       avatar_url: ctx.client.functions.avatarURL(ctx.user),
       embeds: {
