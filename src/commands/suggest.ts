@@ -61,13 +61,15 @@ const suggest: Command = {
     await superagent.post(process.env.SUGGEST_HOOK).send({
       username: ctx.user.username,
       avatar_url: ctx.client.functions.avatarURL(ctx.user),
-      embeds: {
-        color: ctx.client.COLORS.BLUE,
-        title: question,
-        footer: {
-          text: `Type: ${type} | Rating: ${rating}`,
+      embeds: [
+        {
+          color: ctx.client.COLORS.BLUE,
+          title: question,
+          footer: {
+            text: `Type: ${type} | Rating: ${rating}`,
+          },
         },
-      },
+      ],
     });
     ctx.reply({
       embeds: [
