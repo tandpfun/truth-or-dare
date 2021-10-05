@@ -18,7 +18,7 @@ export default class Server {
     this.router.use(
       '/api/',
       rateLimiter({
-        windowMs: 10 * 1000,
+        windowMs: 5 * 1000,
         max: 5,
         skipFailedRequests: true,
         handler: (_: Request, res: Response) => {
