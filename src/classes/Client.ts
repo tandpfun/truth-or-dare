@@ -81,7 +81,9 @@ export default class Client {
   async start() {
     this.console.log(`Starting Truth or Dare...`);
     await this.loadCommands();
-    await this.updateCommands();
+    if (process.argv.includes('dev'))
+      this.console.log((await this.compareCommands()) ? 'Changes detected' : 'No changes detected');
+    else await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);
     await this.database.start();
     this.server.start();

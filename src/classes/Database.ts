@@ -160,6 +160,7 @@ export default class Database {
   }
 
   async makeExampleQuestions() {
+    if (!process.argv.includes('dev')) throw new Error('Example questions in production');
     for (let i = 0; i < 100; i++) {
       for (const type of ['DARE', 'NHIE', 'TRUTH', 'WYR'] as QuestionType[]) {
         for (const rating of ['PG', 'PG13', 'R'] as Rating[]) {

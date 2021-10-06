@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "tsc && node .",
-    "dev": "tsc && node .",
+    "dev": "tsc && node . dev",
     "format": "prettier . --write",
     "generate": "prisma generate"
   },
