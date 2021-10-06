@@ -18,13 +18,6 @@ export default class Client {
   server: Server;
   database: Database;
 
-  questions: {
-    readonly dare: { R: string[]; PG13: string[]; PG: string[] };
-    readonly nhie: { R: string[]; PG13: string[]; PG: string[] };
-    readonly truth: { R: string[]; PG13: string[]; PG: string[] };
-    readonly wyr: { R: string[]; PG13: string[]; PG: string[] };
-  };
-
   static COLORS = {
     WHITE: 0xffffff,
     BLURPLE: 0x5865f2,
