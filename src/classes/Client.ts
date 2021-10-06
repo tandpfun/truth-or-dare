@@ -45,6 +45,9 @@ export default class Client {
     question: ':question:',
     gear: ':gear:',
   } as const;
+  suggestCooldowns: {
+    [id: string]: number;
+  };
 
   constructor({
     token,
@@ -67,6 +70,8 @@ export default class Client {
     this.functions = functions;
     this.server = new Server(this.port, this);
     this.database = new Database(this);
+
+    this.suggestCooldowns = {};
   }
 
   get inviteUrl() {

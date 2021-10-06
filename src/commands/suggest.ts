@@ -58,6 +58,25 @@ const suggest: Command = {
           ),
         ],
       });
+
+    if (!(ctx.user.id in ctx.client.suggestCooldowns)) {
+      ctx.client.suggestCooldowns[ctx.user.id] = 5;
+      setTimeout(() => {
+        delete ctx.client.suggestCooldowns[ctx.user.id];
+      }, 60 * 1000);
+    }
+
+    if (--ctx.client.suggestCooldowns[ctx.user.id] < 0)
+      return ctx.reply({
+        embeds: [
+          ctx.client.functions.embed(
+            "You're currently on cooldown. Please wait a minute and try again.",
+            ctx.user,
+            true
+          ),
+        ],
+      });
+
     await superagent.post(process.env.SUGGEST_HOOK).send({
       username: ctx.user.username,
       avatar_url: ctx.client.functions.avatarURL(ctx.user),
