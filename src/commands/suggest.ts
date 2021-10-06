@@ -78,7 +78,7 @@ const suggest: Command = {
       });
 
     await superagent.post(process.env.SUGGEST_HOOK).send({
-      username: ctx.user.username,
+      username: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
       avatar_url: ctx.client.functions.avatarURL(ctx.user),
       embeds: [
         {
