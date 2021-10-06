@@ -6,7 +6,6 @@ const invite: Command = {
   name: 'invite',
   description: 'Add the bot to another server.',
   category: 'control',
-  options: [],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({

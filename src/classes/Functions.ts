@@ -51,3 +51,20 @@ export function embed(
     color: fail ? Client.COLORS.RED : fail === null ? Client.COLORS.BLUE : Client.COLORS.GREEN,
   };
 }
+
+export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boolean {
+  return (
+    typeof obj1 === typeof obj2 &&
+    Array.isArray(obj1) === Array.isArray(obj2) &&
+    (typeof obj1 === 'object'
+      ? Array.isArray(obj1)
+        ? obj1.length === obj2.length && obj1.every((a, i) => deepEquals(a, obj2[i], ignoreList))
+        : Object.keys(obj1).every(key => {
+            return (
+              ignoreList.includes(key) ||
+              (key in obj2 && deepEquals(obj1[key], obj2[key], ignoreList))
+            );
+          })
+      : obj1 === obj2)
+  );
+}

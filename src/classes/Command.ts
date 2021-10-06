@@ -5,7 +5,7 @@ export default interface Command {
   name: string;
   description: string;
   category: 'question' | 'control';
-  options: APIApplicationCommandOption[];
+  options?: APIApplicationCommandOption[];
   perms: (
     | keyof typeof PermissionFlagsBits
     | typeof PermissionFlagsBits[keyof typeof PermissionFlagsBits]

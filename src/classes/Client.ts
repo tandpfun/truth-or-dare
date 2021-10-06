@@ -108,15 +108,14 @@ export default class Client {
       .set('Authorization', 'Bot ' + this.token)
       .then(res => res.body);
 
-    return this.commands.some(com => {
-      const command: APIApplicationCommand | undefined = commandList.find(c => c.name === com.name);
-
-      return (
-        !command ||
-        com.description !== command.description ||
-        JSON.stringify(command.options || []) !== JSON.stringify(com.options)
-      );
-    });
+    return this.commands.some(
+      com =>
+        !this.functions.deepEquals(
+          com,
+          commandList.find(c => c.name === com.name),
+          ['category', 'perms', 'run']
+        )
+    );
   }
 
   async updateCommands() {

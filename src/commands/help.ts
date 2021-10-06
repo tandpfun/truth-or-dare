@@ -6,7 +6,6 @@ const help: Command = {
   name: 'help',
   description: 'Get a list of commands.',
   category: 'control',
-  options: [],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({

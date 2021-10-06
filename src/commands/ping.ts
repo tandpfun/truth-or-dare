@@ -5,7 +5,6 @@ const ping: Command = {
   name: 'ping',
   description: 'Check if the bot is online.',
   category: 'control',
-  options: [],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({
