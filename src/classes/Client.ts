@@ -6,6 +6,7 @@ import * as functions from './Functions.js';
 import { APIApplicationCommand } from 'discord-api-types';
 import superagent from 'superagent';
 import Database from './Database.js';
+import * as Sentry from '@sentry/node';
 
 export default class Client {
   token: string;
@@ -58,6 +59,13 @@ export default class Client {
     this.publicKey = publicKey;
     this.port = port;
 
+    if (!this.devMode || !process.env.SENTRY_DSN) {
+      Sentry.init({ dsn: process.env.SENTRY_DSN });
+      process.on('unhandledRejection', err => {
+        Sentry.captureException(err);
+      });
+    }
+
     this.commands = [];
     this.console = new Logger('ToD');
     this.functions = functions;
@@ -65,6 +73,10 @@ export default class Client {
     this.database = new Database(this);
 
     this.suggestCooldowns = {};
+  }
+
+  get devMode() {
+    return process.argv.includes('dev');
   }
 
   get inviteUrl() {
@@ -81,7 +93,7 @@ export default class Client {
   async start() {
     this.console.log(`Starting Truth or Dare...`);
     await this.loadCommands();
-    if (process.argv.includes('dev'))
+    if (this.devMode)
       this.console.log((await this.compareCommands()) ? 'Changes detected' : 'No changes detected');
     else await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);

@@ -4,6 +4,7 @@ import rateLimiter from 'express-rate-limit';
 import Context from './Context';
 import type Client from './Client';
 import { QuestionType, Rating } from '.prisma/client';
+import * as Sentry from '@sentry/node';
 
 export default class Server {
   port: number;
@@ -62,7 +63,20 @@ export default class Server {
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
     if (!this.client.functions.checkPerms(command, ctx)) return;
-    await command.run(ctx);
+    try {
+      await command.run(ctx);
+    } catch (err) {
+      this.client.console.error(err);
+      Sentry.withScope(scope => {
+        scope.setExtras({
+          user: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
+          command: command.name,
+          args: JSON.stringify(ctx.options),
+        });
+        Sentry.captureException(err);
+      });
+      ctx.reply(`${this.client.EMOTES.xmark} Something went wrong while running that command.`);
+    }
     this.client.console.log(
       `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
     );
