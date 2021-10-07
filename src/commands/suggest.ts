@@ -48,6 +48,18 @@ const suggest: Command = {
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString).value;
     const question = (ctx.getOption('question') as ApplicationCommandInteractionDataOptionString)
       .value;
+
+    if (question.length > 256)
+      return ctx.reply({
+        embeds: [
+          ctx.client.functions.embed(
+            "That question is too long! Please make sure it's less than 256 characters.",
+            ctx.user,
+            true
+          ),
+        ],
+      });
+
     if (!process.env.SUGGEST_HOOK)
       return ctx.reply({
         embeds: [
