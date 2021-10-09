@@ -40,6 +40,8 @@ export default class Server {
     );
 
     this.router.get('/api/:questionType', this.handleAPI.bind(this));
+
+    this.router.get('/', (_, res) => res.redirect('https://docs.truthordarebot.xyz'));
   }
 
   start() {
