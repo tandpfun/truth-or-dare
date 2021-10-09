@@ -13,7 +13,7 @@ const ping: Command = {
         {
           description:
             `${ctx.client.EMOTES.time} **Pong!** The bot is online.` +
-            `DB ping: \`${await ctx.client.database
+            `\n• Database: \`${await ctx.client.database
               .fetchSpecificQuestion('')
               .then(() => Date.now() - now)}ms\``,
           color: ctx.client.COLORS.GREEN,
