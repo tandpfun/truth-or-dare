@@ -29,10 +29,21 @@ export function checkPerms(command: Command, ctx: Context) {
   return true;
 }
 
-export function avatarURL({ id, avatar }: { id: string; avatar: string }) {
-  return `https://cdn.discordapp.com/avatars/${id}/${avatar}.${
-    avatar.startsWith('_a') ? 'gif' : 'png'
-  }`;
+export function avatarURL({
+  id,
+  avatar,
+  discriminator,
+}: {
+  id: string;
+  avatar: string | null;
+  discriminator: string;
+}) {
+  return (
+    'https://cdn.discordapp.com/' +
+    (avatar
+      ? `avatars/${id}/${avatar}.${avatar.startsWith('_a') ? 'gif' : 'png'}`
+      : `/embed/avatars/${Number(discriminator) % 5}.png`)
+  );
 }
 
 export function embed(
