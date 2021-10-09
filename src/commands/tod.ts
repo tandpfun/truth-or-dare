@@ -8,7 +8,7 @@ import Context from '../classes/Context';
 
 const tod: Command = {
   name: 'tod',
-  description: 'Gives a truth/dare that has to be answered/completed.',
+  description: 'Gives a random truth or dare question.',
   category: 'question',
   options: [
     {
@@ -25,7 +25,7 @@ const tod: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
-    const type = Math.floor(Math.random() * 2) === 0 ? 'TRUTH' : 'DARE'
+    const type = Math.floor(Math.random() * 2) < 0.5 ? 'TRUTH' : 'DARE'
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
     const result = await ctx.client.database.getRandomQuestion(
