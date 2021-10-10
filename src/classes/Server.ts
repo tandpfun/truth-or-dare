@@ -74,6 +74,7 @@ export default class Server {
           user: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
           command: command.name,
           args: JSON.stringify(ctx.options),
+          channelId: ctx.channelId,
         });
         Sentry.captureException(err);
       });
