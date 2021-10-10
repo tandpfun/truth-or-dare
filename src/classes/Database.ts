@@ -48,13 +48,13 @@ export default class Database {
     return this.channelCache[id] ?? this.defaultChannelSettings(id);
   }
 
-  async updateChannelSettings(id: string, update: ChannelSettings) {
+  async updateChannelSettings(update: ChannelSettings) {
     const withoutID = Object.assign({}, update);
     delete withoutID.id;
-    return (this.channelCache[id] = await this.db.channelSettings.upsert({
-      where: { id },
+    return (this.channelCache[update.id] = await this.db.channelSettings.upsert({
+      where: { id: update.id },
       update: withoutID,
-      create: { id, ...update },
+      create: update,
     }));
   }
 
