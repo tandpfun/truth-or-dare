@@ -13,6 +13,7 @@ import {
 } from 'discord-api-types/v9';
 import { Response } from 'express';
 import Client from './Client';
+import { ChannelSettings } from '@prisma/client';
 
 export default class Context {
   rawInteraction: APIApplicationCommandInteraction;
@@ -74,7 +75,9 @@ export default class Context {
     });
   }
 
-  get channelSettings() {
-    return this.client.database.fetchChannelSettings(this.channelId);
+  get channelSettings(): Promise<ChannelSettings> {
+    return this.guildId
+      ? this.client.database.fetchChannelSettings(this.channelId)
+      : new Promise(r => r({ id: this.channelId, disabledRatings: [] }));
   }
 }
