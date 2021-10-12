@@ -67,6 +67,7 @@ export default class Server {
     if (!this.client.functions.checkPerms(command, ctx)) return;
     this.client.stats.minuteCommandCount++;
     this.client.stats.commands[command.name]++;
+    this.client.stats.minuteCommands[command.name]++;
     try {
       await command.run(ctx);
     } catch (err) {
