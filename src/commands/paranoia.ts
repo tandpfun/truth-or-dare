@@ -47,16 +47,18 @@ const paranoia: Command = {
 
     if (!ctx.guildId || !targetUserId) {
       return ctx.reply({
-        embeds: [{
-          title: paranoia.question,
-          color: ctx.client.COLORS.BLUE,
-          footer: {
-            text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`
-          }
-        }]
-      })
+        embeds: [
+          {
+            title: paranoia.question,
+            color: ctx.client.COLORS.BLUE,
+            footer: {
+              text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
+            },
+          },
+        ],
+      });
     }
-    
+
     const status = await ctx.client.database.checkParanoiaStatus(ctx.user.id, ctx.guildId);
 
     if (!status.guildOpen)

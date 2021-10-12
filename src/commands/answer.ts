@@ -83,6 +83,7 @@ const answer: Command = {
 
     const guildName: string | null = await ctx.client.functions
       .fetchGuild(nextQuestion.guildId, ctx.client.token)
+      .then(guild => guild.name)
       .catch(_ => null);
     if (!guildName) ctx.client.console.warn(`Failed to fetch guild: ${nextQuestion.guildId}`);
 
