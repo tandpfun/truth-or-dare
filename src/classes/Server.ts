@@ -65,6 +65,8 @@ export default class Server {
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
     if (!this.client.functions.checkPerms(command, ctx)) return;
+    this.client.stats.minuteCommandCount++;
+    this.client.stats.commands[command.name]++;
     try {
       await command.run(ctx);
     } catch (err) {

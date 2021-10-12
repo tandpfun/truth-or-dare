@@ -19,6 +19,16 @@ export default class Client {
   server: Server;
   database: Database;
 
+  suggestCooldowns: {
+    [id: string]: number;
+  };
+  stats: {
+    minuteCommandCount: number;
+    perMinuteCommandAverage: number;
+    minutesPassed: number;
+    commands: { [command: string]: number };
+  };
+
   static COLORS = {
     WHITE: 0xffffff,
     BLURPLE: 0x5865f2,
@@ -39,9 +49,6 @@ export default class Client {
     question: ':question:',
     gear: ':gear:',
   } as const;
-  suggestCooldowns: {
-    [id: string]: number;
-  };
 
   constructor({
     token,
@@ -73,6 +80,12 @@ export default class Client {
     this.database = new Database(this);
 
     this.suggestCooldowns = {};
+    this.stats = {
+      minuteCommandCount: 0,
+      perMinuteCommandAverage: 0,
+      minutesPassed: 0,
+      commands: {},
+    };
   }
 
   get devMode() {
@@ -93,12 +106,23 @@ export default class Client {
   async start() {
     this.console.log(`Starting Truth or Dare...`);
     await this.loadCommands();
+    for (const { name } of this.commands) {
+      this.stats.commands[name] = 0;
+    }
     if (this.devMode)
       this.console.log((await this.compareCommands()) ? 'Changes detected' : 'No changes detected');
     else await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);
     await this.database.start();
     this.server.start();
+
+    setInterval(() => {
+      this.stats.perMinuteCommandAverage =
+        (this.stats.perMinuteCommandAverage * this.stats.minutesPassed +
+          this.stats.minuteCommandCount) /
+        ++this.stats.minutesPassed;
+      this.stats.minuteCommandCount = 0;
+    }, 60 * 1000);
   }
 
   async loadCommands() {
