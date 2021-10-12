@@ -82,9 +82,9 @@ export default class Server {
       });
       ctx.reply(`${this.client.EMOTES.xmark} Something went wrong while running that command.`);
     }
-    this.client.console.log(
+    /*this.client.console.log(
       `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
-    );
+    );*/
   }
 
   async handleAPI(req: Request, res: Response) {
