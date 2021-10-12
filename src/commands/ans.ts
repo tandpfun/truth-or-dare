@@ -78,9 +78,9 @@ const ans: Command = {
           },
         ],
       } as RESTPatchAPIChannelMessageJSONBody)
-      .set('Authorization', `Bot ${ctx.client.token}`);
-    if (editMessageResponse.status !== 200)
-      console.log('Message edit failed, response code: ' + editMessageResponse.status);
+      .set('Authorization', `Bot ${ctx.client.token}`)
+      .catch(_ => null);
+    if (!editMessageResponse) console.log('Message edit failed, response code: ');
 
     // remove question from database now that it's been answered
     await ctx.client.database.removeParanoiaQuestion(paranoiaData[0].id);
@@ -93,15 +93,13 @@ const ans: Command = {
       // fetch guild to get the server name
       const guildResponse = await superagent
         .get(`https://discord.com/api/guilds/${nextQuestion.guildId}`)
-        .set('Authorization', `Bot ${ctx.client.token}`);
-      if (guildResponse.status !== 200) {
-        console.log('guild fetch failed, code ' + guildResponse.status);
-        return;
-      }
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!guildResponse) return console.log('guild fetch failed');
       const guild = <RESTGetAPIGuildResult>JSON.parse(guildResponse.text);
 
       // send DM with question
-      const messageResponse = await superagent
+      const dmMessageResponse = await superagent
         .post(`https://discord.com/api/channels/${ctx.channelId}/messages`)
         .send({
           embeds: [
@@ -120,13 +118,10 @@ const ans: Command = {
             },
           ],
         } as RESTPostAPIChannelMessageResult)
-        .set('Authorization', `Bot ${ctx.client.token}`);
-      if (messageResponse.status !== 200) {
-        console.log('message send failed, code ' + messageResponse.status);
-        ctx.reply('Failed to send DM');
-        return;
-      }
-      const messageSent = <RESTPostAPIChannelMessageResult>JSON.parse(messageResponse.text);
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (dmMessageResponse.status !== 200) return console.log('message send failed, code ' + dmMessageResponse.status);
+      const messageSent = <RESTPostAPIChannelMessageResult>JSON.parse(dmMessageResponse.text);
 
       // set the DM message ID now that the message has been sent
       await ctx.client.database.setParanoiaMessageId(

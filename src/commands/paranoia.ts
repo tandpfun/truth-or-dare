@@ -61,22 +61,22 @@ const paranoia: Command = {
       const dmChannelResponse = await superagent
         .post('https://discord.com/api/users/@me/channels')
         .send({ recipient_id: targetUserId })
-        .set('Authorization', `Bot ${ctx.client.token}`);
-      if (dmChannelResponse.status !== 200) {
-        console.log('dm channel fetch failed, code ' + dmChannelResponse.status);
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!dmChannelResponse) {
+        console.log('dm channel fetch failed');
         ctx.reply('Failed to send DM');
         return;
       }
-      const dmChannel = <RESTPostAPICurrentUserCreateDMChannelResult>(
-        JSON.parse(dmChannelResponse.text)
-      );
+      const dmChannel = <RESTPostAPICurrentUserCreateDMChannelResult>JSON.parse(dmChannelResponse.text)
 
       // fetch guild to get the server name
       const guildResponse = await superagent
         .get(`https://discord.com/api/guilds/${ctx.guildId}`)
-        .set('Authorization', `Bot ${ctx.client.token}`);
-      if (guildResponse.status !== 200) {
-        console.log('guild fetch failed, code ' + guildResponse.status);
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!guildResponse) {
+        console.log('guild fetch failed');
         ctx.reply('Failed to send DM');
         return;
       }
@@ -96,9 +96,10 @@ const paranoia: Command = {
             },
           ],
         } as RESTPostAPIChannelMessageJSONBody)
-        .set('Authorization', `Bot ${ctx.client.token}`);
-      if (messageResponse.status !== 200) {
-        console.log('message send failed, code ' + messageResponse.status);
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!messageResponse) {
+        console.log('message send failed');
         ctx.reply('Failed to send DM');
         return;
       }
@@ -117,6 +118,45 @@ const paranoia: Command = {
 
       ctx.reply('Question sent');
     } else {
+      // fetch DM channel to get the ID
+      const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
+        ?.value;
+      const dmChannelResponse = await superagent
+        .post('https://discord.com/api/users/@me/channels')
+        .send({ recipient_id: targetUserId })
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!dmChannelResponse) {
+        console.log('dm channel fetch failed');
+        ctx.reply('Failed to send DM');
+        return;
+      }
+      const dmChannel = <RESTPostAPICurrentUserCreateDMChannelResult>JSON.parse(dmChannelResponse.text)
+
+      // fetch guild to get the server name
+      const guildResponse = await superagent
+        .get(`https://discord.com/api/guilds/${ctx.guildId}`)
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!guildResponse) {
+        console.log('guild fetch failed');
+        ctx.reply('Failed to send DM');
+        return;
+      }
+      const guild = <RESTGetAPIGuildResult>JSON.parse(guildResponse.text);
+
+      // send DM to recipient
+      const messageResponse = await superagent
+        .post(`https://discord.com/api/channels/${dmChannel.id}/messages`)
+        .send(`Question sent from ${guild.name}, answer the current question to see it.`)
+        .set('Authorization', `Bot ${ctx.client.token}`)
+        .catch(_ => null);
+      if (!messageResponse) {
+        console.log('message send failed');
+        ctx.reply('Failed to send DM');
+        return;
+      }
+
       // add question to database to be sent later
       await ctx.client.database.addParanoiaQuestion({
         userId: ctx.user.id,
