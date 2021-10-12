@@ -79,3 +79,7 @@ export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boo
       : obj1 === obj2)
   );
 }
+
+export function titleCase(str: string): string {
+  return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
+}

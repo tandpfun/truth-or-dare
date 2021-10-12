@@ -48,6 +48,7 @@ export default class Client {
     time: ':stopwatch:',
     question: ':question:',
     gear: ':gear:',
+    graph: ':chart_with_upwards_trend:',
   } as const;
 
   constructor({
