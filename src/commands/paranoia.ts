@@ -18,7 +18,6 @@ const paranoia: Command = {
       type: ApplicationCommandOptionType.User,
       name: 'target',
       description: 'The user to send a paranoia question to',
-      required: true,
     },
     {
       type: ApplicationCommandOptionType.String,
@@ -33,19 +32,31 @@ const paranoia: Command = {
   ],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    if (!ctx.guildId) return ctx.reply('Paranoia questions cannot be sent from DMs');
-
     const channelSettings = await ctx.channelSettings;
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
     const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
       ?.value;
+
     const paranoia = await ctx.client.database.getRandomQuestion(
       'PARANOIA',
       (rating ? [rating as Rating] : ['PG', 'PG13', 'R']).filter(
         (r: Rating) => !channelSettings.disabledRatings.includes(r)
       ) as Rating[]
     );
+
+    if (!ctx.guildId || !targetUserId) {
+      return ctx.reply({
+        embeds: [{
+          title: paranoia.question,
+          color: ctx.client.COLORS.BLUE,
+          footer: {
+            text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`
+          }
+        }]
+      })
+    }
+    
     const status = await ctx.client.database.checkParanoiaStatus(ctx.user.id, ctx.guildId);
 
     if (!status.guildOpen)
