@@ -4,6 +4,8 @@ import Client from './Client';
 export type ParanoiaQuestionData = {
   userId: string,
   questionText: string,
+  questionRating: Rating,
+  questionId: string,
   guildId: string,
   channelId: string,
   dmMessageId: string
