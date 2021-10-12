@@ -85,7 +85,8 @@ export async function sendMessage(
   return await superagent
     .post(`https://discord.com/api/channels/${channelId}/messages`)
     .send(data)
-    .set('Authorization', `Bot ${token}`);
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
 }
 
 export async function editMessage(
@@ -97,7 +98,8 @@ export async function editMessage(
   return await superagent
     .patch(`https://discord.com/api/channels/${channelId}/messages/${messageId}`)
     .send(data)
-    .set('Authorization', `Bot ${token}`);
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
 }
 
 export async function createDMChannel(
@@ -107,11 +109,13 @@ export async function createDMChannel(
   return await superagent
     .post('https://discord.com/api/users/@me/channels')
     .send({ recipient_id: userId })
-    .set('Authorization', `Bot ${token}`);
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
 }
 
 export async function fetchGuild(guildId: string, token: string): Promise<RESTGetAPIGuildResult> {
   return await superagent
     .get(`https://discord.com/api/guilds/${guildId}`)
-    .set('Authorization', `Bot ${token}`);
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
 }

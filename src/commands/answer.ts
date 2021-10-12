@@ -62,7 +62,7 @@ const answer: Command = {
 
     const editedMessage = await ctx.client.functions
       .editMessage(
-        { content: ctx.client.EMOTES.checkmark + ' Question answered.' },
+        { content: ctx.client.EMOTES.checkmark + ' Question answered' },
         ctx.channelId,
         paranoiaData.dmMessageId,
         ctx.client.token
@@ -102,7 +102,7 @@ const answer: Command = {
             },
           ],
         },
-        nextQuestion.channelId,
+        ctx.channelId,
         ctx.client.token
       )
       .catch(_ => null);
@@ -111,7 +111,7 @@ const answer: Command = {
         `Paranoia next question failed in channel: ${ctx.channelId} with user: ${ctx.user.id}`
       );
 
-    await ctx.client.database.setParanoiaMessageId(paranoiaData.id, nextQuestion.id);
+    await ctx.client.database.setParanoiaMessageId(nextQuestion.id, nextMessage.id);
   },
 };
 
