@@ -38,16 +38,13 @@ model Question {
 }
 
 model ParanoiaQuestion {
-  id              String @id @map("_id")
-  questionText    String
-  questionRating  Rating
-  questionId      String
-  userId          String
-  guildId         String
-  channelId       String
-  dmMessageId     String?
-  time            Int
-
-  @@map("paranoiaQuestions")
-  @@unique([userId, guildId])
+  id             String  @id @map("_id")
+  questionText   String
+  questionRating Rating
+  questionId     String
+  userId         String
+  guildId        String
+  channelId      String
+  dmMessageId    String?
+  time           Int
 }

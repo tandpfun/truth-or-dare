@@ -191,7 +191,7 @@ export default class Database {
   async addParanoiaQuestion(questionData: ParanoiaQuestionData) {
     await this.db.paranoiaQuestion.create({
       data: {
-        id: this.generateId(),
+        id: `${questionData.userId}-${questionData.guildId}`,
         time: Date.now(),
         ...questionData,
       },
@@ -199,20 +199,19 @@ export default class Database {
   }
 
   async getParanoiaData(userId: string) {
-    let results = await this.db.paranoiaQuestion.findMany({
+    const results = await this.db.paranoiaQuestion.findMany({
       where: { userId },
     });
-    let sorted = results.sort((a, b) => a.time - b.time);
-    return sorted;
+    return results.sort((a, b) => a.time - b.time);
   }
 
   async checkParanoiaStatus(userId: string, guildId: string) {
-    let questions = await this.db.paranoiaQuestion.findMany({
+    const questions = await this.db.paranoiaQuestion.findMany({
       where: { userId },
     });
 
     return {
-      guildOpen: !questions.some(x => x.guildId === guildId),
+      guildOpen: !questions.some(data => data.guildId === guildId),
       queueEmpty: !questions.length,
     };
   }
@@ -224,18 +223,15 @@ export default class Database {
   }
 
   async getNextParanoia(userId: string) {
-    let questions = await this.db.paranoiaQuestion.findMany({
+    const questions = await this.db.paranoiaQuestion.findMany({
       where: { userId },
     });
-    let sorted = questions.sort((a, b) => a.time - b.time);
-    return sorted[0];
+    return questions.length ? questions.reduce((a, data) => (a.time < data.time ? a : data)) : null;
   }
 
-  async setParanoiaMessageId(userId: string, guildId: string, dmMessageId: string) {
+  async setParanoiaMessageId(id: string, dmMessageId: string) {
     await this.db.paranoiaQuestion.update({
-      where: {
-        userId_guildId: { userId, guildId },
-      },
+      where: { id },
       data: { dmMessageId },
     });
   }

@@ -2,15 +2,12 @@ import { Rating } from '.prisma/client';
 import {
   ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
-  RESTPostAPICurrentUserCreateDMChannelResult,
-  RESTPostAPIChannelMessageJSONBody,
-  RESTGetAPIGuildResult,
-  RESTPostAPIChannelMessageResult,
   ApplicationCommandInteractionDataOptionUser,
+  APIChannel,
+  APIMessage,
 } from 'discord-api-types';
 import Command from '../classes/Command';
 import Context from '../classes/Context';
-import superagent from 'superagent';
 
 const paranoia: Command = {
   name: 'paranoia',
@@ -36,12 +33,12 @@ const paranoia: Command = {
   ],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    if (ctx.guildId === null) {
-      ctx.reply('Paranoia questions cannot be sent from DMs');
-      return;
-    }
+    if (!ctx.guildId) return ctx.reply('Paranoia questions cannot be sent from DMs');
+
     const channelSettings = await ctx.channelSettings;
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
+      ?.value;
+    const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
       ?.value;
     const paranoia = await ctx.client.database.getRandomQuestion(
       'PARANOIA',
@@ -51,127 +48,73 @@ const paranoia: Command = {
     );
     const status = await ctx.client.database.checkParanoiaStatus(ctx.user.id, ctx.guildId);
 
-    if (!status.guildOpen) {
-      ctx.reply('That user already has an active question sent from this server');
-      return;
-    } else if (status.queueEmpty) {
-      // fetch DM channel to get the ID
-      const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
-        ?.value;
-      const dmChannelResponse = await superagent
-        .post('https://discord.com/api/users/@me/channels')
-        .send({ recipient_id: targetUserId })
-        .set('Authorization', `Bot ${ctx.client.token}`)
-        .catch(_ => null);
-      if (!dmChannelResponse) {
-        console.log('dm channel fetch failed');
-        ctx.reply('Failed to send DM');
-        return;
-      }
-      const dmChannel = <RESTPostAPICurrentUserCreateDMChannelResult>JSON.parse(dmChannelResponse.text)
+    if (!status.guildOpen)
+      return ctx.reply('That user already has an active question sent from this server');
 
-      // fetch guild to get the server name
-      const guildResponse = await superagent
-        .get(`https://discord.com/api/guilds/${ctx.guildId}`)
-        .set('Authorization', `Bot ${ctx.client.token}`)
-        .catch(_ => null);
-      if (!guildResponse) {
-        console.log('guild fetch failed');
-        ctx.reply('Failed to send DM');
-        return;
-      }
-      const guild = <RESTGetAPIGuildResult>JSON.parse(guildResponse.text);
+    // create dm channel
+    const dmChannel: APIChannel | null = await ctx.client.functions
+      .createDMChannel(targetUserId, ctx.client.token)
+      .catch(_ => null);
+    if (!dmChannel)
+      return ctx.reply({
+        embeds: [ctx.client.functions.embed('Failed to create DMs', ctx.user, true)],
+      });
 
-      // send DM to recipient
-      const messageResponse = await superagent
-        .post(`https://discord.com/api/channels/${dmChannel.id}/messages`)
-        .send({
+    // fetch guild name
+    const guildName: string | null = await ctx.client.functions
+      .fetchGuild(ctx.guildId, ctx.client.token)
+      .then(guild => guild.name)
+      .catch(_ => null);
+    if (!guildName)
+      return ctx.reply({
+        embeds: [ctx.client.functions.embed("I can't seem to find this server.", ctx.user, true)],
+      });
+
+    // send message
+    const message: APIMessage | null = await ctx.client.functions
+      .sendMessage(
+        {
           embeds: [
-            {
-              title: `Paranoia Question from **${guild.name}**`,
-              description: `Use \`/ans\` to answer this question\n\n**${paranoia.question}**`,
-              footer: {
-                text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
-              },
-            },
+            status.queueEmpty
+              ? {
+                  title: `Paranoia Question From: **${guildName}**`,
+                  color: ctx.client.COLORS.BLUE,
+                  description: `Use \`/answer\` to answer this question\n\n**${paranoia.question}**`,
+                  footer: {
+                    text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
+                  },
+                }
+              : {
+                  title: `Question sent from ${guildName}, answer the current question to see it.`,
+                  color: ctx.client.COLORS.BLUE,
+                },
           ],
-        } as RESTPostAPIChannelMessageJSONBody)
-        .set('Authorization', `Bot ${ctx.client.token}`)
-        .catch(_ => null);
-      if (!messageResponse) {
-        console.log('message send failed');
-        ctx.reply('Failed to send DM');
-        return;
-      }
-      const messageSent = <RESTPostAPIChannelMessageResult>JSON.parse(messageResponse.text);
-
-      // add question to database
-      await ctx.client.database.addParanoiaQuestion({
-        userId: ctx.user.id,
-        questionText: paranoia.question,
-        questionRating: paranoia.rating,
-        questionId: paranoia.id,
-        guildId: ctx.guildId,
-        channelId: ctx.channelId,
-        dmMessageId: messageSent.id,
+        },
+        dmChannel.id,
+        ctx.client.token
+      )
+      .catch(_ => null);
+    if (!message)
+      return ctx.reply({
+        embeds: [ctx.client.functions.embed('Failed to send DM', ctx.user, true)],
       });
 
-      ctx.reply('Question sent');
-    } else {
-      // fetch DM channel to get the ID
-      const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
-        ?.value;
-      const dmChannelResponse = await superagent
-        .post('https://discord.com/api/users/@me/channels')
-        .send({ recipient_id: targetUserId })
-        .set('Authorization', `Bot ${ctx.client.token}`)
-        .catch(_ => null);
-      if (!dmChannelResponse) {
-        console.log('dm channel fetch failed');
-        ctx.reply('Failed to send DM');
-        return;
-      }
-      const dmChannel = <RESTPostAPICurrentUserCreateDMChannelResult>JSON.parse(dmChannelResponse.text)
+    // create db object
+    await ctx.client.database.addParanoiaQuestion({
+      userId: ctx.user.id,
+      questionText: paranoia.question,
+      questionRating: paranoia.rating,
+      questionId: paranoia.id,
+      guildId: ctx.guildId,
+      channelId: ctx.channelId,
+      dmMessageId: status.queueEmpty ? message.id : null,
+    });
 
-      // fetch guild to get the server name
-      const guildResponse = await superagent
-        .get(`https://discord.com/api/guilds/${ctx.guildId}`)
-        .set('Authorization', `Bot ${ctx.client.token}`)
-        .catch(_ => null);
-      if (!guildResponse) {
-        console.log('guild fetch failed');
-        ctx.reply('Failed to send DM');
-        return;
-      }
-      const guild = <RESTGetAPIGuildResult>JSON.parse(guildResponse.text);
-
-      // send DM to recipient
-      const messageResponse = await superagent
-        .post(`https://discord.com/api/channels/${dmChannel.id}/messages`)
-        .send(`Question sent from ${guild.name}, answer the current question to see it.`)
-        .set('Authorization', `Bot ${ctx.client.token}`)
-        .catch(_ => null);
-      if (!messageResponse) {
-        console.log('message send failed');
-        ctx.reply('Failed to send DM');
-        return;
-      }
-
-      // add question to database to be sent later
-      await ctx.client.database.addParanoiaQuestion({
-        userId: ctx.user.id,
-        questionText: paranoia.question,
-        questionRating: paranoia.rating,
-        questionId: paranoia.id,
-        guildId: ctx.guildId,
-        channelId: ctx.channelId,
-        dmMessageId: null,
-      });
-
-      ctx.reply(
-        'User already has a live question from a different server, question added to queue'
-      );
-    }
+    ctx.reply(
+      status.queueEmpty
+        ? 'Message sent.'
+        : "I'll send them the question once they've answered their current question."
+    );
   },
 };
 
