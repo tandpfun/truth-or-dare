@@ -2,11 +2,8 @@ import {
   APIMessage,
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
-  RESTGetAPIGuildResult,
-  RESTPostAPIChannelMessageResult,
 } from 'discord-api-types';
 import Context from '../classes/Context';
-import superagent from 'superagent';
 import Command from '../classes/Command';
 
 const answer: Command = {
@@ -109,7 +106,7 @@ const answer: Command = {
         ctx.client.token
       )
       .catch(_ => null);
-    if (!nextQuestion)
+    if (!nextMessage)
       return ctx.client.console.error(
         `Paranoia next question failed in channel: ${ctx.channelId} with user: ${ctx.user.id}`
       );
