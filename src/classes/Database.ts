@@ -1,15 +1,15 @@
-import { ChannelSettings, ParanoiaQuestion, PrismaClient, Question, QuestionType, Rating } from '@prisma/client';
+import { ChannelSettings, PrismaClient, Question, QuestionType, Rating } from '@prisma/client';
 import Client from './Client';
 
 export type ParanoiaQuestionData = {
-  userId: string,
-  questionText: string,
-  questionRating: Rating,
-  questionId: string,
-  guildId: string,
-  channelId: string,
-  dmMessageId: string
-}
+  userId: string;
+  questionText: string;
+  questionRating: Rating;
+  questionId: string;
+  guildId: string;
+  channelId: string;
+  dmMessageId: string;
+};
 
 export default class Database {
   client: Client;
@@ -193,52 +193,50 @@ export default class Database {
       data: {
         id: this.generateId(),
         time: Date.now(),
-        ...questionData
-      }
-    })
+        ...questionData,
+      },
+    });
   }
 
   async getParanoiaData(userId: string) {
     let results = await this.db.paranoiaQuestion.findMany({
-      where: { userId }
-    })
-    let sorted = results.sort((a, b) => a.time - b.time)
-    return sorted
+      where: { userId },
+    });
+    let sorted = results.sort((a, b) => a.time - b.time);
+    return sorted;
   }
 
   async checkParanoiaStatus(userId: string, guildId: string) {
     let questions = await this.db.paranoiaQuestion.findMany({
-      where: { userId }
-    })
-    
+      where: { userId },
+    });
+
     return {
       guildOpen: !questions.some(x => x.guildId === guildId),
-      queueEmpty: !questions.length
-    }
+      queueEmpty: !questions.length,
+    };
   }
 
-  async removeParanoiaQuestion(userId: string, guildId: string) {
+  async removeParanoiaQuestion(id: string) {
     await this.db.paranoiaQuestion.delete({
-      where:  {
-        userId_guildId: { userId, guildId }
-      }
-    })
+      where: { id },
+    });
   }
-  
+
   async getNextParanoia(userId: string) {
     let questions = await this.db.paranoiaQuestion.findMany({
-      where: { userId }
-    })
-    let sorted = questions.sort((a, b) => a.time - b.time)
-    return sorted[0]
+      where: { userId },
+    });
+    let sorted = questions.sort((a, b) => a.time - b.time);
+    return sorted[0];
   }
 
   async setParanoiaMessageId(userId: string, guildId: string, dmMessageId: string) {
     await this.db.paranoiaQuestion.update({
       where: {
-        userId_guildId: { userId, guildId }
+        userId_guildId: { userId, guildId },
       },
-      data: { dmMessageId }
-    })
+      data: { dmMessageId },
+    });
   }
 }
