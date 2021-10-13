@@ -11,7 +11,7 @@ import Context from '../classes/Context';
 
 const paranoia: Command = {
   name: 'paranoia',
-  description: 'Gives a paranoia question.',
+  description: 'Gives a paranoia question or sends one to a user.',
   category: 'question',
   options: [
     {

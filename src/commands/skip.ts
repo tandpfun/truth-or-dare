@@ -3,15 +3,17 @@ import Context from '../classes/Context';
 
 const skip: Command = {
   name: 'skip',
-  description: 'Skips a paranoia question sent to you',
+  description: 'Skips a paranoia question sent to you if the question is stuck',
   category: 'question',
   perms: [],
   run: async (ctx: Context) => {
-    if (ctx.guildId) return ctx.reply('Paranoia questions can only be skipped in DMs');
+    if (ctx.guildId)
+      return ctx.reply(`${ctx.client.EMOTES.xmark} Paranoia questions can only be skipped in DMs.`);
 
     const currentParanoia = await ctx.client.database.getNextParanoia(ctx.user.id);
 
-    if (!currentParanoia) return ctx.reply('There are no questions to skip');
+    if (!currentParanoia)
+      return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
     await ctx.client.database.removeParanoiaQuestion(currentParanoia.id);
 
@@ -19,7 +21,15 @@ const skip: Command = {
     const editedMessage = await ctx.client.functions
       .editMessage(
         {
-          content: ctx.client.EMOTES.checkmark + ' Question skipped',
+          embeds: [
+            {
+              title: 'Question skipped: ' + currentParanoia.questionText,
+              color: ctx.client.COLORS.YELLOW,
+              footer: {
+                text: `Type: PARANOIA | Rating: ${currentParanoia.questionRating} | ID: ${currentParanoia.questionId}`,
+              },
+            },
+          ],
         },
         ctx.channelId,
         currentParanoia.dmMessageId,
@@ -28,7 +38,7 @@ const skip: Command = {
       .catch(_ => null);
     if (!editedMessage)
       ctx.client.console.warn(
-        `Paranoia message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${currentParanoia.dmMessageId}`
+        `Paranoia skip message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${currentParanoia.dmMessageId}`
       );
 
     // get next queued question, if there is one
@@ -48,11 +58,11 @@ const skip: Command = {
         {
           embeds: [
             {
-              title: `Paranoia Question From: ${
-                guildName ? `**${guildName}**` : `Unknown server (${nextParanoia.guildId})`
-              }`,
+              title: nextParanoia.questionText,
               color: ctx.client.COLORS.BLUE,
-              description: `Use \`/answer\` to answer this question\n\n**${nextParanoia.questionText}**`,
+              description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
+                guildName || `Unknown Guild (${nextParanoia.guildId})`
+              }**.`,
               footer: {
                 text: `Type: PARANOIA | Rating: ${nextParanoia.questionRating} | ID: ${nextParanoia.questionId}`,
               },
@@ -68,12 +78,12 @@ const skip: Command = {
         `${ctx.client.EMOTES.xmark} Something went wrong trying to send you the next question.`
       );
       return ctx.client.console.error(
-        `Paranoia next question failed in channel: ${ctx.channelId} with user: ${ctx.user.id}`
+        `Paranoia skip next question failed in channel: ${ctx.channelId} with user: ${ctx.user.id}`
       );
     }
 
     await ctx.client.database.setParanoiaMessageId(nextParanoia.id, nextMessage.id);
-    ctx.reply(`${ctx.client.EMOTES.checkmark} Sent the next question.`);
+    ctx.reply(`${ctx.client.EMOTES.checkmark} **Question skipped!** Your next question was sent.`);
   },
 };
 

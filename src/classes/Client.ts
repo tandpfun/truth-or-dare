@@ -26,7 +26,7 @@ export default class Client {
     DARK_BUT_NOT_BLACK: 0x2c2f33,
     NOT_QUITE_BLACK: 0x23272a,
     GREEN: 0x57f287,
-    YELLOW: 0xfee7c,
+    YELLOW: 0xfee75c,
     FUSCHIA: 0xeb459e,
     RED: 0xed4245,
     BLACK: 0xffffff,
