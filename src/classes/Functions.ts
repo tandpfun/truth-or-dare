@@ -1,4 +1,12 @@
-import { APIEmbed, PermissionFlagsBits } from 'discord-api-types/v9';
+import {
+  APIEmbed,
+  PermissionFlagsBits,
+  RESTGetAPIGuildResult,
+  RESTPostAPIChannelMessageJSONBody,
+  RESTPostAPIChannelMessageResult,
+  RESTPostAPICurrentUserCreateDMChannelResult,
+} from 'discord-api-types/v9';
+import superagent from 'superagent';
 import Client from './Client';
 import Command from './Command';
 import Context from './Context';
@@ -82,4 +90,47 @@ export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boo
 
 export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export async function sendMessage(
+  data: RESTPostAPIChannelMessageJSONBody,
+  channelId: string,
+  token: string
+): Promise<RESTPostAPIChannelMessageResult> {
+  return await superagent
+    .post(`https://discord.com/api/channels/${channelId}/messages`)
+    .send(data)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
+}
+
+export async function editMessage(
+  data: RESTPostAPIChannelMessageJSONBody,
+  channelId: string,
+  messageId: string,
+  token: string
+) {
+  return await superagent
+    .patch(`https://discord.com/api/channels/${channelId}/messages/${messageId}`)
+    .send(data)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
+}
+
+export async function createDMChannel(
+  userId: string,
+  token: string
+): Promise<RESTPostAPICurrentUserCreateDMChannelResult> {
+  return await superagent
+    .post('https://discord.com/api/users/@me/channels')
+    .send({ recipient_id: userId })
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
+}
+
+export async function fetchGuild(guildId: string, token: string): Promise<RESTGetAPIGuildResult> {
+  return await superagent
+    .get(`https://discord.com/api/guilds/${guildId}`)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
 }

@@ -1,6 +1,16 @@
 import { ChannelSettings, PrismaClient, Question, QuestionType, Rating } from '@prisma/client';
 import Client from './Client';
 
+export type ParanoiaQuestionData = {
+  userId: string;
+  questionText: string;
+  questionRating: Rating;
+  questionId: string;
+  guildId: string;
+  channelId: string;
+  dmMessageId: string;
+};
+
 export default class Database {
   client: Client;
   db: PrismaClient;
@@ -176,5 +186,53 @@ export default class Database {
         }
       }
     }
+  }
+
+  async addParanoiaQuestion(questionData: ParanoiaQuestionData) {
+    await this.db.paranoiaQuestion.create({
+      data: {
+        id: `${questionData.userId}-${questionData.guildId}`,
+        time: Date.now(),
+        ...questionData,
+      },
+    });
+  }
+
+  async getParanoiaData(userId: string) {
+    const results = await this.db.paranoiaQuestion.findMany({
+      where: { userId },
+    });
+    return results.sort((a, b) => a.time - b.time);
+  }
+
+  async checkParanoiaStatus(userId: string, guildId: string) {
+    const questions = await this.db.paranoiaQuestion.findMany({
+      where: { userId },
+    });
+
+    return {
+      guildOpen: !questions.some(data => data.guildId === guildId),
+      queueEmpty: !questions.length,
+    };
+  }
+
+  async removeParanoiaQuestion(id: string) {
+    await this.db.paranoiaQuestion.delete({
+      where: { id },
+    });
+  }
+
+  async getNextParanoia(userId: string) {
+    const questions = await this.db.paranoiaQuestion.findMany({
+      where: { userId },
+    });
+    return questions.length ? questions.reduce((a, data) => (a.time < data.time ? a : data)) : null;
+  }
+
+  async setParanoiaMessageId(id: string, dmMessageId: string) {
+    await this.db.paranoiaQuestion.update({
+      where: { id },
+      data: { dmMessageId },
+    });
   }
 }
