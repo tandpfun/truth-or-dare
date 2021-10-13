@@ -45,7 +45,7 @@ const paranoia: Command = {
       ) as Rating[]
     );
 
-    if (!ctx.guildId || !targetUserId) {
+    if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
         embeds: [
           {
