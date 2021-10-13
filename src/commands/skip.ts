@@ -5,7 +5,6 @@ const skip: Command = {
   name: 'skip',
   description: 'Skips a paranoia question sent to you',
   category: 'question',
-  options: [],
   perms: [],
   run: async (ctx: Context) => {
     if (ctx.guildId) return ctx.reply('Paranoia questions can only be skipped in DMs');
