@@ -130,7 +130,7 @@ const paranoia: Command = {
 
     // create db object
     await ctx.client.database.addParanoiaQuestion({
-      userId: ctx.user.id,
+      userId: targetUserId,
       questionText: paranoia.question,
       questionRating: paranoia.rating,
       questionId: paranoia.id,
