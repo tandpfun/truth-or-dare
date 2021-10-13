@@ -59,7 +59,7 @@ const paranoia: Command = {
       });
     }
 
-    const status = await ctx.client.database.checkParanoiaStatus(ctx.user.id, ctx.guildId);
+    const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
 
     if (!status.guildOpen)
       return ctx.reply(
