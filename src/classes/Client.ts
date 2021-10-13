@@ -126,7 +126,7 @@ export default class Client {
         (this.stats.perMinuteCommandAverage * this.stats.minutesPassed +
           this.stats.minuteCommandCount) /
         ++this.stats.minutesPassed;
-      if (!this.devMode)
+      if (!this.devMode && process.env.STATCORD_KEY)
         this.postToStatcord(this.stats.minuteCommandCount, this.stats.minuteCommands);
       for (const command in this.stats.minuteCommands) {
         this.stats.minuteCommands[command] = 0;
