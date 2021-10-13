@@ -38,6 +38,7 @@ export default class Client {
     time: ':stopwatch:',
     question: ':question:',
     gear: ':gear:',
+    warning: ':warning:',
   } as const;
   suggestCooldowns: {
     [id: string]: number;

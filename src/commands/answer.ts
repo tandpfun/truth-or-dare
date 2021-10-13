@@ -20,28 +20,45 @@ const answer: Command = {
   ],
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    if (ctx.guildId) return ctx.reply('Paranoia questions can only be answered in DMs');
+    const paranoiaAnswer = (
+      ctx.getOption('answer') as ApplicationCommandInteractionDataOptionString
+    )?.value;
+
+    if (ctx.guildId)
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} Paranoia questions can only be answered in DMs.`
+      );
 
     const paranoiaData = await ctx.client.database.getNextParanoia(ctx.user.id);
-    if (!paranoiaData) return ctx.reply('There are no active paranoia questions');
+    if (!paranoiaData)
+      return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
     // send answer to the channel the question was sent from
-    // @ts-ignore
     const message: APIMessage | null = await ctx.client.functions
       .sendMessage(
         {
           embeds: [
             {
               author: {
-                name: ctx.user.username,
+                name: `${ctx.user.username}#${ctx.user.discriminator}`,
                 icon_url: ctx.client.functions.avatarURL(ctx.user),
               },
-              title: `Paranoia Answer To: ${
-                Math.random() < 0.5 ? paranoiaData.questionText : 'Question Hidden'
-              }`,
-              description: (
-                ctx.getOption('answer') as ApplicationCommandInteractionDataOptionString
-              )?.value,
+              title: `Paranoia Answer`,
+              color: ctx.client.COLORS.BLUE,
+              fields: [
+                {
+                  name: 'Question:',
+                  value:
+                    Math.random() < 0.5
+                      ? paranoiaData.questionText
+                      : `The user got lucky, question wasn't shared.`,
+                },
+                {
+                  name: `${ctx.user.username}'s Answer:`,
+                  value:
+                    paranoiaAnswer.slice(0, 1021) + (paranoiaAnswer.length > 1021 ? '...' : ''),
+                },
+              ],
             },
           ],
         },
@@ -62,7 +79,17 @@ const answer: Command = {
 
     const editedMessage = await ctx.client.functions
       .editMessage(
-        { content: ctx.client.EMOTES.checkmark + ' Question answered' },
+        {
+          embeds: [
+            {
+              title: 'Question answered: ' + paranoiaData.questionText,
+              color: ctx.client.COLORS.GREEN,
+              footer: {
+                text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
+              },
+            },
+          ],
+        },
         ctx.channelId,
         paranoiaData.dmMessageId,
         ctx.client.token
@@ -92,11 +119,11 @@ const answer: Command = {
         {
           embeds: [
             {
-              title: `Paranoia Question From: ${
-                guildName ? `**${guildName}**` : `Unknown server (${nextQuestion.guildId})`
-              }`,
+              title: nextQuestion.questionText,
               color: ctx.client.COLORS.BLUE,
-              description: `Use \`/answer\` to answer this question\n\n**${nextQuestion.questionText}**`,
+              description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
+                guildName || `Unknown Guild (${nextQuestion.guildId})`
+              }**.`,
               footer: {
                 text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,
               },

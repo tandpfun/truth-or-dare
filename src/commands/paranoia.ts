@@ -62,7 +62,9 @@ const paranoia: Command = {
     const status = await ctx.client.database.checkParanoiaStatus(ctx.user.id, ctx.guildId);
 
     if (!status.guildOpen)
-      return ctx.reply('That user already has an active question sent from this server');
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} That user already has an active question sent from this server.`
+      );
 
     // create dm channel
     const dmChannel: APIChannel | null = await ctx.client.functions
@@ -70,7 +72,9 @@ const paranoia: Command = {
       .catch(_ => null);
     if (!dmChannel)
       return ctx.reply({
-        embeds: [ctx.client.functions.embed('Failed to create DMs', ctx.user, true)],
+        embeds: [
+          ctx.client.functions.embed('Failed to create a DM with the user.', ctx.user, true),
+        ],
       });
 
     // fetch guild name
@@ -80,7 +84,13 @@ const paranoia: Command = {
       .catch(_ => null);
     if (!guildName)
       return ctx.reply({
-        embeds: [ctx.client.functions.embed("I can't seem to find this server.", ctx.user, true)],
+        embeds: [
+          ctx.client.functions.embed(
+            "I can't get this guild. Was I authorized with the bot scope?",
+            ctx.user,
+            true
+          ),
+        ],
       });
 
     // send message
@@ -90,15 +100,15 @@ const paranoia: Command = {
           embeds: [
             status.queueEmpty
               ? {
-                  title: `Paranoia Question From: **${guildName}**`,
+                  title: paranoia.question,
                   color: ctx.client.COLORS.BLUE,
-                  description: `Use \`/answer\` to answer this question\n\n**${paranoia.question}**`,
+                  description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guildName}**.`,
                   footer: {
                     text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
                   },
                 }
               : {
-                  title: `Question sent from ${guildName}, answer the current question to see it.`,
+                  description: `${ctx.client.EMOTES.warning} You received a question from ${guildName}, but you need to answer the current question to see it.`,
                   color: ctx.client.COLORS.BLUE,
                 },
           ],
@@ -109,7 +119,13 @@ const paranoia: Command = {
       .catch(_ => null);
     if (!message)
       return ctx.reply({
-        embeds: [ctx.client.functions.embed('Failed to send DM', ctx.user, true)],
+        embeds: [
+          ctx.client.functions.embed(
+            'I was unable to send a DM to that user. Do they have DMs enabled?',
+            ctx.user,
+            true
+          ),
+        ],
       });
 
     // create db object
@@ -125,8 +141,8 @@ const paranoia: Command = {
 
     ctx.reply(
       status.queueEmpty
-        ? 'Message sent.'
-        : "I'll send them the question once they've answered their current question."
+        ? `${ctx.client.EMOTES.checkmark} **Question sent!** Their answer will be sent here once they reply.`
+        : `${ctx.client.EMOTES.checkmark} That user already has a question from another server, but I'll send them this one after they reply to that.`
     );
   },
 };
