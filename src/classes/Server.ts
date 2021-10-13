@@ -65,6 +65,9 @@ export default class Server {
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
     if (!this.client.functions.checkPerms(command, ctx)) return;
+    this.client.stats.minuteCommandCount++;
+    this.client.stats.commands[command.name]++;
+    this.client.stats.minuteCommands[command.name]++;
     try {
       await command.run(ctx);
     } catch (err) {
@@ -74,14 +77,15 @@ export default class Server {
           user: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
           command: command.name,
           args: JSON.stringify(ctx.options),
+          channelId: ctx.channelId,
         });
         Sentry.captureException(err);
       });
       ctx.reply(`${this.client.EMOTES.xmark} Something went wrong while running that command.`);
     }
-    this.client.console.log(
+    /*this.client.console.log(
       `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
-    );
+    );*/
   }
 
   async handleAPI(req: Request, res: Response) {

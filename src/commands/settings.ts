@@ -87,7 +87,7 @@ const settings: Command = {
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is already disabled here!`);
 
       channelSettings.disabledRatings.push(ratingToDisable);
-      await ctx.client.database.updateChannelSettings(ctx.channelId, channelSettings);
+      await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was disabled here!`);
     } else if (ctx.args[0] === 'enablerating') {
       const ratingToDisable = (
@@ -100,7 +100,7 @@ const settings: Command = {
       channelSettings.disabledRatings = channelSettings.disabledRatings.filter(
         type => type !== ratingToDisable
       );
-      await ctx.client.database.updateChannelSettings(ctx.channelId, channelSettings);
+      await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was enabled here!`);
     }
   },

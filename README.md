@@ -1,13 +1,9 @@
 # Truth or Dare Bot
 
-A reincarnation of the truth or dare bot, this time with HTTP slash commands. More features coming soon.
+**Source code for the HTTP interactions system for the Truth or Dare Discord bot!**
 
-### To-do List
+Make conversations with your friends more fun and exciting! This bot has Truth or Dare questions, Never Have I Ever prompts, and Would You Rather questions. Altogether, the bot has over 1,500 questions for you to answer! Add it to your server to try it out.
 
-- [x] HTTP interactions handler
-- [x] Questions API
-- [x] Slash Command Posting
-- [x] Commands
-  - [x] Settings
-  - [x] Questions
-- [x] Database
+[**Check out the bot**](https://truthordarebot.xyz)
+
+[**Gateway Repo**](https://github.com/acd124/truth-or-dare-gw)

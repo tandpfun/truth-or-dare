@@ -37,10 +37,21 @@ export function checkPerms(command: Command, ctx: Context) {
   return true;
 }
 
-export function avatarURL({ id, avatar }: { id: string; avatar: string }) {
-  return `https://cdn.discordapp.com/avatars/${id}/${avatar}.${
-    avatar.startsWith('_a') ? 'gif' : 'png'
-  }`;
+export function avatarURL({
+  id,
+  avatar,
+  discriminator,
+}: {
+  id: string;
+  avatar: string | null;
+  discriminator: string;
+}) {
+  return (
+    'https://cdn.discordapp.com/' +
+    (avatar
+      ? `avatars/${id}/${avatar}.${avatar.startsWith('_a') ? 'gif' : 'png'}`
+      : `/embed/avatars/${Number(discriminator) % 5}.png`)
+  );
 }
 
 export function embed(
@@ -75,6 +86,10 @@ export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boo
           })
       : obj1 === obj2)
   );
+}
+
+export function titleCase(str: string): string {
+  return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 export async function sendMessage(

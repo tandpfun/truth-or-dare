@@ -7,6 +7,7 @@ import { APIApplicationCommand } from 'discord-api-types';
 import superagent from 'superagent';
 import Database from './Database.js';
 import * as Sentry from '@sentry/node';
+import os from 'os';
 
 export default class Client {
   token: string;
@@ -18,6 +19,17 @@ export default class Client {
   functions: typeof functions;
   server: Server;
   database: Database;
+
+  suggestCooldowns: {
+    [id: string]: number;
+  };
+  stats: {
+    minuteCommandCount: number;
+    perMinuteCommandAverage: number;
+    minutesPassed: number;
+    commands: { [command: string]: number };
+    minuteCommands: { [command: string]: number };
+  };
 
   static COLORS = {
     WHITE: 0xffffff,
@@ -39,10 +51,8 @@ export default class Client {
     question: ':question:',
     gear: ':gear:',
     warning: ':warning:',
+    graph: ':chart_with_upwards_trend:',
   } as const;
-  suggestCooldowns: {
-    [id: string]: number;
-  };
 
   constructor({
     token,
@@ -74,6 +84,13 @@ export default class Client {
     this.database = new Database(this);
 
     this.suggestCooldowns = {};
+    this.stats = {
+      minuteCommandCount: 0,
+      perMinuteCommandAverage: 0,
+      minutesPassed: 0,
+      commands: {},
+      minuteCommands: {},
+    };
   }
 
   get devMode() {
@@ -94,12 +111,29 @@ export default class Client {
   async start() {
     this.console.log(`Starting Truth or Dare...`);
     await this.loadCommands();
+    for (const { name } of this.commands) {
+      this.stats.commands[name] = 0;
+      this.stats.minuteCommands[name] = 0;
+    }
     if (this.devMode)
       this.console.log((await this.compareCommands()) ? 'Changes detected' : 'No changes detected');
     else await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);
     await this.database.start();
     this.server.start();
+
+    setInterval(() => {
+      this.stats.perMinuteCommandAverage =
+        (this.stats.perMinuteCommandAverage * this.stats.minutesPassed +
+          this.stats.minuteCommandCount) /
+        ++this.stats.minutesPassed;
+      if (!this.devMode && process.env.STATCORD_KEY)
+        this.postToStatcord(this.stats.minuteCommandCount, this.stats.minuteCommands);
+      for (const command in this.stats.minuteCommands) {
+        this.stats.minuteCommands[command] = 0;
+      }
+      this.stats.minuteCommandCount = 0;
+    }, 60 * 1000);
   }
 
   async loadCommands() {
@@ -140,5 +174,27 @@ export default class Client {
         }))
       );
     this.console.success(`Updated ${this.commands.length} slash commands`);
+  }
+
+  async postToStatcord(minuteCommandCount: number, minuteCommands: { [command: string]: number }) {
+    const activeMem = os.totalmem() - os.freemem();
+
+    await superagent
+      .post(`https://api.statcord.com/v3/stats`)
+      .send({
+        id: this.id,
+        key: process.env.STATCORD_KEY,
+        servers: 200000,
+        users: 0,
+        active: [],
+        commands: minuteCommandCount,
+        popular: Object.entries(minuteCommands).map(([name, count]) => ({ name, count })),
+        memactive: activeMem,
+        memload: (activeMem / os.totalmem()) * 100,
+        cpuload: 0,
+        bandwidth: 0,
+      })
+      .then(res => res.body)
+      .catch(_ => null);
   }
 }
