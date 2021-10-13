@@ -59,6 +59,11 @@ const paranoia: Command = {
       });
     }
 
+    if (ctx.resolved.users[targetUserId].bot)
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} Bots can't answer paranoia questions, no matter how hard they try.`
+      );
+
     const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
 
     if (!status.guildOpen)
@@ -102,7 +107,7 @@ const paranoia: Command = {
               ? {
                   title: paranoia.question,
                   color: ctx.client.COLORS.BLUE,
-                  description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guildName}**.`,
+                  description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guildName}** <#${ctx.channelId}>.`,
                   footer: {
                     text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
                   },

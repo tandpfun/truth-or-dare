@@ -123,7 +123,7 @@ const answer: Command = {
               color: ctx.client.COLORS.BLUE,
               description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
                 guildName || `Unknown Guild (${nextQuestion.guildId})`
-              }**.`,
+              }** <#${nextQuestion.channelId}>.`,
               footer: {
                 text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,
               },
