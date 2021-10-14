@@ -1,29 +1,21 @@
-import { ChannelSettings, PrismaClient, Question, QuestionType, Rating } from '@prisma/client';
+import {
+  ChannelSettings,
+  CustomQuestion,
+  ParanoiaQuestion,
+  PrismaClient,
+  Question,
+  QuestionType,
+  Rating,
+} from '@prisma/client';
 import Client from './Client';
 
-export type ParanoiaQuestionData = {
-  userId: string;
-  questionText: string;
-  questionRating: Rating;
-  questionId: string;
-  guildId: string;
-  channelId: string;
-  dmMessageId: string;
-};
-
-export type CustomQuestion = {
-  id: string,
-  guildId: string,
-  type: QuestionType,
-  rating: Rating,
-  question: string
-}
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export default class Database {
   client: Client;
   db: PrismaClient;
-  channelCache: { [id: string]: ChannelSettings | null };
-  questionCache: { [type in QuestionType]: { [rating in Rating]: Question[] } };
+  channelCache: Record<string, ChannelSettings | null>;
+  questionCache: Record<QuestionType, Record<Rating, Question[]>>;
 
   constructor(client: Client) {
     this.client = client;
@@ -35,10 +27,11 @@ export default class Database {
     await this.db.$connect();
     this.client.console.success('Connected to database!');
     await this.fetchAllQuestions();
-    setInterval(() => {
+    setInterval(async () => {
       const cacheSize = Object.keys(this.channelCache).length;
       this.channelCache = {};
       this.client.console.log(`Cleared ${cacheSize} entries from the channel cache`);
+      await this.fetchAllQuestions();
     }, 6 * 60 * 60 * 1000);
   }
 
@@ -51,23 +44,18 @@ export default class Database {
     );
   }
 
-  defaultChannelSettings(id: string): ChannelSettings {
-    return {
-      id,
-      disabledRatings: ['R'],
-    };
+  defaultChannelSettings(id: string, dm = false): ChannelSettings {
+    return { id, disabledRatings: dm ? [] : ['R'] };
   }
 
-  async fetchChannelSettings(id: string) {
-    if (!(id in this.channelCache))
-      this.channelCache[id] = await this.db.channelSettings.findUnique({
-        where: { id },
-      });
-    return this.channelCache[id] ?? this.defaultChannelSettings(id);
+  async fetchChannelSettings(id: string, dm = false) {
+    if (!dm && !(id in this.channelCache))
+      this.channelCache[id] = await this.db.channelSettings.findUnique({ where: { id } });
+    return this.channelCache[id] ?? this.defaultChannelSettings(id, dm);
   }
 
   async updateChannelSettings(update: ChannelSettings) {
-    const withoutID = Object.assign({}, update);
+    const withoutID = { ...update };
     delete withoutID.id;
     return (this.channelCache[update.id] = await this.db.channelSettings.upsert({
       where: { id: update.id },
@@ -126,65 +114,55 @@ export default class Database {
     return await this.db.question.findUnique({ where: { id } });
   }
 
-  async getRandomQuestion(type: QuestionType, ratings?: Rating[], guildId?: string): Promise<Question> {
-    const rates = ratings ?? ['PG', 'PG13', 'R'];
-    if (!rates.length)
+  async getRandomQuestion(
+    type: QuestionType,
+    ratings?: Rating[],
+    guildId?: string
+  ): Promise<Question> {
+    ratings = ratings ?? ['PG', 'PG13', 'R'];
+    if (!ratings.length)
       return {
         id: '',
         type,
         rating: 'NONE',
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
-    const rating = rates[Math.floor(Math.random() * rates.length)];
-    const questions = guildId ? [
-      ...this.questionCache[type][rating],
-      ...await this.getCustomQuestions(type, guildId, ratings)
-    ] : this.questionCache[type][rating];
+    const rating = ratings[Math.floor(Math.random() * ratings.length)];
+    const questions = guildId
+      ? [
+          ...this.questionCache[type][rating],
+          ...(await this.getCustomQuestions(guildId, type, [rating])),
+        ]
+      : this.questionCache[type][rating];
     return questions[Math.floor(Math.random() * questions.length)];
   }
 
-  async getCustomQuestions(type: QuestionType, guildId: string, ratings?: Rating[]) {
-    const queryArray = ratings.map(rating => ({
-      type,
-      guildId,
-      rating
-    }))
-    return await this.db.customQuestions.findMany({
-      where: {
-        OR: queryArray
-      }
-    })
+  async getCustomQuestions(guildId: string, type?: QuestionType, ratings?: Rating[]) {
+    const queries = ratings.map(rating => ({ guildId, type, rating: rating }));
+    return await this.db.customQuestion.findMany({
+      where: queries.length
+        ? {
+            OR: queries,
+          }
+        : { guildId, type },
+    });
   }
 
-  async addCustomQuestion(data: CustomQuestion) {
-    return await this.db.customQuestions.create({
-      data
-    })
+  async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
+    return await this.db.customQuestion.create({ data: { id: this.generateId(), ...data } });
   }
 
   async deleteCustomQuestion(id: string) {
-    return await this.db.customQuestions.delete({
-      where: {
-        id
-      }
-    })
+    return await this.db.customQuestion.delete({ where: { id } });
   }
 
-  async updateQuestion(
-    id: string,
-    { type, rating, question }: { type: QuestionType; rating: Rating; question: string }
-  ) {
+  async updateQuestion(id: string, data: Optional<Question, 'id'>) {
     const quest = await this.db.question.upsert({
       where: { id },
-      update: { type, rating, question },
-      create: {
-        id: this.generateId(),
-        type,
-        rating,
-        question,
-      },
+      update: data,
+      create: { id: this.generateId(), ...data },
     });
-    const questions = this.questionCache[type][rating];
+    const questions = this.questionCache[data.type][data.rating];
     if (questions.some(q => q.id === quest.id))
       questions.splice(
         questions.findIndex(q => q.id === quest.id),
@@ -196,8 +174,10 @@ export default class Database {
   }
 
   async deleteQuestion(id: string): Promise<Question | null> {
-    const question: Question = await this.db.question.delete({ where: { id } }).catch(_ => null);
-    if (!question) return;
+    const question: Question | null = await this.db.question
+      .delete({ where: { id } })
+      .catch(_ => null);
+    if (!question) return null;
     const questions = this.questionCache[question.type][question.rating];
     if (questions.some(q => q.id === question.id))
       questions.splice(
@@ -208,7 +188,8 @@ export default class Database {
   }
 
   async makeExampleQuestions() {
-    if (!this.client.devMode) throw new Error('Example questions in production');
+    if (!this.client.devMode || (await this.db.question.count()) > 0)
+      throw new Error('Example questions in production database');
     for (let i = 0; i < 100; i++) {
       for (const type of ['DARE', 'NHIE', 'TRUTH', 'WYR'] as QuestionType[]) {
         for (const rating of ['PG', 'PG13', 'R'] as Rating[]) {
@@ -226,7 +207,7 @@ export default class Database {
     }
   }
 
-  async addParanoiaQuestion(questionData: ParanoiaQuestionData) {
+  async addParanoiaQuestion(questionData: Optional<ParanoiaQuestion, 'id' | 'time'>) {
     await this.db.paranoiaQuestion.create({
       data: {
         id: `${questionData.userId}-${questionData.guildId}`,
@@ -237,17 +218,12 @@ export default class Database {
   }
 
   async getParanoiaData(userId: string) {
-    const results = await this.db.paranoiaQuestion.findMany({
-      where: { userId },
-    });
+    const results = await this.db.paranoiaQuestion.findMany({ where: { userId } });
     return results.sort((a, b) => a.time - b.time);
   }
 
   async checkParanoiaStatus(userId: string, guildId: string) {
-    const questions = await this.db.paranoiaQuestion.findMany({
-      where: { userId },
-    });
-
+    const questions = await this.db.paranoiaQuestion.findMany({ where: { userId } });
     return {
       guildOpen: !questions.some(data => data.guildId === guildId),
       queueEmpty: !questions.length,
@@ -255,22 +231,15 @@ export default class Database {
   }
 
   async removeParanoiaQuestion(id: string) {
-    await this.db.paranoiaQuestion.delete({
-      where: { id },
-    });
+    await this.db.paranoiaQuestion.delete({ where: { id } });
   }
 
   async getNextParanoia(userId: string) {
-    const questions = await this.db.paranoiaQuestion.findMany({
-      where: { userId },
-    });
+    const questions = await this.db.paranoiaQuestion.findMany({ where: { userId } });
     return questions.length ? questions.reduce((a, data) => (a.time < data.time ? a : data)) : null;
   }
 
   async setParanoiaMessageId(id: string, dmMessageId: string) {
-    await this.db.paranoiaQuestion.update({
-      where: { id },
-      data: { dmMessageId },
-    });
+    await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
   }
 }

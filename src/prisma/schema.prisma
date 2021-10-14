@@ -49,10 +49,10 @@ model ParanoiaQuestion {
   time           Int
 }
 
-model CustomQuestions {
-  id        String @id @map("_id")
-  guildId   String
-  type      QuestionType
-  rating    Rating
-  question  String
+model CustomQuestion {
+  id       String       @id @map("_id")
+  guildId  String
+  type     QuestionType
+  rating   Rating
+  question String
 }

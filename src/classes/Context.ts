@@ -76,8 +76,6 @@ export default class Context {
   }
 
   get channelSettings(): Promise<ChannelSettings> {
-    return this.guildId
-      ? this.client.database.fetchChannelSettings(this.channelId)
-      : new Promise(r => r({ id: this.channelId, disabledRatings: [] }));
+    return this.client.database.fetchChannelSettings(this.channelId, !this.guildId);
   }
 }

@@ -3,8 +3,6 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandInteractionDataOptionUser,
-  APIChannel,
-  APIMessage,
 } from 'discord-api-types';
 import Command from '../classes/Command';
 import Context from '../classes/Context';
@@ -72,9 +70,7 @@ const paranoia: Command = {
       );
 
     // create dm channel
-    const dmChannel: APIChannel | null = await ctx.client.functions
-      .createDMChannel(targetUserId, ctx.client.token)
-      .catch(_ => null);
+    const dmChannel = await ctx.client.functions.createDMChannel(targetUserId, ctx.client.token);
     if (!dmChannel)
       return ctx.reply({
         embeds: [
@@ -83,11 +79,8 @@ const paranoia: Command = {
       });
 
     // fetch guild name
-    const guildName: string | null = await ctx.client.functions
-      .fetchGuild(ctx.guildId, ctx.client.token)
-      .then(guild => guild.name)
-      .catch(_ => null);
-    if (!guildName)
+    const guild = await ctx.client.functions.fetchGuild(ctx.guildId, ctx.client.token);
+    if (!guild)
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
@@ -99,29 +92,27 @@ const paranoia: Command = {
       });
 
     // send message
-    const message: APIMessage | null = await ctx.client.functions
-      .sendMessage(
-        {
-          embeds: [
-            status.queueEmpty
-              ? {
-                  title: paranoia.question,
-                  color: ctx.client.COLORS.BLUE,
-                  description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guildName}** <#${ctx.channelId}>.`,
-                  footer: {
-                    text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
-                  },
-                }
-              : {
-                  description: `${ctx.client.EMOTES.warning} You received a question from ${guildName}, but you need to answer the current question to see it.`,
-                  color: ctx.client.COLORS.BLUE,
+    const message = await ctx.client.functions.sendMessage(
+      {
+        embeds: [
+          status.queueEmpty
+            ? {
+                title: paranoia.question,
+                color: ctx.client.COLORS.BLUE,
+                description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guild.name}** <#${ctx.channelId}>.`,
+                footer: {
+                  text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
                 },
-          ],
-        },
-        dmChannel.id,
-        ctx.client.token
-      )
-      .catch(_ => null);
+              }
+            : {
+                description: `${ctx.client.EMOTES.warning} You received a question from ${guild.name}, but you need to answer the current question to see it.`,
+                color: ctx.client.COLORS.BLUE,
+              },
+        ],
+      },
+      dmChannel.id,
+      ctx.client.token
+    );
     if (!message)
       return ctx.reply({
         embeds: [
