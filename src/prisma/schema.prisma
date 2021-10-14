@@ -48,3 +48,11 @@ model ParanoiaQuestion {
   dmMessageId    String?
   time           Int
 }
+
+model CustomQuestions {
+  id        String @id @map("_id")
+  guildId   String
+  type      QuestionType
+  rating    Rating
+  question  String
+}

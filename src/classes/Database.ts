@@ -11,6 +11,14 @@ export type ParanoiaQuestionData = {
   dmMessageId: string;
 };
 
+export type CustomQuestion = {
+  id: string,
+  guildId: string,
+  type: QuestionType,
+  rating: Rating,
+  question: string
+}
+
 export default class Database {
   client: Client;
   db: PrismaClient;
@@ -118,7 +126,7 @@ export default class Database {
     return await this.db.question.findUnique({ where: { id } });
   }
 
-  async getRandomQuestion(type: QuestionType, ratings?: Rating[]): Promise<Question> {
+  async getRandomQuestion(type: QuestionType, ratings?: Rating[], guildId?: string): Promise<Question> {
     const rates = ratings ?? ['PG', 'PG13', 'R'];
     if (!rates.length)
       return {
@@ -128,8 +136,38 @@ export default class Database {
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
     const rating = rates[Math.floor(Math.random() * rates.length)];
-    const questions = this.questionCache[type][rating];
+    const questions = guildId ? [
+      ...this.questionCache[type][rating],
+      ...await this.getCustomQuestions(type, guildId, ratings)
+    ] : this.questionCache[type][rating];
     return questions[Math.floor(Math.random() * questions.length)];
+  }
+
+  async getCustomQuestions(type: QuestionType, guildId: string, ratings?: Rating[]) {
+    const queryArray = ratings.map(rating => ({
+      type,
+      guildId,
+      rating
+    }))
+    return await this.db.customQuestions.findMany({
+      where: {
+        OR: queryArray
+      }
+    })
+  }
+
+  async addCustomQuestion(data: CustomQuestion) {
+    return await this.db.customQuestions.create({
+      data
+    })
+  }
+
+  async deleteCustomQuestion(id: string) {
+    return await this.db.customQuestions.delete({
+      where: {
+        id
+      }
+    })
   }
 
   async updateQuestion(
