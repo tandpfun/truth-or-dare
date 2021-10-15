@@ -20,15 +20,13 @@ export default class Client {
   server: Server;
   database: Database;
 
-  suggestCooldowns: {
-    [id: string]: number;
-  };
+  suggestCooldowns: Record<string, number>;
   stats: {
     minuteCommandCount: number;
     perMinuteCommandAverage: number;
     minutesPassed: number;
-    commands: { [command: string]: number };
-    minuteCommands: { [command: string]: number };
+    commands: Record<string, number>;
+    minuteCommands: Record<string, number>;
   };
 
   static COLORS = {

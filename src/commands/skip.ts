@@ -18,24 +18,22 @@ const skip: Command = {
     await ctx.client.database.removeParanoiaQuestion(currentParanoia.id);
 
     // edit message to let the user know the question has been skipped
-    const editedMessage = await ctx.client.functions
-      .editMessage(
-        {
-          embeds: [
-            {
-              title: 'Question skipped: ' + currentParanoia.questionText,
-              color: ctx.client.COLORS.YELLOW,
-              footer: {
-                text: `Type: PARANOIA | Rating: ${currentParanoia.questionRating} | ID: ${currentParanoia.questionId}`,
-              },
+    const editedMessage = await ctx.client.functions.editMessage(
+      {
+        embeds: [
+          {
+            title: 'Question skipped: ' + currentParanoia.questionText,
+            color: ctx.client.COLORS.YELLOW,
+            footer: {
+              text: `Type: PARANOIA | Rating: ${currentParanoia.questionRating} | ID: ${currentParanoia.questionId}`,
             },
-          ],
-        },
-        ctx.channelId,
-        currentParanoia.dmMessageId,
-        ctx.client.token
-      )
-      .catch(_ => null);
+          },
+        ],
+      },
+      ctx.channelId,
+      currentParanoia.dmMessageId,
+      ctx.client.token
+    );
     if (!editedMessage)
       ctx.client.console.warn(
         `Paranoia skip message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${currentParanoia.dmMessageId}`
@@ -46,33 +44,28 @@ const skip: Command = {
     if (!nextParanoia) return ctx.reply(`${ctx.client.EMOTES.checkmark} Your queue is now empty.`);
 
     // fetch server name
-    const guildName: string | null = await ctx.client.functions
-      .fetchGuild(nextParanoia.guildId, ctx.client.token)
-      .then(guild => guild.name)
-      .catch(_ => null);
-    if (!guildName) ctx.client.console.warn(`Failed to fetch guild: ${nextParanoia.guildId}`);
+    const guild = await ctx.client.functions.fetchGuild(nextParanoia.guildId, ctx.client.token);
+    if (!guild) ctx.client.console.warn(`Failed to fetch guild: ${nextParanoia.guildId}`);
 
     // send next question in DMs
-    const nextMessage = await ctx.client.functions
-      .sendMessage(
-        {
-          embeds: [
-            {
-              title: nextParanoia.questionText,
-              color: ctx.client.COLORS.BLUE,
-              description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
-                guildName || `Unknown Guild (${nextParanoia.guildId})`
-              }** <#${nextParanoia.channelId}>.`,
-              footer: {
-                text: `Type: PARANOIA | Rating: ${nextParanoia.questionRating} | ID: ${nextParanoia.questionId}`,
-              },
+    const nextMessage = await ctx.client.functions.sendMessage(
+      {
+        embeds: [
+          {
+            title: nextParanoia.questionText,
+            color: ctx.client.COLORS.BLUE,
+            description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
+              guild.name || `Unknown Guild (${nextParanoia.guildId})`
+            }** <#${nextParanoia.channelId}>.`,
+            footer: {
+              text: `Type: PARANOIA | Rating: ${nextParanoia.questionRating} | ID: ${nextParanoia.questionId}`,
             },
-          ],
-        },
-        ctx.channelId,
-        ctx.client.token
-      )
-      .catch(_ => null);
+          },
+        ],
+      },
+      ctx.channelId,
+      ctx.client.token
+    );
     if (!nextMessage) {
       ctx.reply(
         `${ctx.client.EMOTES.xmark} Something went wrong trying to send you the next question.`

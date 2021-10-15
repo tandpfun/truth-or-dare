@@ -1,5 +1,4 @@
 import {
-  APIMessage,
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
 } from 'discord-api-types';
@@ -34,38 +33,35 @@ const answer: Command = {
       return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
     // send answer to the channel the question was sent from
-    const message: APIMessage | null = await ctx.client.functions
-      .sendMessage(
-        {
-          embeds: [
-            {
-              author: {
-                name: `${ctx.user.username}#${ctx.user.discriminator}`,
-                icon_url: ctx.client.functions.avatarURL(ctx.user),
-              },
-              title: `Paranoia Answer`,
-              color: ctx.client.COLORS.BLUE,
-              fields: [
-                {
-                  name: 'Question:',
-                  value:
-                    Math.random() < 0.5
-                      ? paranoiaData.questionText
-                      : `The user got lucky, question wasn't shared.`,
-                },
-                {
-                  name: `${ctx.user.username}'s Answer:`,
-                  value:
-                    paranoiaAnswer.slice(0, 1021) + (paranoiaAnswer.length > 1021 ? '...' : ''),
-                },
-              ],
+    const message = await ctx.client.functions.sendMessage(
+      {
+        embeds: [
+          {
+            author: {
+              name: `${ctx.user.username}#${ctx.user.discriminator}`,
+              icon_url: ctx.client.functions.avatarURL(ctx.user),
             },
-          ],
-        },
-        paranoiaData.channelId,
-        ctx.client.token
-      )
-      .catch(_ => null);
+            title: `Paranoia Answer`,
+            color: ctx.client.COLORS.BLUE,
+            fields: [
+              {
+                name: 'Question:',
+                value:
+                  Math.random() < 0.5
+                    ? paranoiaData.questionText
+                    : `The user got lucky, question wasn't shared.`,
+              },
+              {
+                name: `${ctx.user.username}'s Answer:`,
+                value: paranoiaAnswer.slice(0, 1021) + (paranoiaAnswer.length > 1021 ? '...' : ''),
+              },
+            ],
+          },
+        ],
+      },
+      paranoiaData.channelId,
+      ctx.client.token
+    );
     if (!message)
       return ctx.reply({
         embeds: [
@@ -77,24 +73,23 @@ const answer: Command = {
         ],
       });
 
-    const editedMessage = await ctx.client.functions
-      .editMessage(
-        {
-          embeds: [
-            {
-              title: 'Question answered: ' + paranoiaData.questionText,
-              color: ctx.client.COLORS.GREEN,
-              footer: {
-                text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
-              },
+    const editedMessage = await ctx.client.functions.editMessage(
+      {
+        embeds: [
+          {
+            title: 'Question answered: ' + paranoiaData.questionText,
+            color: ctx.client.COLORS.GREEN,
+            description: `Check it out in <#${paranoiaData.channelId}>`,
+            footer: {
+              text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
             },
-          ],
-        },
-        ctx.channelId,
-        paranoiaData.dmMessageId,
-        ctx.client.token
-      )
-      .catch(_ => null);
+          },
+        ],
+      },
+      ctx.channelId,
+      paranoiaData.dmMessageId,
+      ctx.client.token
+    );
     if (!editedMessage)
       ctx.client.console.warn(
         `Paranoia message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${paranoiaData.dmMessageId}`
@@ -108,32 +103,27 @@ const answer: Command = {
     const nextQuestion = await ctx.client.database.getNextParanoia(ctx.user.id);
     if (!nextQuestion) return;
 
-    const guildName: string | null = await ctx.client.functions
-      .fetchGuild(nextQuestion.guildId, ctx.client.token)
-      .then(guild => guild.name)
-      .catch(_ => null);
-    if (!guildName) ctx.client.console.warn(`Failed to fetch guild: ${nextQuestion.guildId}`);
+    const guild = await ctx.client.functions.fetchGuild(nextQuestion.guildId, ctx.client.token);
+    if (!guild) ctx.client.console.warn(`Failed to fetch guild: ${nextQuestion.guildId}`);
 
-    const nextMessage = await ctx.client.functions
-      .sendMessage(
-        {
-          embeds: [
-            {
-              title: nextQuestion.questionText,
-              color: ctx.client.COLORS.BLUE,
-              description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
-                guildName || `Unknown Guild (${nextQuestion.guildId})`
-              }** <#${nextQuestion.channelId}>.`,
-              footer: {
-                text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,
-              },
+    const nextMessage = await ctx.client.functions.sendMessage(
+      {
+        embeds: [
+          {
+            title: nextQuestion.questionText,
+            color: ctx.client.COLORS.BLUE,
+            description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
+              guild.name || `Unknown Guild (${nextQuestion.guildId})`
+            }** <#${nextQuestion.channelId}>.`,
+            footer: {
+              text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,
             },
-          ],
-        },
-        ctx.channelId,
-        ctx.client.token
-      )
-      .catch(_ => null);
+          },
+        ],
+      },
+      ctx.channelId,
+      ctx.client.token
+    );
     if (!nextMessage)
       return ctx.client.console.error(
         `Paranoia next question failed in channel: ${ctx.channelId} with user: ${ctx.user.id}`
