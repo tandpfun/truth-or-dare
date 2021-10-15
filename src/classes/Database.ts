@@ -25,6 +25,7 @@ export default class Database {
   async start() {
     await this.db.$connect();
     this.client.console.success('Connected to database!');
+    await this.fetchAllQuestions();
     setInterval(async () => {
       const cacheSize = Object.keys(this.channelCache).length;
       this.channelCache = {};
@@ -48,9 +49,7 @@ export default class Database {
 
   async fetchChannelSettings(id: string, dm = false) {
     if (!dm && !(id in this.channelCache))
-      this.channelCache[id] = await this.db.channelSettings.findUnique({
-        where: { id },
-      });
+      this.channelCache[id] = await this.db.channelSettings.findUnique({ where: { id } });
     return this.channelCache[id] ?? this.defaultChannelSettings(id, dm);
   }
 
@@ -128,7 +127,7 @@ export default class Database {
     return questions[Math.floor(Math.random() * questions.length)];
   }
 
-  async updateQuestion(id: string, data: { type: QuestionType; rating: Rating; question: string }) {
+  async updateQuestion(id: string, data: Optional<Question, 'id'>) {
     const quest = await this.db.question.upsert({
       where: { id },
       update: data,
@@ -149,7 +148,7 @@ export default class Database {
     const question: Question | null = await this.db.question
       .delete({ where: { id } })
       .catch(_ => null);
-    if (!question) return;
+    if (!question) return null;
     const questions = this.questionCache[question.type][question.rating];
     if (questions.some(q => q.id === question.id))
       questions.splice(
@@ -196,7 +195,6 @@ export default class Database {
 
   async checkParanoiaStatus(userId: string, guildId: string) {
     const questions = await this.db.paranoiaQuestion.findMany({ where: { userId } });
-
     return {
       guildOpen: !questions.some(data => data.guildId === guildId),
       queueEmpty: !questions.length,

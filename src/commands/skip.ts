@@ -55,7 +55,7 @@ const skip: Command = {
             title: nextParanoia.questionText,
             color: ctx.client.COLORS.BLUE,
             description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
-              guild.name || `Unknown Guild (${nextParanoia.guildId})`
+              guild ? guild.name : `Unknown Guild (${nextParanoia.guildId})`
             }** <#${nextParanoia.channelId}>.`,
             footer: {
               text: `Type: PARANOIA | Rating: ${nextParanoia.questionRating} | ID: ${nextParanoia.questionId}`,

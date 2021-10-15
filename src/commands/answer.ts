@@ -113,7 +113,7 @@ const answer: Command = {
             title: nextQuestion.questionText,
             color: ctx.client.COLORS.BLUE,
             description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
-              guild.name || `Unknown Guild (${nextQuestion.guildId})`
+              guild ? guild.name : `Unknown Guild (${nextQuestion.guildId})`
             }** <#${nextQuestion.channelId}>.`,
             footer: {
               text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,
