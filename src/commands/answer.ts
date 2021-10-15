@@ -21,7 +21,7 @@ const answer: Command = {
   run: async (ctx: Context): Promise<void> => {
     const paranoiaAnswer = (
       ctx.getOption('answer') as ApplicationCommandInteractionDataOptionString
-    )?.value;
+    ).value;
 
     if (ctx.guildId)
       return ctx.reply(
@@ -77,9 +77,9 @@ const answer: Command = {
       {
         embeds: [
           {
-            title: 'Question answered: ' + paranoiaData.questionText,
+            title: paranoiaData.questionText,
             color: ctx.client.COLORS.GREEN,
-            description: `Check it out in <#${paranoiaData.channelId}>`,
+            description: `Question answered: Check it out in <#${paranoiaData.channelId}>`,
             footer: {
               text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
             },

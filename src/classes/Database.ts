@@ -131,29 +131,10 @@ export default class Database {
     const questions = guildId
       ? [
           ...this.questionCache[type][rating],
-          ...(await this.getCustomQuestions(guildId, type, [rating])),
+          ...(await this.getCustomQuestions(guildId, type, rating)),
         ]
       : this.questionCache[type][rating];
     return questions[Math.floor(Math.random() * questions.length)];
-  }
-
-  async getCustomQuestions(guildId: string, type?: QuestionType, ratings?: Rating[]) {
-    const queries = ratings.map(rating => ({ guildId, type, rating: rating }));
-    return await this.db.customQuestion.findMany({
-      where: queries.length
-        ? {
-            OR: queries,
-          }
-        : { guildId, type },
-    });
-  }
-
-  async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
-    return await this.db.customQuestion.create({ data: { id: this.generateId(), ...data } });
-  }
-
-  async deleteCustomQuestion(id: string) {
-    return await this.db.customQuestion.delete({ where: { id } });
   }
 
   async updateQuestion(id: string, data: Optional<Question, 'id'>) {
@@ -207,6 +188,18 @@ export default class Database {
     }
   }
 
+  async getCustomQuestions(guildId: string, type?: QuestionType, rating?: Rating) {
+    return await this.db.customQuestion.findMany({ where: { guildId, type, rating } });
+  }
+
+  async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
+    return await this.db.customQuestion.create({ data: { id: this.generateId(), ...data } });
+  }
+
+  async deleteCustomQuestion(id: string): Promise<CustomQuestion | null> {
+    return await this.db.customQuestion.delete({ where: { id } }).catch(_ => null);
+  }
+
   async addParanoiaQuestion(questionData: Optional<ParanoiaQuestion, 'id' | 'time'>) {
     await this.db.paranoiaQuestion.create({
       data: {
@@ -230,8 +223,8 @@ export default class Database {
     };
   }
 
-  async removeParanoiaQuestion(id: string) {
-    await this.db.paranoiaQuestion.delete({ where: { id } });
+  async removeParanoiaQuestion(id: string): Promise<ParanoiaQuestion | null> {
+    return await this.db.paranoiaQuestion.delete({ where: { id } }).catch(_ => null);
   }
 
   async getNextParanoia(userId: string) {
