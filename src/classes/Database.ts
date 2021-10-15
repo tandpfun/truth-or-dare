@@ -43,7 +43,7 @@ export default class Database {
   }
 
   defaultChannelSettings(id: string, dm = false): ChannelSettings {
-    return { id, disabledRatings: dm ? [] : ['R'] };
+    return { id, disabledRatings: dm ? [] : ['R'], muted: false };
   }
 
   async fetchChannelSettings(id: string, dm = false) {

@@ -28,6 +28,7 @@ enum Rating {
 model ChannelSettings {
   id              String   @id @map("_id")
   disabledRatings Rating[]
+  muted           Boolean
 }
 
 model Question {

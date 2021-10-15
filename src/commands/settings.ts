@@ -1,6 +1,7 @@
 import { Rating } from '.prisma/client';
 import {
-  ApplicationCommandInteractionDataOptionSubCommand,
+  ApplicationCommandInteractionDataOptionChannel,
+  ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
 } from 'discord-api-types/v9';
 import Command from '../classes/Command';
@@ -16,6 +17,13 @@ const settings: Command = {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'view',
       description: "View a channel's settings.",
+      options: [
+        {
+          type: ApplicationCommandOptionType.Channel,
+          name: 'channel',
+          description: 'The channel to mute the bot in',
+        },
+      ],
     },
     {
       type: ApplicationCommandOptionType.Subcommand,
@@ -32,6 +40,11 @@ const settings: Command = {
             { name: 'PG13', value: 'PG13' },
             { name: 'R', value: 'R' },
           ],
+        },
+        {
+          type: ApplicationCommandOptionType.Channel,
+          name: 'channel',
+          description: 'The channel to mute the bot in',
         },
       ],
     },
@@ -51,6 +64,23 @@ const settings: Command = {
             { name: 'R', value: 'R' },
           ],
         },
+        {
+          type: ApplicationCommandOptionType.Channel,
+          name: 'channel',
+          description: 'The channel to mute the bot in',
+        },
+      ],
+    },
+    {
+      type: ApplicationCommandOptionType.Subcommand,
+      name: 'mute',
+      description: 'Disable all commands in a channel',
+      options: [
+        {
+          type: ApplicationCommandOptionType.Channel,
+          name: 'channel',
+          description: 'The channel to mute the bot in',
+        },
       ],
     },
   ],
@@ -58,14 +88,20 @@ const settings: Command = {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
 
-    const channelSettings = await ctx.channelSettings;
+    const channelId = ctx.getOption('channel')
+      ? (ctx.getOption('channel') as ApplicationCommandInteractionDataOptionChannel)?.value
+      : ctx.channelId;
+    const channelSettings =
+      channelId === ctx.channelId
+        ? await ctx.channelSettings
+        : await ctx.client.database.fetchChannelSettings(channelId);
 
     if (ctx.args[0] === 'view') {
-      function ratingEmoji(rating: Rating) {
+      const ratingEmoji = (rating: Rating) => {
         return channelSettings.disabledRatings.includes(rating)
           ? ctx.client.EMOTES.xmark
           : ctx.client.EMOTES.checkmark;
-      }
+      };
 
       ctx.reply({
         embeds: [
@@ -80,8 +116,8 @@ const settings: Command = {
       });
     } else if (ctx.args[0] === 'disablerating') {
       const ratingToDisable = (
-        ctx.getOption('disablerating') as ApplicationCommandInteractionDataOptionSubCommand
-      ).options[0].value as Rating;
+        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
+      )?.value as Rating;
 
       if (channelSettings.disabledRatings.includes(ratingToDisable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is already disabled here!`);
@@ -90,18 +126,32 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was disabled here!`);
     } else if (ctx.args[0] === 'enablerating') {
-      const ratingToDisable = (
-        ctx.getOption('enablerating') as ApplicationCommandInteractionDataOptionSubCommand
-      ).options[0].value as Rating;
+      const ratingToEnable = (
+        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
+      )?.value as Rating;
 
-      if (!channelSettings.disabledRatings.includes(ratingToDisable))
+      if (!channelSettings.disabledRatings.includes(ratingToEnable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is not disabled here!`);
 
       channelSettings.disabledRatings = channelSettings.disabledRatings.filter(
-        type => type !== ratingToDisable
+        type => type !== ratingToEnable
       );
       await ctx.client.database.updateChannelSettings(channelSettings);
-      ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was enabled here!`);
+      ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToEnable} rating was enabled here!`);
+    } else if (ctx.args[0] === 'mute') {
+      if (channelSettings.muted)
+        return ctx.reply(ctx.client.EMOTES.xmark + ' I am already muted here');
+
+      channelSettings.muted = true;
+      await ctx.client.database.updateChannelSettings(channelSettings);
+      ctx.reply(ctx.client.EMOTES.checkmark + ' Muted, use `/settings unmute` to unmute');
+    } else if (ctx.args[0] === 'unmute') {
+      if (!channelSettings.muted)
+        return ctx.reply(ctx.client.EMOTES.xmark + ' I am already unmuted here');
+
+      channelSettings.muted = false;
+      await ctx.client.database.updateChannelSettings(channelSettings);
+      ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted, use `/settings mute` to mute');
     }
   },
 };
