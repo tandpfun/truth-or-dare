@@ -64,10 +64,12 @@ export function embed(
     description: `${
       fail ? Client.EMOTES.xmark : fail !== null ? Client.EMOTES.checkmark : ''
     } ${description}`,
-    author: user ? {
-      name: `${user.username}#${user.discriminator}`,
-      icon_url: avatarURL(user),
-    } : null,
+    author: user
+      ? {
+          name: `${user.username}#${user.discriminator}`,
+          icon_url: avatarURL(user),
+        }
+      : null,
     color: fail ? Client.COLORS.RED : fail === null ? Client.COLORS.BLUE : Client.COLORS.GREEN,
   };
 }
@@ -132,7 +134,10 @@ export async function createDMChannel(
     .catch(_ => null);
 }
 
-export async function fetchGuild(guildId: string, token: string): Promise<RESTGetAPIGuildResult | null> {
+export async function fetchGuild(
+  guildId: string,
+  token: string
+): Promise<RESTGetAPIGuildResult | null> {
   return await superagent
     .get(`https://discord.com/api/guilds/${guildId}`)
     .set('Authorization', `Bot ${token}`)
