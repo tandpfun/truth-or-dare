@@ -54,7 +54,11 @@ export default class Server {
     const interaction = req.body;
     if (interaction.type === InteractionType.APPLICATION_COMMAND) {
       const ctx = new Context(interaction, this.client, res);
-      if ((await ctx.channelSettings).muted) 
+      if (
+        (await ctx.channelSettings).muted
+        && !(ctx.command.name === "settings"
+          && ctx.args[0] === "unmute")
+      )
         return ctx.reply({
           content: "I am muted in this channel",
           flags: 1 << 6
