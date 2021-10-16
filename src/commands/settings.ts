@@ -3,37 +3,39 @@ import {
   ApplicationCommandInteractionDataOptionChannel,
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
+  ChannelType,
 } from 'discord-api-types/v9';
 import Command from '../classes/Command';
 import Context from '../classes/Context';
+import { fetchChannel } from '../classes/Functions';
 
 const settings: Command = {
   name: 'settings',
-  description: 'Show and configure the channel settings of a channel.',
+  description: 'Show and configure the channel settings of a channel',
   category: 'control',
   perms: ['ManageChannels'],
   options: [
     {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'view',
-      description: "View a channel's settings.",
+      description: "View a channel's settings",
       options: [
         {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
-          description: 'The channel to mute the bot in',
+          description: 'The channel to view settings for',
         },
       ],
     },
     {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'disablerating',
-      description: 'Disable a question rating for a channel.',
+      description: 'Disable a question rating for a channel',
       options: [
         {
           type: ApplicationCommandOptionType.String,
           name: 'rating',
-          description: 'The rating to disable.',
+          description: 'The rating to disable',
           required: true,
           choices: [
             { name: 'PG', value: 'PG' },
@@ -44,19 +46,19 @@ const settings: Command = {
         {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
-          description: 'The channel to mute the bot in',
+          description: 'The channel to disable the rating in',
         },
       ],
     },
     {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'enablerating',
-      description: 'Enable a question rating for a channel.',
+      description: 'Enable a question rating for a channel',
       options: [
         {
           type: ApplicationCommandOptionType.String,
           name: 'rating',
-          description: 'The rating to enable.',
+          description: 'The rating to enable',
           required: true,
           choices: [
             { name: 'PG', value: 'PG' },
@@ -67,7 +69,7 @@ const settings: Command = {
         {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
-          description: 'The channel to mute the bot in',
+          description: 'The channel to enable the rating in',
         },
       ],
     },
@@ -75,6 +77,18 @@ const settings: Command = {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'mute',
       description: 'Disable all commands in a channel',
+      options: [
+        {
+          type: ApplicationCommandOptionType.Channel,
+          name: 'channel',
+          description: 'The channel to mute the bot in',
+        },
+      ],
+    },
+    {
+      type: ApplicationCommandOptionType.Subcommand,
+      name: 'unmute',
+      description: 'Reenable all commands in a channel',
       options: [
         {
           type: ApplicationCommandOptionType.Channel,
@@ -91,6 +105,12 @@ const settings: Command = {
     const channelId = ctx.getOption('channel')
       ? (ctx.getOption('channel') as ApplicationCommandInteractionDataOptionChannel)?.value
       : ctx.channelId;
+
+    const fetchedChannel = await fetchChannel(channelId, ctx.client.token)
+
+    if (fetchedChannel.type !== ChannelType.GuildText)
+      return ctx.reply('The channel must be a text channel')
+
     const channelSettings =
       channelId === ctx.channelId
         ? await ctx.channelSettings

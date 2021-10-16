@@ -1,6 +1,7 @@
 import {
   APIEmbed,
   PermissionFlagsBits,
+  RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageJSONBody,
@@ -143,4 +144,15 @@ export async function fetchGuild(
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(_ => null);
+}
+
+export async function fetchChannel(
+  channelId: string,
+  token: string
+): Promise<RESTGetAPIChannelResult | null> {
+  return await superagent
+    .get(`https://discord.com/api/channel/${channelId}`)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body)
+    .catch(_ => null)
 }
