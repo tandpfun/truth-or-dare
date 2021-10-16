@@ -29,9 +29,8 @@ const nhie: Command = {
       ?.value;
     const nhie = await ctx.client.database.getRandomQuestion(
       'NHIE',
-      (rating ? [rating as Rating] : ['PG', 'PG13', 'R']).filter(
-        (r: Rating) => !channelSettings.disabledRatings.includes(r)
-      ) as Rating[]
+      channelSettings.disabledRatings,
+      rating as Rating
     );
     ctx.reply({
       embeds: [

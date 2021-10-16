@@ -71,9 +71,9 @@ const settings: Command = {
         embeds: [
           {
             title: `${ctx.client.EMOTES.gear} Channel Settings`,
-            description: `__Ratings:__\n${ratingEmoji('PG')} PG Questions\n${ratingEmoji(
-              'PG13'
-            )} PG13 Questions\n${ratingEmoji('R')} R Questions`,
+            description: `__Ratings:__\n${Object.values(Rating)
+              .map(r => `${ratingEmoji(r)} ${r} Questions`)
+              .join('\n')}`,
             color: ctx.client.COLORS.BLUE,
           },
         ],

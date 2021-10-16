@@ -116,10 +116,13 @@ export default class Database {
 
   async getRandomQuestion(
     type: QuestionType,
-    ratings?: Rating[],
+    disabledRatings: Rating[] = [],
+    rating?: Rating,
     guildId?: string
   ): Promise<Question> {
-    ratings = ratings ?? ['PG', 'PG13', 'R'];
+    const ratings = (rating ? [rating] : Object.values(Rating)).filter(
+      r => !disabledRatings.includes(r)
+    );
     if (!ratings.length)
       return {
         id: '',
@@ -127,13 +130,13 @@ export default class Database {
         rating: 'NONE',
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
-    const rating = ratings[Math.floor(Math.random() * ratings.length)];
+    const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
     const questions = guildId
       ? [
-          ...this.questionCache[type][rating],
-          ...(await this.getCustomQuestions(guildId, type, rating)),
+          ...this.questionCache[type][chosenRating],
+          ...(await this.getCustomQuestions(guildId, type, chosenRating)),
         ]
-      : this.questionCache[type][rating];
+      : this.questionCache[type][chosenRating];
     return questions[Math.floor(Math.random() * questions.length)];
   }
 

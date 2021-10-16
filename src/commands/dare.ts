@@ -29,9 +29,8 @@ const dare: Command = {
       ?.value;
     const dare = await ctx.client.database.getRandomQuestion(
       'DARE',
-      (rating ? [rating as Rating] : ['PG', 'PG13', 'R']).filter(
-        (r: Rating) => !channelSettings.disabledRatings.includes(r)
-      ) as Rating[]
+      channelSettings.disabledRatings,
+      rating as Rating
     );
     ctx.reply({
       embeds: [

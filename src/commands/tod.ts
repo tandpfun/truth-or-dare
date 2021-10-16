@@ -30,9 +30,8 @@ const tod: Command = {
       ?.value;
     const result = await ctx.client.database.getRandomQuestion(
       type,
-      (rating ? [rating as Rating] : ['PG', 'PG13', 'R']).filter(
-        (r: Rating) => !channelSettings.disabledRatings.includes(r)
-      ) as Rating[]
+      channelSettings.disabledRatings,
+      rating as Rating
     );
     ctx.reply({
       embeds: [
