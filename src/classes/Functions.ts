@@ -154,5 +154,5 @@ export async function fetchChannel(
     .get(`https://discord.com/api/channel/${channelId}`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
-    .catch(_ => null)
+    .catch(_ => null);
 }

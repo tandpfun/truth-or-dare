@@ -7,7 +7,11 @@ import {
 } from 'discord-api-types/v9';
 import Command from '../classes/Command';
 import Context from '../classes/Context';
-import { fetchChannel } from '../classes/Functions';
+
+const CHANNEL_TYPES: [ChannelType.GuildText, ChannelType.GuildNews] = [
+  ChannelType.GuildText,
+  ChannelType.GuildNews,
+];
 
 const settings: Command = {
   name: 'settings',
@@ -24,9 +28,7 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to view settings for',
-          channel_types: [
-            ChannelType.GuildText,
-          ]
+          channel_types: CHANNEL_TYPES,
         },
       ],
     },
@@ -50,9 +52,7 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to disable the rating in',
-          channel_types: [
-            ChannelType.GuildText,
-          ]
+          channel_types: CHANNEL_TYPES,
         },
       ],
     },
@@ -76,9 +76,7 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to enable the rating in',
-          channel_types: [
-            ChannelType.GuildText,
-          ]
+          channel_types: CHANNEL_TYPES,
         },
       ],
     },
@@ -91,9 +89,7 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to mute the bot in',
-          channel_types: [
-            ChannelType.GuildText,
-          ]
+          channel_types: CHANNEL_TYPES,
         },
       ],
     },
@@ -106,9 +102,7 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to mute the bot in',
-          channel_types: [
-            ChannelType.GuildText,
-          ]
+          channel_types: CHANNEL_TYPES,
         },
       ],
     },
@@ -117,14 +111,14 @@ const settings: Command = {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
 
-    const channelId = ctx.getOption('channel')
-      ? (ctx.getOption('channel') as ApplicationCommandInteractionDataOptionChannel)?.value
-      : ctx.channelId;
+    const channelId =
+      (ctx.getOption('channel') as ApplicationCommandInteractionDataOptionChannel)?.value ??
+      ctx.channelId;
 
-    const fetchedChannel = await fetchChannel(channelId, ctx.client.token)
+    const fetchedChannel = await ctx.client.functions.fetchChannel(channelId, ctx.client.token);
 
-    if (fetchedChannel.type !== ChannelType.GuildText)
-      return ctx.reply('The channel must be a text channel')
+    if (!(CHANNEL_TYPES as ChannelType[]).includes(fetchedChannel.type))
+      return ctx.reply('The channel must be a text channel');
 
     const channelSettings =
       channelId === ctx.channelId
