@@ -24,6 +24,9 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to view settings for',
+          channel_types: [
+            ChannelType.GuildText,
+          ]
         },
       ],
     },
@@ -47,6 +50,9 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to disable the rating in',
+          channel_types: [
+            ChannelType.GuildText,
+          ]
         },
       ],
     },
@@ -70,6 +76,9 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to enable the rating in',
+          channel_types: [
+            ChannelType.GuildText,
+          ]
         },
       ],
     },
@@ -82,6 +91,9 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to mute the bot in',
+          channel_types: [
+            ChannelType.GuildText,
+          ]
         },
       ],
     },
@@ -94,6 +106,9 @@ const settings: Command = {
           type: ApplicationCommandOptionType.Channel,
           name: 'channel',
           description: 'The channel to mute the bot in',
+          channel_types: [
+            ChannelType.GuildText,
+          ]
         },
       ],
     },
