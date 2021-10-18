@@ -49,9 +49,11 @@ const paranoia: Command = {
           {
             title: paranoia.question,
             color: ctx.client.COLORS.BLUE,
-            footer: {
-              text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
-            },
+            footer: paranoia.id
+              ? {
+                  text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
+                }
+              : null,
           },
         ],
       });
