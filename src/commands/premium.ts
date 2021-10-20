@@ -131,11 +131,11 @@ const premium: Command = {
             ),
           ],
         });
-      await ctx.client.database.diactivatePremium(ctx.user.id, guildId);
+      await ctx.client.database.deactivatePremium(ctx.user.id, guildId);
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
-            `Successfully diactivated premium for ${
+            `Successfully deactivated premium for ${
               ctx.guildId === guildId ? 'this server' : guildId
             }`,
             ctx.user,

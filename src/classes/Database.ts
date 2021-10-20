@@ -293,7 +293,7 @@ export default class Database {
     });
   }
 
-  async diactivatePremium(userId: string, guildId: string) {
+  async deactivatePremium(userId: string, guildId: string) {
     const { premiumServers } = await this.db.premiumUser.findUnique({ where: { id: userId } });
     return await this.db.premiumUser.update({
       where: { id: userId },
