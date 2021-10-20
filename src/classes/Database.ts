@@ -71,16 +71,7 @@ export default class Database {
   }
 
   async fetchAllQuestions() {
-    const questions: Question[] = [];
-    const totalQuestions = await this.db.question.count();
-    for (let i = 0; i < Math.ceil(totalQuestions / 100); i++) {
-      questions.push(
-        ...(await this.db.question.findMany({
-          take: 100,
-          skip: i * 100,
-        }))
-      );
-    }
+    const questions: Question[] = await this.db.question.findMany();
     this.questionCache = {
       DARE: {
         PG: questions.filter(q => q.type === 'DARE' && q.rating === 'PG'),

@@ -1,12 +1,12 @@
-import {
+import type {
   RESTPostAPICurrentUserCreateDMChannelResult,
   RESTPostAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
   RESTGetAPIGuildResult,
-  PermissionFlagsBits,
   APIEmbed,
 } from 'discord-api-types';
+import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
 import type Command from './Command';
