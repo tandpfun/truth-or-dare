@@ -56,3 +56,8 @@ model CustomQuestion {
   rating   Rating
   question String
 }
+
+model PremiumChannelSettings {
+  id       String    @id @map("_id")
+  disabledQuestionIDs   String[]
+}

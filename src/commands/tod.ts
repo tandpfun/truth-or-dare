@@ -25,12 +25,16 @@ const tod: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const disabledQuestionIDs = ctx.guildId 
+      ? await ctx.client.database.getDisabledQuestionIDs(ctx.guildId)
+      : []
     const type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
     const result = await ctx.client.database.getRandomQuestion(
       type,
       channelSettings.disabledRatings,
+      disabledQuestionIDs,
       rating as Rating
     );
     ctx.reply({

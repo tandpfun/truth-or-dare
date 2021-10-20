@@ -2,6 +2,7 @@ import { InteractionResponseType } from 'discord-interactions';
 import {
   APIApplicationCommandInteraction,
   APIApplicationCommandInteractionDataOption,
+  APIApplicationCommandInteractionDataOptionWithValues,
   APIChatInputApplicationCommandInteraction,
   APIChatInputApplicationCommandInteractionData,
   APIChatInputApplicationCommandInteractionDataResolved,
@@ -64,7 +65,35 @@ export default class Context {
   }
 
   getOption(name: string) {
-    return this.options.find(o => o.name === name);
+    const mainResult = this.options.find(o => o.name === name);
+    if (mainResult) return mainResult;
+    const firstSubcommandResult = this.options
+      .reduce(
+        (result, o) =>
+          o.type === ApplicationCommandOptionType.Subcommand ? [...result, ...o.options] : result,
+        [] as APIApplicationCommandInteractionDataOptionWithValues[]
+      )
+      .find(o => o.name === name);
+    if (firstSubcommandResult) return firstSubcommandResult;
+    const secondSubcommandResult = this.options
+      .reduce(
+        (result, o) =>
+          o.type === ApplicationCommandOptionType.SubcommandGroup
+            ? [
+                ...result,
+                ...o.options.reduce(
+                  (subresult, so) =>
+                    so.type === ApplicationCommandOptionType.Subcommand
+                      ? [...subresult, ...so.options]
+                      : subresult,
+                  [] as APIApplicationCommandInteractionDataOptionWithValues[]
+                ),
+              ]
+            : result,
+        [] as APIApplicationCommandInteractionDataOptionWithValues[]
+      )
+      .find(o => o.name === name);
+    return secondSubcommandResult;
   }
 
   reply(data: string | APIInteractionResponseCallbackData) {

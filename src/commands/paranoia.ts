@@ -31,6 +31,9 @@ const paranoia: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const disabledQuestionIDs = ctx.guildId 
+      ? await ctx.client.database.getDisabledQuestionIDs(ctx.guildId)
+      : []
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
     const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
@@ -39,6 +42,7 @@ const paranoia: Command = {
     const paranoia = await ctx.client.database.getRandomQuestion(
       'PARANOIA',
       channelSettings.disabledRatings,
+      disabledQuestionIDs,
       rating as Rating
     );
 

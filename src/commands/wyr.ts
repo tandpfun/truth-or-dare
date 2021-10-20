@@ -25,11 +25,15 @@ const wyr: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const disabledQuestionIDs = ctx.guildId 
+      ? await ctx.client.database.getDisabledQuestionIDs(ctx.guildId)
+      : []
     const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
       ?.value;
     const wyr = await ctx.client.database.getRandomQuestion(
       'WYR',
       channelSettings.disabledRatings,
+      disabledQuestionIDs,
       rating as Rating
     );
     ctx.reply({

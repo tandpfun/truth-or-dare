@@ -117,6 +117,7 @@ export default class Database {
   async getRandomQuestion(
     type: QuestionType,
     disabledRatings: Rating[] = [],
+    disabledQuestionIDs: string[] = [],
     rating?: Rating,
     guildId?: string
   ): Promise<Question> {
@@ -130,13 +131,14 @@ export default class Database {
         rating: 'NONE',
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
-    const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
-    const questions = guildId
+      const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
+    const unfiltered = guildId
       ? [
           ...this.questionCache[type][chosenRating],
           ...(await this.getCustomQuestions(guildId, type, chosenRating)),
         ]
       : this.questionCache[type][chosenRating];
+    const questions = unfiltered.filter(q => !disabledQuestionIDs.includes(q.id))
     return questions[Math.floor(Math.random() * questions.length)];
   }
 
@@ -237,5 +239,22 @@ export default class Database {
 
   async setParanoiaMessageId(id: string, dmMessageId: string) {
     await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
+  }
+
+  async getDisabledQuestionIDs(id: string): Promise<string[] | null> {
+    return this.db.premiumChannelSettings.findUnique({ where: { id } }).then(result => result?.disabledQuestionIDs || []).catch(_ => null);
+  }
+
+  async getDisabledQuestions(id: string) {
+    const ids = await this.getDisabledQuestionIDs(id)
+    return Promise.all(ids.map(async id => this.fetchSpecificQuestion(id)))
+  }
+
+  async setDisabledQuestionIDs(id: string, disabledQuestionIDs: string[]) {
+    return this.db.premiumChannelSettings.upsert({
+      where: { id },
+      update: { disabledQuestionIDs },
+      create: { id, disabledQuestionIDs }
+    })
   }
 }

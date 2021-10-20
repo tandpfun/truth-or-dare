@@ -118,6 +118,7 @@ export default class Server {
       await this.client.database.getRandomQuestion(
         questionType.toUpperCase() as QuestionType,
         [],
+        [],
         (rating as string).toUpperCase() as Rating
       )
     );
