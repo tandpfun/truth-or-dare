@@ -111,7 +111,7 @@ const questions: Command = {
       const rating =
         ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value || 'ALL';
 
-      const questions = await ctx.client.database.getCustomQuestions(
+      const questions = ctx.client.database.getCustomQuestions(
         ctx.guildId,
         questionType === 'ALL' ? undefined : questionType,
         rating === 'ALL' ? undefined : rating

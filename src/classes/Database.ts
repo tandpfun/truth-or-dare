@@ -17,6 +17,7 @@ export default class Database {
   db: PrismaClient;
   channelCache: Record<string, ChannelSettings | null>;
   questionCache: Record<QuestionType, Record<Rating, Question[]>>;
+  customQuestions: Record<QuestionType, Record<Rating, CustomQuestion[]>>;
 
   constructor(client: Client) {
     this.client = client;
@@ -28,6 +29,7 @@ export default class Database {
     await this.db.$connect();
     this.client.console.success('Connected to database!');
     await this.fetchAllQuestions();
+    await this.fetchAllCustomQuestions();
     setInterval(async () => {
       const cacheSize = Object.keys(this.channelCache).length;
       this.channelCache = {};
@@ -72,33 +74,17 @@ export default class Database {
 
   async fetchAllQuestions() {
     const questions: Question[] = await this.db.question.findMany();
-    this.questionCache = {
-      DARE: {
-        PG: questions.filter(q => q.type === 'DARE' && q.rating === 'PG'),
-        PG13: questions.filter(q => q.type === 'DARE' && q.rating === 'PG13'),
-        R: questions.filter(q => q.type === 'DARE' && q.rating === 'R'),
-      },
-      NHIE: {
-        PG: questions.filter(q => q.type === 'NHIE' && q.rating === 'PG'),
-        PG13: questions.filter(q => q.type === 'NHIE' && q.rating === 'PG13'),
-        R: questions.filter(q => q.type === 'NHIE' && q.rating === 'R'),
-      },
-      TRUTH: {
-        PG: questions.filter(q => q.type === 'TRUTH' && q.rating === 'PG'),
-        PG13: questions.filter(q => q.type === 'TRUTH' && q.rating === 'PG13'),
-        R: questions.filter(q => q.type === 'TRUTH' && q.rating === 'R'),
-      },
-      WYR: {
-        PG: questions.filter(q => q.type === 'WYR' && q.rating === 'PG'),
-        PG13: questions.filter(q => q.type === 'WYR' && q.rating === 'PG13'),
-        R: questions.filter(q => q.type === 'WYR' && q.rating === 'R'),
-      },
-      PARANOIA: {
-        PG: questions.filter(q => q.type === 'PARANOIA' && q.rating === 'PG'),
-        PG13: questions.filter(q => q.type === 'PARANOIA' && q.rating === 'PG13'),
-        R: questions.filter(q => q.type === 'PARANOIA' && q.rating === 'R'),
-      },
-    };
+    this.questionCache = Object.fromEntries(
+      Object.values(QuestionType).map(type => [
+        type,
+        Object.fromEntries(
+          Object.values(Rating).map(rating => [
+            rating,
+            questions.filter(q => q.type === type && q.rating === rating),
+          ])
+        ),
+      ])
+    ) as Record<QuestionType, Record<Rating, Question[]>>;
     return this.questionCache;
   }
 
@@ -126,7 +112,7 @@ export default class Database {
     const questions = guildId
       ? [
           ...this.questionCache[type][chosenRating],
-          ...(await this.getCustomQuestions(guildId, type, chosenRating)),
+          ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
         ]
       : this.questionCache[type][chosenRating];
     return questions[Math.floor(Math.random() * questions.length)];
@@ -183,16 +169,59 @@ export default class Database {
     }
   }
 
-  async getCustomQuestions(guildId: string, type?: QuestionType, rating?: Rating) {
-    return await this.db.customQuestion.findMany({ where: { guildId, type, rating } });
+  async fetchAllCustomQuestions() {
+    const questions = await this.db.customQuestion.findMany();
+    this.customQuestions = Object.fromEntries(
+      Object.values(QuestionType).map(type => [
+        type,
+        Object.fromEntries(
+          Object.values(Rating).map(rating => [
+            rating,
+            questions.filter(q => q.type === type && q.rating === rating),
+          ])
+        ),
+      ])
+    ) as Record<QuestionType, Record<Rating, CustomQuestion[]>>;
+    return this.customQuestions;
+  }
+
+  getCustomQuestions(guildId: string, type?: QuestionType, rating?: Rating) {
+    return Object.values(QuestionType)
+      .map(t =>
+        Object.values(Rating)
+          .map(r =>
+            this.customQuestions[t][r].filter(
+              q =>
+                q.guildId === guildId &&
+                (!type || q.type === type) &&
+                (!rating || q.rating === rating)
+            )
+          )
+          .flat()
+      )
+      .flat();
   }
 
   async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
-    return await this.db.customQuestion.create({ data: { id: this.generateId(), ...data } });
+    const question = await this.db.customQuestion.create({
+      data: { id: this.generateId(), ...data },
+    });
+    this.customQuestions[data.type][data.rating].push(question);
+    return question;
   }
 
   async deleteCustomQuestion(id: string): Promise<CustomQuestion | null> {
-    return await this.db.customQuestion.delete({ where: { id } }).catch(_ => null);
+    const question: CustomQuestion | null = await this.db.customQuestion
+      .delete({ where: { id } })
+      .catch(_ => null);
+    if (!question) return null;
+    const questions = this.customQuestions[question.type][question.rating];
+    if (questions.some(q => q.id === question.id))
+      questions.splice(
+        questions.findIndex(q => q.id === question.id),
+        1
+      );
+    return question;
   }
 
   async addParanoiaQuestion(questionData: Optional<ParanoiaQuestion, 'id' | 'time'>) {
