@@ -230,4 +230,31 @@ export default class Database {
   async setParanoiaMessageId(id: string, dmMessageId: string) {
     await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
   }
+
+  async getPremiumUser(id: string) {
+    return await this.db.premiumUser.findUnique({ where: { id } });
+  }
+
+  async isPremiumGuild(guildId: string): Promise<boolean> {
+    return !!(await this.db.premiumUser.findFirst({ where: { premiumServers: { has: guildId } } }));
+  }
+
+  async getPremiumActivated(guildId: string) {
+    return await this.db.premiumUser.findMany({ where: { premiumServers: { has: guildId } } });
+  }
+
+  async activatePremium(userId: string, guildId: string) {
+    return await this.db.premiumUser.update({
+      where: { id: userId },
+      data: { premiumServers: { push: guildId } },
+    });
+  }
+
+  async diactivatePremium(userId: string, guildId: string) {
+    const { premiumServers } = await this.db.premiumUser.findUnique({ where: { id: userId } });
+    return await this.db.premiumUser.update({
+      where: { id: userId },
+      data: { premiumServers: premiumServers.filter(id => id !== guildId) },
+    });
+  }
 }

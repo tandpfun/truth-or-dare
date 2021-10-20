@@ -56,3 +56,19 @@ model CustomQuestion {
   rating   Rating
   question String
 }
+
+model PremiumUser {
+  id             String        @id @map("_id")
+  totalDonated   Float
+  premiumSlots   Int
+  premiumServers String[]
+  transactions   Transaction[]
+}
+
+model Transaction {
+  id            String      @id @map("_id")
+  amount        Float
+  itemId        Int
+  discordUserId String
+  user          PremiumUser @relation(fields: [discordUserId], references: [id])
+}
