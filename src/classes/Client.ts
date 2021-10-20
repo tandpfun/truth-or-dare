@@ -23,8 +23,7 @@ export default class Client {
   suggestCooldowns: Record<string, number>;
   stats: {
     minuteCommandCount: number;
-    perMinuteCommandAverage: number;
-    minutesPassed: number;
+    pastCommandCounts: number[];
     commands: Record<string, number>;
     minuteCommands: Record<string, number>;
   };
@@ -84,8 +83,7 @@ export default class Client {
     this.suggestCooldowns = {};
     this.stats = {
       minuteCommandCount: 0,
-      perMinuteCommandAverage: 0,
-      minutesPassed: 0,
+      pastCommandCounts: [],
       commands: {},
       minuteCommands: {},
     };
@@ -121,10 +119,8 @@ export default class Client {
     this.server.start();
 
     setInterval(() => {
-      this.stats.perMinuteCommandAverage =
-        (this.stats.perMinuteCommandAverage * this.stats.minutesPassed +
-          this.stats.minuteCommandCount) /
-        ++this.stats.minutesPassed;
+      this.stats.pastCommandCounts.unshift(this.stats.minuteCommandCount);
+      if (this.stats.pastCommandCounts.length > 30) this.stats.pastCommandCounts.pop();
       if (!this.devMode && process.env.STATCORD_KEY)
         this.postToStatcord(this.stats.minuteCommandCount, this.stats.minuteCommands);
       for (const command in this.stats.minuteCommands) {
