@@ -57,7 +57,7 @@ model CustomQuestion {
   question String
 }
 
-model PremiumChannelSettings {
+model PremiumSettings {
   id       String    @id @map("_id")
   disabledQuestionIDs   String[]
 }

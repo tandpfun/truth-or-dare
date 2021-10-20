@@ -242,7 +242,7 @@ export default class Database {
   }
 
   async getDisabledQuestionIDs(id: string): Promise<string[] | null> {
-    return this.db.premiumChannelSettings.findUnique({ where: { id } }).then(result => result?.disabledQuestionIDs || []).catch(_ => null);
+    return this.db.premiumSettings.findUnique({ where: { id } }).then(result => result?.disabledQuestionIDs || []).catch(_ => null);
   }
 
   async getDisabledQuestions(id: string) {
@@ -251,7 +251,7 @@ export default class Database {
   }
 
   async setDisabledQuestionIDs(id: string, disabledQuestionIDs: string[]) {
-    return this.db.premiumChannelSettings.upsert({
+    return this.db.premiumSettings.upsert({
       where: { id },
       update: { disabledQuestionIDs },
       create: { id, disabledQuestionIDs }
