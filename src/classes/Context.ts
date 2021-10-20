@@ -9,6 +9,8 @@ import {
   APIInteractionGuildMember,
   APIInteractionResponseCallbackData,
   APIUser,
+  ApplicationCommandInteractionDataOptionSubCommand,
+  ApplicationCommandInteractionDataOptionSubCommandGroup,
   ApplicationCommandOptionType,
   ApplicationCommandType,
 } from 'discord-api-types/v9';
@@ -67,33 +69,38 @@ export default class Context {
   getOption(name: string) {
     const mainResult = this.options.find(o => o.name === name);
     if (mainResult) return mainResult;
-    const firstSubcommandResult = this.options
-      .reduce(
-        (result, o) =>
-          o.type === ApplicationCommandOptionType.Subcommand ? [...result, ...o.options] : result,
-        [] as APIApplicationCommandInteractionDataOptionWithValues[]
-      )
-      .find(o => o.name === name);
-    if (firstSubcommandResult) return firstSubcommandResult;
-    const secondSubcommandResult = this.options
-      .reduce(
-        (result, o) =>
-          o.type === ApplicationCommandOptionType.SubcommandGroup
-            ? [
-                ...result,
-                ...o.options.reduce(
-                  (subresult, so) =>
-                    so.type === ApplicationCommandOptionType.Subcommand
-                      ? [...subresult, ...so.options]
-                      : subresult,
-                  [] as APIApplicationCommandInteractionDataOptionWithValues[]
-                ),
-              ]
-            : result,
-        [] as APIApplicationCommandInteractionDataOptionWithValues[]
-      )
-      .find(o => o.name === name);
-    return secondSubcommandResult;
+    if (
+      ![
+        ApplicationCommandOptionType.Subcommand,
+        ApplicationCommandOptionType.SubcommandGroup,
+      ].includes(this.options[0]?.type)
+    )
+      return null;
+    const firstRes = (
+      (
+        this.options[0] as
+          | ApplicationCommandInteractionDataOptionSubCommandGroup
+          | ApplicationCommandInteractionDataOptionSubCommand
+      ).options as (
+        | ApplicationCommandInteractionDataOptionSubCommandGroup
+        | ApplicationCommandInteractionDataOptionSubCommand
+      )[]
+    ).find(o => o.name === name);
+    if (firstRes) return firstRes;
+    if (
+      (
+        this.options[0] as
+          | ApplicationCommandInteractionDataOptionSubCommandGroup
+          | ApplicationCommandInteractionDataOptionSubCommand
+      ).options[0]?.type !== ApplicationCommandOptionType.Subcommand
+    )
+      return null;
+    const secondRes = (
+      (this.options[0] as ApplicationCommandInteractionDataOptionSubCommandGroup)
+        .options[0] as ApplicationCommandInteractionDataOptionSubCommand
+    ).options.find(o => o.name === name);
+    if (secondRes) return secondRes;
+    return null;
   }
 
   reply(data: string | APIInteractionResponseCallbackData) {
