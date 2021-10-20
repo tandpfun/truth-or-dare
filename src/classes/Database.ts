@@ -88,6 +88,20 @@ export default class Database {
     return this.questionCache;
   }
 
+  getQuestions(type?: QuestionType, rating?: Rating) {
+    return Object.values(QuestionType)
+      .map(t =>
+        Object.values(Rating)
+          .map(r =>
+            this.questionCache[t][r].filter(
+              q => (!type || q.type === type) && (!rating || q.rating === rating)
+            )
+          )
+          .flat()
+      )
+      .flat();
+  }
+
   async fetchSpecificQuestion(id: string) {
     return await this.db.question.findUnique({ where: { id } });
   }

@@ -5,6 +5,7 @@ import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
+const { MAIN_GUILD } = process.env;
 const PER_PAGE = 15;
 const options = [
   {
@@ -111,11 +112,17 @@ const questions: Command = {
       const rating =
         ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value || 'ALL';
 
-      const questions = ctx.client.database.getCustomQuestions(
-        ctx.guildId,
-        questionType === 'ALL' ? undefined : questionType,
-        rating === 'ALL' ? undefined : rating
-      );
+      const questions =
+        ctx.guildId === MAIN_GUILD
+          ? ctx.client.database.getQuestions(
+              questionType === 'ALL' ? undefined : questionType,
+              rating === 'ALL' ? undefined : rating
+            )
+          : ctx.client.database.getCustomQuestions(
+              ctx.guildId,
+              questionType === 'ALL' ? undefined : questionType,
+              rating === 'ALL' ? undefined : rating
+            );
 
       const page = Math.min(
         Math.max(ctx.getOption<Mutable<typeof options[0]['options'][2]>>('page')?.value || 1, 1),
@@ -159,23 +166,27 @@ const questions: Command = {
 
       if (question.length > 256) return ctx.reply('Maximum question length is 256 characters');
 
-      await ctx.client.database.addCustomQuestion({
-        guildId: ctx.guildId,
-        type,
-        rating,
-        question,
-      });
+      const addedQuestion = await (ctx.guildId === MAIN_GUILD
+        ? ctx.client.database.updateQuestion('', { type, rating, question })
+        : ctx.client.database.addCustomQuestion({
+            guildId: ctx.guildId,
+            type,
+            rating,
+            question,
+          }));
 
-      return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added`);
+      return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added. ID: ${addedQuestion.id}`);
     } else if (ctx.args[0] === 'remove') {
       const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id').value;
 
-      const deleted = await ctx.client.database.deleteCustomQuestion(id);
+      const deleted = await (ctx.guildId === MAIN_GUILD
+        ? ctx.client.database.deleteQuestion(id)
+        : ctx.client.database.deleteCustomQuestion(id));
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
             deleted
-              ? 'Question removed'
+              ? `Question removed. ID: ${deleted.id}`
               : 'Something went wrong, maybe the question has already been deleted?',
             ctx.user,
             !!deleted
