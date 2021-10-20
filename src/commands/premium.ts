@@ -7,6 +7,11 @@ import type Context from '../classes/Context';
 const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
+    name: 'check',
+    description: 'Check if this current server has premium activated',
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
     name: 'list',
     description: 'List your premium servers',
   },
@@ -37,8 +42,10 @@ const premium: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const premiumUser = false; // TODO: fetch data
-    const premiumGuild = false;
+    const premiumGuild = ctx.guildId
+      ? await ctx.client.database.isPremiumGuild(ctx.guildId)
+      : false;
+    const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
 
     if (!premiumUser)
       return ctx.reply({
@@ -67,12 +74,31 @@ const premium: Command = {
         ],
       });
 
-    if (ctx.args[0] === 'list') {
+    if (ctx.args[0] === 'check') {
       return ctx.reply({
         embeds: [
           {
+            title: ctx.guildId
+              ? `You do${
+                  premiumUser.premiumServers.includes(ctx.guildId) ? '' : ' not'
+                } have premium activated for this server`
+              : null,
             color: ctx.client.COLORS.BLUE,
-            description: undefined || 'None', // TODO: use fetched settings
+            description: ctx.guildId
+              ? `This server does${premiumGuild ? '' : ' not'} have premium activated`
+              : 'This is a dm',
+          },
+        ],
+      });
+    } else if (ctx.args[0] === 'list') {
+      return ctx.reply({
+        embeds: [
+          {
+            title: ctx.guildId
+              ? `This server does${premiumGuild ? '' : ' not'} have premium activated`
+              : null,
+            color: ctx.client.COLORS.BLUE,
+            description: premiumUser.premiumServers.join('\n') || 'None', // TODO: use fetched settings
           },
         ],
       });
@@ -87,22 +113,36 @@ const premium: Command = {
             ),
           ],
         });
-      // TODO: activate preium
+      await ctx.client.database.activatePremium(ctx.user.id, ctx.guildId);
+      return ctx.reply({
+        embeds: [ctx.client.functions.embed('Activated premium for this server', ctx.user, false)],
+      });
     } else if (ctx.args[0] === 'remove') {
       const guildId =
-        ctx.getOption<Mutable<typeof options[2]['options'][0]>>('server')?.value || ctx.guildId;
-      if (!guildId || !/^\d{17,20}$/.test(guildId))
+        ctx.getOption<Mutable<typeof options[3]['options'][0]>>('server')?.value || ctx.guildId;
+      if (!premiumUser.premiumServers.includes(guildId))
         // TODO: check in premium guilds array
         return ctx.reply({
           embeds: [
             ctx.client.functions.embed(
-              'Please include a valid server id from `/premium list` or run this command in the server you want to remove premium from',
+              "You don't have premium activated for that server",
               ctx.user,
               true
             ),
           ],
         });
-      // TODO: remove premium
+      await ctx.client.database.diactivatePremium(ctx.user.id, guildId);
+      return ctx.reply({
+        embeds: [
+          ctx.client.functions.embed(
+            `Successfully diactivated premium for ${
+              ctx.guildId === guildId ? 'this server' : guildId
+            }`,
+            ctx.user,
+            false
+          ),
+        ],
+      });
     }
   },
 };
