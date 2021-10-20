@@ -1,11 +1,12 @@
 import {
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
-  ButtonStyle,
   ComponentType,
+  ButtonStyle,
 } from 'discord-api-types';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const premium: Command = {
   name: 'premium',
@@ -91,7 +92,8 @@ const premium: Command = {
       // TODO: activate preium
     } else if (ctx.args[0] === 'remove') {
       const guildId =
-        (ctx.getOption('server') as ApplicationCommandInteractionDataOptionString)?.value || ctx.guildId;
+        (ctx.getOption('server') as ApplicationCommandInteractionDataOptionString)?.value ||
+        ctx.guildId;
       if (!guildId || !/^\d{17,20}$/.test(guildId))
         // TODO: check in premium guilds array
         return ctx.reply({

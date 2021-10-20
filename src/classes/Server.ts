@@ -1,10 +1,11 @@
-import express, { Express, Request, Response } from 'express';
 import { verifyKeyMiddleware, InteractionType } from 'discord-interactions';
-import rateLimiter from 'express-rate-limit';
-import Context from './Context';
-import type Client from './Client';
+import express, { Express, Request, Response } from 'express';
 import { QuestionType, Rating } from '.prisma/client';
+import rateLimiter from 'express-rate-limit';
 import * as Sentry from '@sentry/node';
+
+import type Client from './Client';
+import Context from './Context';
 
 export default class Server {
   port: number;

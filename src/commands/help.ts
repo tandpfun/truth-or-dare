@@ -1,6 +1,7 @@
-import { ButtonStyle, ComponentType } from 'discord-api-types/v9';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
+import { ButtonStyle, ComponentType } from 'discord-api-types';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const help: Command = {
   name: 'help',

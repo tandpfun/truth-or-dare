@@ -1,10 +1,11 @@
 import {
-  ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
+  ApplicationCommandOptionType,
 } from 'discord-api-types';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
 import superagent from 'superagent';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const suggest: Command = {
   name: 'suggest',

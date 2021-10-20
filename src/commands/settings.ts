@@ -1,10 +1,11 @@
-import { Rating } from '.prisma/client';
 import {
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
-} from 'discord-api-types/v9';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
+} from 'discord-api-types';
+import { Rating } from '.prisma/client';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const settings: Command = {
   name: 'settings',
@@ -79,7 +80,9 @@ const settings: Command = {
         ],
       });
     } else if (ctx.args[0] === 'disablerating') {
-      const ratingToDisable = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString).value as Rating;
+      const ratingToDisable = (
+        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
+      ).value as Rating;
 
       if (channelSettings.disabledRatings.includes(ratingToDisable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is already disabled here!`);
@@ -88,7 +91,9 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was disabled here!`);
     } else if (ctx.args[0] === 'enablerating') {
-      const ratingToEnable = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString).value as Rating;
+      const ratingToEnable = (
+        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
+      ).value as Rating;
 
       if (!channelSettings.disabledRatings.includes(ratingToEnable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is not disabled here!`);

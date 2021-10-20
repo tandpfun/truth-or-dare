@@ -1,13 +1,14 @@
 import {
+  ParanoiaQuestion,
   ChannelSettings,
   CustomQuestion,
-  ParanoiaQuestion,
   PrismaClient,
-  Question,
   QuestionType,
+  Question,
   Rating,
 } from '@prisma/client';
-import Client from './Client';
+
+import type Client from './Client';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 

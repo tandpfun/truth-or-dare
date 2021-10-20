@@ -1,5 +1,6 @@
-import { APIApplicationCommandOption, PermissionFlagsBits } from 'discord-api-types/v9';
-import Context from './Context';
+import { APIApplicationCommandOption, PermissionFlagsBits } from 'discord-api-types';
+
+import type Context from './Context';
 
 export default interface Command {
   name: string;

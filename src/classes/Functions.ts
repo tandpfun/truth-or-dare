@@ -1,16 +1,17 @@
 import {
-  APIEmbed,
-  PermissionFlagsBits,
-  RESTGetAPIGuildResult,
-  RESTPatchAPIChannelMessageResult,
-  RESTPostAPIChannelMessageJSONBody,
-  RESTPostAPIChannelMessageResult,
   RESTPostAPICurrentUserCreateDMChannelResult,
-} from 'discord-api-types/v9';
+  RESTPostAPIChannelMessageJSONBody,
+  RESTPatchAPIChannelMessageResult,
+  RESTPostAPIChannelMessageResult,
+  RESTGetAPIGuildResult,
+  PermissionFlagsBits,
+  APIEmbed,
+} from 'discord-api-types';
 import superagent from 'superagent';
+
+import type Command from './Command';
+import type Context from './Context';
 import Client from './Client';
-import Command from './Command';
-import Context from './Context';
 
 export function checkPerms(command: Command, ctx: Context) {
   if (!ctx.guildId) return true;

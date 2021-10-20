@@ -1,11 +1,12 @@
-import { QuestionType, Rating } from '.prisma/client';
 import {
   ApplicationCommandInteractionDataOptionNumber,
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
 } from 'discord-api-types';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
+import { QuestionType, Rating } from '.prisma/client';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const PER_PAGE = 15;
 
@@ -109,12 +110,10 @@ const questions: Command = {
     // const args = (ctx.options[0] as ApplicationCommandInteractionDataOptionSubCommand).options;
 
     if (ctx.args[0] === 'list') {
-      const questionType = ((
-        ctx.getOption('type') as ApplicationCommandInteractionDataOptionString
-      )?.value || 'ALL') as QuestionType | 'ALL';
-      const rating = ((
-        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
-      )?.value || 'ALL') as Rating | 'ALL';
+      const questionType = ((ctx.getOption('type') as ApplicationCommandInteractionDataOptionString)
+        ?.value || 'ALL') as QuestionType | 'ALL';
+      const rating = ((ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
+        ?.value || 'ALL') as Rating | 'ALL';
 
       const questions = await ctx.client.database.getCustomQuestions(
         ctx.guildId,
@@ -124,8 +123,7 @@ const questions: Command = {
 
       const page = Math.min(
         Math.max(
-          (ctx.getOption('page') as ApplicationCommandInteractionDataOptionNumber)
-            ?.value || 1,
+          (ctx.getOption('page') as ApplicationCommandInteractionDataOptionNumber)?.value || 1,
           1
         ),
         Math.ceil(questions.length / PER_PAGE)
@@ -162,15 +160,12 @@ const questions: Command = {
         ],
       });
     } else if (ctx.args[0] === 'add') {
-      const type = (
-        ctx.getOption('type') as ApplicationCommandInteractionDataOptionString
-      ).value as QuestionType;
-      const rating = (
-        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
-      ).value as Rating;
-      const question = (
-        ctx.getOption('question') as ApplicationCommandInteractionDataOptionString
-      ).value;
+      const type = (ctx.getOption('type') as ApplicationCommandInteractionDataOptionString)
+        .value as QuestionType;
+      const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
+        .value as Rating;
+      const question = (ctx.getOption('question') as ApplicationCommandInteractionDataOptionString)
+        .value;
 
       if (question.length > 256) return ctx.reply('Maximum question length is 256 characters');
 
@@ -183,8 +178,7 @@ const questions: Command = {
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added`);
     } else if (ctx.args[0] === 'remove') {
-      const id = (ctx.getOption('id') as ApplicationCommandInteractionDataOptionString)
-        .value;
+      const id = (ctx.getOption('id') as ApplicationCommandInteractionDataOptionString).value;
 
       const deleted = await ctx.client.database.deleteCustomQuestion(id);
       return ctx.reply({

@@ -2,8 +2,9 @@ import {
   ApplicationCommandInteractionDataOptionString,
   ApplicationCommandOptionType,
 } from 'discord-api-types';
-import Context from '../classes/Context';
-import Command from '../classes/Command';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const answer: Command = {
   name: 'answer',

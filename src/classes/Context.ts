@@ -1,22 +1,22 @@
-import { InteractionResponseType } from 'discord-interactions';
 import {
-  APIApplicationCommandInteraction,
-  APIApplicationCommandInteractionDataOption,
-  APIApplicationCommandInteractionDataOptionWithValues,
-  APIChatInputApplicationCommandInteraction,
-  APIChatInputApplicationCommandInteractionData,
-  APIChatInputApplicationCommandInteractionDataResolved,
-  APIInteractionGuildMember,
-  APIInteractionResponseCallbackData,
-  APIUser,
-  ApplicationCommandInteractionDataOptionSubCommand,
   ApplicationCommandInteractionDataOptionSubCommandGroup,
+  APIChatInputApplicationCommandInteractionDataResolved,
+  ApplicationCommandInteractionDataOptionSubCommand,
+  APIChatInputApplicationCommandInteractionData,
+  APIApplicationCommandInteractionDataOption,
+  APIChatInputApplicationCommandInteraction,
+  APIInteractionResponseCallbackData,
+  APIApplicationCommandInteraction,
   ApplicationCommandOptionType,
+  APIInteractionGuildMember,
+  InteractionResponseType,
   ApplicationCommandType,
-} from 'discord-api-types/v9';
-import { Response } from 'express';
-import Client from './Client';
-import { ChannelSettings } from '@prisma/client';
+  APIUser,
+} from 'discord-api-types';
+import type { ChannelSettings } from '@prisma/client';
+import type { Response } from 'express';
+
+import type Client from './Client';
 
 export default class Context {
   rawInteraction: APIApplicationCommandInteraction;
@@ -106,7 +106,7 @@ export default class Context {
   reply(data: string | APIInteractionResponseCallbackData) {
     if (typeof data === 'string') data = { content: data };
     this.response.send({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      type: InteractionResponseType.ChannelMessageWithSource,
       data,
     });
   }

@@ -1,10 +1,11 @@
-import { Rating } from '.prisma/client';
 import {
-  ApplicationCommandOptionType,
   ApplicationCommandInteractionDataOptionString,
+  ApplicationCommandOptionType,
 } from 'discord-api-types';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
+import type { Rating } from '.prisma/client';
+
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const dare: Command = {
   name: 'dare',
