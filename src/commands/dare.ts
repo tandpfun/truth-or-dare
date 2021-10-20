@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord-api-types';
 
-import type { Mutable, OptionType } from '../classes/OptionTypes';
+import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
@@ -25,7 +25,7 @@ const dare: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
-    const rating = (ctx.getOption('rating') as OptionType<Mutable<typeof options[0]>>)?.value;
+    const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const dare = await ctx.client.database.getRandomQuestion(
       'DARE',
       channelSettings.disabledRatings,

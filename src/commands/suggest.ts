@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord-api-types';
 import superagent from 'superagent';
 
-import type { Mutable, OptionType } from '../classes/OptionTypes';
+import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
@@ -45,9 +45,9 @@ const suggest: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const type = (ctx.getOption('type') as OptionType<Mutable<typeof options[0]>>).value;
-    const rating = (ctx.getOption('rating') as OptionType<Mutable<typeof options[1]>>).value;
-    const question = (ctx.getOption('question') as OptionType<Mutable<typeof options[2]>>).value;
+    const type = ctx.getOption<Mutable<typeof options[0]>>('type').value;
+    const rating = ctx.getOption<Mutable<typeof options[1]>>('rating').value;
+    const question = ctx.getOption<Mutable<typeof options[2]>>('question').value;
 
     if (question.length > 256)
       return ctx.reply({

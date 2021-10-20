@@ -12,10 +12,12 @@ import {
   InteractionResponseType,
   ApplicationCommandType,
   APIUser,
+  APIApplicationCommandOption,
 } from 'discord-api-types';
 import type { ChannelSettings } from '@prisma/client';
 import type { Response } from 'express';
 
+import type { OptionType } from './OptionTypes';
 import type Client from './Client';
 
 export default class Context {
@@ -66,9 +68,9 @@ export default class Context {
     this.user = interaction.user || interaction.member.user;
   }
 
-  getOption(name: string) {
+  getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> {
     const mainResult = this.options.find(o => o.name === name);
-    if (mainResult) return mainResult;
+    if (mainResult) return mainResult as OptionType<O>;
     if (
       ![
         ApplicationCommandOptionType.Subcommand,
@@ -86,7 +88,7 @@ export default class Context {
         | ApplicationCommandInteractionDataOptionSubCommand
       )[]
     ).find(o => o.name === name);
-    if (firstRes) return firstRes;
+    if (firstRes) return firstRes as OptionType<O>;
     if (
       (
         this.options[0] as
@@ -99,7 +101,7 @@ export default class Context {
       (this.options[0] as ApplicationCommandInteractionDataOptionSubCommandGroup)
         .options[0] as ApplicationCommandInteractionDataOptionSubCommand
     ).options.find(o => o.name === name);
-    if (secondRes) return secondRes;
+    if (secondRes) return secondRes as OptionType<O>;
     return null;
   }
 

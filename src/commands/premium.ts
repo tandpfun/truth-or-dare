@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ComponentType, ButtonStyle } from 'discord-api-types';
 
-import type { Mutable, OptionType } from '../classes/OptionTypes';
+import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
@@ -90,8 +90,7 @@ const premium: Command = {
       // TODO: activate preium
     } else if (ctx.args[0] === 'remove') {
       const guildId =
-        (ctx.getOption('server') as OptionType<Mutable<typeof options[2]['options'][0]>>)?.value ||
-        ctx.guildId;
+        ctx.getOption<Mutable<typeof options[2]['options'][0]>>('server')?.value || ctx.guildId;
       if (!guildId || !/^\d{17,20}$/.test(guildId))
         // TODO: check in premium guilds array
         return ctx.reply({

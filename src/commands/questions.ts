@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord-api-types';
 import { QuestionType } from '.prisma/client';
 
-import type { Mutable, OptionType } from '../classes/OptionTypes';
+import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
@@ -107,11 +107,9 @@ const questions: Command = {
 
     if (ctx.args[0] === 'list') {
       const questionType =
-        (ctx.getOption('type') as OptionType<Mutable<typeof options[0]['options'][0]>>)?.value ||
-        'ALL';
+        ctx.getOption<Mutable<typeof options[0]['options'][0]>>('type')?.value || 'ALL';
       const rating =
-        (ctx.getOption('rating') as OptionType<Mutable<typeof options[0]['options'][1]>>)?.value ||
-        'ALL';
+        ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value || 'ALL';
 
       const questions = await ctx.client.database.getCustomQuestions(
         ctx.guildId,
@@ -120,11 +118,7 @@ const questions: Command = {
       );
 
       const page = Math.min(
-        Math.max(
-          (ctx.getOption('page') as OptionType<Mutable<typeof options[0]['options'][2]>>)?.value ||
-            1,
-          1
-        ),
+        Math.max(ctx.getOption<Mutable<typeof options[0]['options'][2]>>('page')?.value || 1, 1),
         Math.ceil(questions.length / PER_PAGE)
       );
 
@@ -159,14 +153,9 @@ const questions: Command = {
         ],
       });
     } else if (ctx.args[0] === 'add') {
-      const type = (ctx.getOption('type') as OptionType<Mutable<typeof options[1]['options'][0]>>)
-        .value;
-      const rating = (
-        ctx.getOption('rating') as OptionType<Mutable<typeof options[1]['options'][1]>>
-      ).value;
-      const question = (
-        ctx.getOption('question') as OptionType<Mutable<typeof options[1]['options'][2]>>
-      ).value;
+      const type = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('type').value;
+      const rating = ctx.getOption<Mutable<typeof options[1]['options'][1]>>('rating').value;
+      const question = ctx.getOption<Mutable<typeof options[1]['options'][2]>>('question').value;
 
       if (question.length > 256) return ctx.reply('Maximum question length is 256 characters');
 
@@ -179,8 +168,7 @@ const questions: Command = {
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added`);
     } else if (ctx.args[0] === 'remove') {
-      const id = (ctx.getOption('id') as OptionType<Mutable<typeof options[2]['options'][0]>>)
-        .value;
+      const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id').value;
 
       const deleted = await ctx.client.database.deleteCustomQuestion(id);
       return ctx.reply({
