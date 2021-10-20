@@ -1,6 +1,5 @@
 import {
   ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandInteractionDataOptionSubCommand,
   ApplicationCommandOptionType,
   ButtonStyle,
   ComponentType,
@@ -92,10 +91,7 @@ const premium: Command = {
       // TODO: activate preium
     } else if (ctx.args[0] === 'remove') {
       const guildId =
-        (
-          (ctx.getOption('add') as ApplicationCommandInteractionDataOptionSubCommand)
-            .options[0] as ApplicationCommandInteractionDataOptionString
-        )?.value || ctx.guildId;
+        (ctx.getOption('server') as ApplicationCommandInteractionDataOptionString)?.value || ctx.guildId;
       if (!guildId || !/^\d{17,20}$/.test(guildId))
         // TODO: check in premium guilds array
         return ctx.reply({

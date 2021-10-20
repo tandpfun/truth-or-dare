@@ -2,7 +2,6 @@ import { QuestionType, Rating } from '.prisma/client';
 import {
   ApplicationCommandInteractionDataOptionNumber,
   ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandInteractionDataOptionSubCommand,
   ApplicationCommandOptionType,
 } from 'discord-api-types';
 import Command from '../classes/Command';
@@ -10,8 +9,8 @@ import Context from '../classes/Context';
 
 const PER_PAGE = 15;
 
-const customQuestion: Command = {
-  name: 'customquestion',
+const questions: Command = {
+  name: 'questions',
   description: 'List, add, and remove custom questions for this server',
   category: 'control',
   perms: ['ManageGuild'],
@@ -107,14 +106,14 @@ const customQuestion: Command = {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Custom questions cannot be edited in DMs`);
 
-    const args = (ctx.options[0] as ApplicationCommandInteractionDataOptionSubCommand).options;
+    // const args = (ctx.options[0] as ApplicationCommandInteractionDataOptionSubCommand).options;
 
     if (ctx.args[0] === 'list') {
       const questionType = ((
-        args.find(o => o.name === 'type') as ApplicationCommandInteractionDataOptionString
+        ctx.getOption('type') as ApplicationCommandInteractionDataOptionString
       )?.value || 'ALL') as QuestionType | 'ALL';
       const rating = ((
-        args.find(o => o.name === 'rating') as ApplicationCommandInteractionDataOptionString
+        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
       )?.value || 'ALL') as Rating | 'ALL';
 
       const questions = await ctx.client.database.getCustomQuestions(
@@ -125,7 +124,7 @@ const customQuestion: Command = {
 
       const page = Math.min(
         Math.max(
-          (args.find(o => o.name === 'page') as ApplicationCommandInteractionDataOptionNumber)
+          (ctx.getOption('page') as ApplicationCommandInteractionDataOptionNumber)
             ?.value || 1,
           1
         ),
@@ -164,13 +163,13 @@ const customQuestion: Command = {
       });
     } else if (ctx.args[0] === 'add') {
       const type = (
-        args.find(o => o.name === 'type') as ApplicationCommandInteractionDataOptionString
+        ctx.getOption('type') as ApplicationCommandInteractionDataOptionString
       ).value as QuestionType;
       const rating = (
-        args.find(o => o.name === 'rating') as ApplicationCommandInteractionDataOptionString
+        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
       ).value as Rating;
       const question = (
-        args.find(o => o.name === 'question') as ApplicationCommandInteractionDataOptionString
+        ctx.getOption('question') as ApplicationCommandInteractionDataOptionString
       ).value;
 
       if (question.length > 256) return ctx.reply('Maximum question length is 256 characters');
@@ -184,7 +183,7 @@ const customQuestion: Command = {
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added`);
     } else if (ctx.args[0] === 'remove') {
-      const id = (args.find(o => o.name === 'id') as ApplicationCommandInteractionDataOptionString)
+      const id = (ctx.getOption('id') as ApplicationCommandInteractionDataOptionString)
         .value;
 
       const deleted = await ctx.client.database.deleteCustomQuestion(id);
@@ -203,4 +202,4 @@ const customQuestion: Command = {
   },
 };
 
-export default customQuestion;
+export default questions;
