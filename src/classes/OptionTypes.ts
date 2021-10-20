@@ -11,6 +11,9 @@ import type {
 export type Mutable<D> = {
   -readonly [key in keyof D]: Mutable<D[key]>;
 };
+export type ReadOnly<D> = {
+  readonly [key in keyof D]: ReadOnly<D[key]>;
+};
 
 export type OptionType<O extends APIApplicationCommandOption> =
   O extends APIApplicationCommandSubCommandOptions

@@ -1,42 +1,40 @@
-import {
-  ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandOptionType,
-  ComponentType,
-  ButtonStyle,
-} from 'discord-api-types';
+import { ApplicationCommandOptionType, ComponentType, ButtonStyle } from 'discord-api-types';
 
+import type { Mutable, OptionType } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+
+const options = [
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'list',
+    description: 'List your premium servers',
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'activate',
+    description: 'Add the current server as a premium server',
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'remove',
+    description: 'Remove a server from your premium slots',
+    options: [
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'server',
+        description:
+          'The server id to remove from your premium slots (found from /premium list) default current server',
+      },
+    ],
+  },
+] as const;
 
 const premium: Command = {
   name: 'premium',
   description: 'Manage your premium servers for the bot',
   category: 'control',
-  options: [
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'list',
-      description: 'List your premium servers',
-    },
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'activate',
-      description: 'Add the current server as a premium server',
-    },
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'remove',
-      description: 'Remove a server from your premium slots',
-      options: [
-        {
-          type: ApplicationCommandOptionType.String,
-          name: 'server',
-          description:
-            'The server id to remove from your premium slots (found from /premium list) default current server',
-        },
-      ],
-    },
-  ],
+  options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const premiumUser = false; // TODO: fetch data
@@ -92,7 +90,7 @@ const premium: Command = {
       // TODO: activate preium
     } else if (ctx.args[0] === 'remove') {
       const guildId =
-        (ctx.getOption('server') as ApplicationCommandInteractionDataOptionString)?.value ||
+        (ctx.getOption('server') as OptionType<Mutable<typeof options[2]['options'][0]>>)?.value ||
         ctx.guildId;
       if (!guildId || !/^\d{17,20}$/.test(guildId))
         // TODO: check in premium guilds array

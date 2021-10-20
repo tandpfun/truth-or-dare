@@ -1,28 +1,27 @@
-import {
-  ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandOptionType,
-} from 'discord-api-types';
+import { ApplicationCommandOptionType } from 'discord-api-types';
 
+import type { Mutable, OptionType } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+
+const options = [
+  {
+    type: ApplicationCommandOptionType.String,
+    name: 'answer',
+    description: 'The answer to the paranoia question',
+    required: true,
+  },
+] as const;
 
 const answer: Command = {
   name: 'answer',
   description: 'Answers a paranoia question sent to you',
   category: 'question',
-  options: [
-    {
-      type: ApplicationCommandOptionType.String,
-      name: 'answer',
-      description: 'The answer to the paranoia question',
-      required: true,
-    },
-  ],
+  options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const paranoiaAnswer = (
-      ctx.getOption('answer') as ApplicationCommandInteractionDataOptionString
-    ).value;
+    const paranoiaAnswer = (ctx.getOption('answer') as OptionType<Mutable<typeof options[0]>>)
+      .value;
 
     if (ctx.guildId)
       return ctx.reply(

@@ -1,46 +1,42 @@
-import {
-  ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandInteractionDataOptionUser,
-  ApplicationCommandOptionType,
-} from 'discord-api-types';
-import type { Rating } from '.prisma/client';
+import { ApplicationCommandOptionType } from 'discord-api-types';
 
+import type { Mutable, OptionType } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+
+const options = [
+  {
+    type: ApplicationCommandOptionType.User,
+    name: 'target',
+    description: 'The user to send a paranoia question to',
+  },
+  {
+    type: ApplicationCommandOptionType.String,
+    name: 'rating',
+    description: 'The maturity level of the topics the question can relate to.',
+    choices: [
+      { name: 'PG', value: 'PG' },
+      { name: 'PG13', value: 'PG13' },
+      { name: 'R', value: 'R' },
+    ],
+  },
+] as const;
 
 const paranoia: Command = {
   name: 'paranoia',
   description: 'Gives a paranoia question or sends one to a user.',
   category: 'question',
-  options: [
-    {
-      type: ApplicationCommandOptionType.User,
-      name: 'target',
-      description: 'The user to send a paranoia question to',
-    },
-    {
-      type: ApplicationCommandOptionType.String,
-      name: 'rating',
-      description: 'The maturity level of the topics the question can relate to.',
-      choices: [
-        { name: 'PG', value: 'PG' },
-        { name: 'PG13', value: 'PG13' },
-        { name: 'R', value: 'R' },
-      ],
-    },
-  ],
+  options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
-    const rating = (ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString)
-      ?.value;
-    const targetUserId = (ctx.getOption('target') as ApplicationCommandInteractionDataOptionUser)
-      ?.value;
+    const targetUserId = (ctx.getOption('target') as OptionType<Mutable<typeof options[0]>>)?.value;
+    const rating = (ctx.getOption('rating') as OptionType<Mutable<typeof options[1]>>)?.value;
 
     const paranoia = await ctx.client.database.getRandomQuestion(
       'PARANOIA',
       channelSettings.disabledRatings,
-      rating as Rating
+      rating
     );
 
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
