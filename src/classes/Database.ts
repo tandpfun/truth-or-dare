@@ -226,7 +226,7 @@ export default class Database {
 
   async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
     const question = await this.db.customQuestion.create({
-      data: { id: this.generateId(), ...data },
+      data: { id: this.generateId() + '_c', ...data },
     });
     this.customQuestions[data.type][data.rating].push(question);
     return question;
