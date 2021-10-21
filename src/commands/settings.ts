@@ -1,85 +1,52 @@
+import { ApplicationCommandOptionType } from 'discord-api-types';
 import { Rating } from '.prisma/client';
-import {
-  ApplicationCommandInteractionDataOptionChannel,
-  ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandOptionType,
-  ChannelType,
-} from 'discord-api-types/v9';
-import Command from '../classes/Command';
-import Context from '../classes/Context';
 
-const CHANNEL_TYPES: [ChannelType.GuildText, ChannelType.GuildNews] = [
-  ChannelType.GuildText,
-  ChannelType.GuildNews,
-];
+import type { Mutable } from '../classes/OptionTypes';
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
-const settings: Command = {
-  name: 'settings',
-  description: 'Show and configure the channel settings of a channel',
-  category: 'control',
-  perms: ['ManageChannels'],
-  options: [
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'view',
-      description: "View a channel's settings",
-      options: [
-        {
-          type: ApplicationCommandOptionType.Channel,
-          name: 'channel',
-          description: 'The channel to view settings for',
-          channel_types: CHANNEL_TYPES,
-        },
-      ],
-    },
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'disablerating',
-      description: 'Disable a question rating for a channel',
-      options: [
-        {
-          type: ApplicationCommandOptionType.String,
-          name: 'rating',
-          description: 'The rating to disable',
-          required: true,
-          choices: [
-            { name: 'PG', value: 'PG' },
-            { name: 'PG13', value: 'PG13' },
-            { name: 'R', value: 'R' },
-          ],
-        },
-        {
-          type: ApplicationCommandOptionType.Channel,
-          name: 'channel',
-          description: 'The channel to disable the rating in',
-          channel_types: CHANNEL_TYPES,
-        },
-      ],
-    },
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'enablerating',
-      description: 'Enable a question rating for a channel',
-      options: [
-        {
-          type: ApplicationCommandOptionType.String,
-          name: 'rating',
-          description: 'The rating to enable',
-          required: true,
-          choices: [
-            { name: 'PG', value: 'PG' },
-            { name: 'PG13', value: 'PG13' },
-            { name: 'R', value: 'R' },
-          ],
-        },
-        {
-          type: ApplicationCommandOptionType.Channel,
-          name: 'channel',
-          description: 'The channel to enable the rating in',
-          channel_types: CHANNEL_TYPES,
-        },
-      ],
-    },
+const options = [
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'view',
+    description: "View a channel's settings.",
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'disablerating',
+    description: 'Disable a question rating for a channel.',
+    options: [
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'rating',
+        description: 'The rating to disable.',
+        required: true,
+        choices: [
+          { name: 'PG', value: 'PG' },
+          { name: 'PG13', value: 'PG13' },
+          { name: 'R', value: 'R' },
+        ],
+      },
+    ],
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'enablerating',
+    description: 'Enable a question rating for a channel.',
+    options: [
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'rating',
+        description: 'The rating to enable.',
+        required: true,
+        choices: [
+          { name: 'PG', value: 'PG' },
+          { name: 'PG13', value: 'PG13' },
+          { name: 'R', value: 'R' },
+        ],
+      },
+    ],
+  },
     {
       type: ApplicationCommandOptionType.Subcommand,
       name: 'mute',
@@ -106,7 +73,19 @@ const settings: Command = {
         },
       ],
     },
-  ],
+] as const;
+
+const CHANNEL_TYPES: [ChannelType.GuildText, ChannelType.GuildNews] = [
+  ChannelType.GuildText,
+  ChannelType.GuildNews,
+];
+
+const settings: Command = {
+  name: 'settings',
+  description: 'Show and configure the channel settings of a channel',
+  category: 'control',
+  perms: ['ManageChannels'],
+  options,
   run: async (ctx: Context): Promise<void> => {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
@@ -136,17 +115,16 @@ const settings: Command = {
         embeds: [
           {
             title: `${ctx.client.EMOTES.gear} Channel Settings`,
-            description: `__Ratings:__\n${ratingEmoji('PG')} PG Questions\n${ratingEmoji(
-              'PG13'
-            )} PG13 Questions\n${ratingEmoji('R')} R Questions`,
+            description: `__Ratings:__\n${Object.values(Rating)
+              .map(r => `${ratingEmoji(r)} ${r} Questions`)
+              .join('\n')}`,
             color: ctx.client.COLORS.BLUE,
           },
         ],
       });
     } else if (ctx.args[0] === 'disablerating') {
-      const ratingToDisable = (
-        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
-      )?.value as Rating;
+      const ratingToDisable =
+        ctx.getOption<Mutable<typeof options[1]['options'][0]>>('rating').value;
 
       if (channelSettings.disabledRatings.includes(ratingToDisable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is already disabled here!`);
@@ -155,9 +133,8 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was disabled here!`);
     } else if (ctx.args[0] === 'enablerating') {
-      const ratingToEnable = (
-        ctx.getOption('rating') as ApplicationCommandInteractionDataOptionString
-      )?.value as Rating;
+      const ratingToEnable =
+        ctx.getOption<Mutable<typeof options[2]['options'][0]>>('rating').value;
 
       if (!channelSettings.disabledRatings.includes(ratingToEnable))
         return ctx.reply(`${ctx.client.EMOTES.xmark} That rating is not disabled here!`);

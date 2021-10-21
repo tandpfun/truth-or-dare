@@ -1,13 +1,15 @@
 import { readdirSync } from 'fs';
+import os from 'os';
+
+import type { RESTPostAPIWebhookWithTokenJSONBody, APIApplicationCommand } from 'discord-api-types';
+import * as Sentry from '@sentry/node';
+import superagent from 'superagent';
+
+import * as functions from './Functions.js';
+import type Command from './Command.js';
+import Database from './Database.js';
 import Logger from './Logger.js';
 import Server from './Server.js';
-import Command from './Command.js';
-import * as functions from './Functions.js';
-import { APIApplicationCommand } from 'discord-api-types';
-import superagent from 'superagent';
-import Database from './Database.js';
-import * as Sentry from '@sentry/node';
-import os from 'os';
 
 export default class Client {
   token: string;
@@ -23,8 +25,7 @@ export default class Client {
   suggestCooldowns: Record<string, number>;
   stats: {
     minuteCommandCount: number;
-    perMinuteCommandAverage: number;
-    minutesPassed: number;
+    pastCommandCounts: number[];
     commands: Record<string, number>;
     minuteCommands: Record<string, number>;
   };
@@ -50,6 +51,8 @@ export default class Client {
     gear: ':gear:',
     warning: ':warning:',
     graph: ':chart_with_upwards_trend:',
+    sparkles: ':sparkles:',
+    info: ':information_source:',
   } as const;
 
   constructor({
@@ -84,8 +87,7 @@ export default class Client {
     this.suggestCooldowns = {};
     this.stats = {
       minuteCommandCount: 0,
-      perMinuteCommandAverage: 0,
-      minutesPassed: 0,
+      pastCommandCounts: [],
       commands: {},
       minuteCommands: {},
     };
@@ -121,10 +123,8 @@ export default class Client {
     this.server.start();
 
     setInterval(() => {
-      this.stats.perMinuteCommandAverage =
-        (this.stats.perMinuteCommandAverage * this.stats.minutesPassed +
-          this.stats.minuteCommandCount) /
-        ++this.stats.minutesPassed;
+      this.stats.pastCommandCounts.unshift(this.stats.minuteCommandCount);
+      if (this.stats.pastCommandCounts.length > 30) this.stats.pastCommandCounts.pop();
       if (!this.devMode && process.env.STATCORD_KEY)
         this.postToStatcord(this.stats.minuteCommandCount, this.stats.minuteCommands);
       for (const command in this.stats.minuteCommands) {
@@ -193,6 +193,13 @@ export default class Client {
         bandwidth: 0,
       })
       .then(res => res.body)
+      .catch(_ => null);
+  }
+
+  async webhookLog(type: string, data: RESTPostAPIWebhookWithTokenJSONBody) {
+    await superagent
+      .post(process.env[type.toUpperCase() + '_HOOK'])
+      .send(data)
       .catch(_ => null);
   }
 }

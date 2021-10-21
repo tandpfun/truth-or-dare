@@ -1,27 +1,26 @@
-import {
-  ApplicationCommandInteractionDataOptionString,
-  ApplicationCommandOptionType,
-} from 'discord-api-types';
-import Context from '../classes/Context';
-import Command from '../classes/Command';
+import { ApplicationCommandOptionType } from 'discord-api-types';
+
+import type { Mutable } from '../classes/OptionTypes';
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
+
+const options = [
+  {
+    type: ApplicationCommandOptionType.String,
+    name: 'answer',
+    description: 'The answer to the paranoia question',
+    required: true,
+  },
+] as const;
 
 const answer: Command = {
   name: 'answer',
   description: 'Answers a paranoia question sent to you',
   category: 'question',
-  options: [
-    {
-      type: ApplicationCommandOptionType.String,
-      name: 'answer',
-      description: 'The answer to the paranoia question',
-      required: true,
-    },
-  ],
+  options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const paranoiaAnswer = (
-      ctx.getOption('answer') as ApplicationCommandInteractionDataOptionString
-    )?.value;
+    const paranoiaAnswer = ctx.getOption<Mutable<typeof options[0]>>('answer').value;
 
     if (ctx.guildId)
       return ctx.reply(
@@ -77,9 +76,9 @@ const answer: Command = {
       {
         embeds: [
           {
-            title: 'Question answered: ' + paranoiaData.questionText,
+            title: paranoiaData.questionText,
             color: ctx.client.COLORS.GREEN,
-            description: `Check it out in <#${paranoiaData.channelId}>`,
+            description: `Question answered: Check it out in <#${paranoiaData.channelId}>`,
             footer: {
               text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
             },
@@ -113,7 +112,7 @@ const answer: Command = {
             title: nextQuestion.questionText,
             color: ctx.client.COLORS.BLUE,
             description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
-              guild.name || `Unknown Guild (${nextQuestion.guildId})`
+              guild ? guild.name : `Unknown Guild (${nextQuestion.guildId})`
             }** <#${nextQuestion.channelId}>.`,
             footer: {
               text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,

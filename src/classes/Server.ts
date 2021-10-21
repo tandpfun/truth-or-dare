@@ -1,10 +1,11 @@
-import express, { Express, Request, Response } from 'express';
 import { verifyKeyMiddleware, InteractionType } from 'discord-interactions';
-import rateLimiter from 'express-rate-limit';
-import Context from './Context';
-import type Client from './Client';
+import express, { Express, Request, Response } from 'express';
 import { QuestionType, Rating } from '.prisma/client';
+import rateLimiter from 'express-rate-limit';
 import * as Sentry from '@sentry/node';
+
+import type Client from './Client';
+import Context from './Context';
 
 export default class Server {
   port: number;
@@ -100,8 +101,8 @@ export default class Server {
     const questionType = req.params.questionType;
     const rating = req.query.rating;
     if (
-      !['DARE', 'TRUTH', 'NHIE', 'WYR', 'PARANOIA'].includes(
-        (questionType as string).toUpperCase?.()
+      !Object.values(QuestionType).includes(
+        (questionType as string).toUpperCase?.() as QuestionType
       )
     )
       return res
@@ -115,7 +116,7 @@ export default class Server {
       return res.send(
         await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType)
       );
-    if (!['PG', 'PG13', 'R'].includes((rating as string).toUpperCase?.()))
+    if (!Object.values(Rating).includes((rating as string).toUpperCase?.() as Rating))
       return res
         .send({
           error: true,
@@ -123,9 +124,11 @@ export default class Server {
         })
         .status(400);
     res.send(
-      await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType, [
-        (rating as string).toUpperCase() as Rating,
-      ])
+      await this.client.database.getRandomQuestion(
+        questionType.toUpperCase() as QuestionType,
+        [],
+        (rating as string).toUpperCase() as Rating
+      )
     );
   }
 }
