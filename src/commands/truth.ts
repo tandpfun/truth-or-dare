@@ -29,7 +29,8 @@ const truth: Command = {
     const truth = await ctx.client.database.getRandomQuestion(
       'TRUTH',
       channelSettings.disabledRatings,
-      rating
+      rating,
+      ctx.guildId
     );
     ctx.reply({
       embeds: [

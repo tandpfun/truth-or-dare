@@ -7,6 +7,8 @@ import * as Sentry from '@sentry/node';
 import type Client from './Client';
 import Context from './Context';
 
+const passthroughCommands = ['settings'];
+
 export default class Server {
   port: number;
   client: Client;
@@ -55,12 +57,11 @@ export default class Server {
     const interaction = req.body;
     if (interaction.type === InteractionType.APPLICATION_COMMAND) {
       const ctx = new Context(interaction, this.client, res);
-      if (
-        (await ctx.channelSettings).muted &&
-        !(ctx.command.name === 'settings' && ctx.args[0] === 'unmute')
-      )
+      if ((await ctx.channelSettings).muted && !passthroughCommands.includes(ctx.command.name))
         return ctx.reply({
-          content: 'I am muted in this channel',
+          content:
+            this.client.EMOTES.xmark +
+            ' I am muted in this channel. Use `/settings unmute` to unmute me.',
           flags: 1 << 6,
         });
       await this.handleCommand(ctx);

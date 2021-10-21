@@ -29,7 +29,8 @@ const nhie: Command = {
     const nhie = await ctx.client.database.getRandomQuestion(
       'NHIE',
       channelSettings.disabledRatings,
-      rating
+      rating,
+      ctx.guildId
     );
     ctx.reply({
       embeds: [

@@ -30,7 +30,8 @@ const tod: Command = {
     const result = await ctx.client.database.getRandomQuestion(
       type,
       channelSettings.disabledRatings,
-      rating
+      rating,
+      ctx.guildId
     );
     ctx.reply({
       embeds: [
