@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types';
+import { ApplicationCommandOptionType, ChannelType } from 'discord-api-types';
 import { Rating } from '.prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
@@ -10,6 +10,14 @@ const options = [
     type: ApplicationCommandOptionType.Subcommand,
     name: 'view',
     description: "View a channel's settings.",
+    options: [
+      {
+        type: ApplicationCommandOptionType.Channel,
+        name: 'channel',
+        description: 'The channel to view the settings for',
+        channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
+      },
+    ],
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
@@ -26,6 +34,12 @@ const options = [
           { name: 'PG13', value: 'PG13' },
           { name: 'R', value: 'R' },
         ],
+      },
+      {
+        type: ApplicationCommandOptionType.Channel,
+        name: 'channel',
+        description: 'The channel to disable the rating in',
+        channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
       },
     ],
   },
@@ -45,40 +59,41 @@ const options = [
           { name: 'R', value: 'R' },
         ],
       },
+      {
+        type: ApplicationCommandOptionType.Channel,
+        name: 'channel',
+        description: 'The channel to enable the rating in',
+        channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
+      },
     ],
   },
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'mute',
-      description: 'Disable all commands in a channel',
-      options: [
-        {
-          type: ApplicationCommandOptionType.Channel,
-          name: 'channel',
-          description: 'The channel to mute the bot in',
-          channel_types: CHANNEL_TYPES,
-        },
-      ],
-    },
-    {
-      type: ApplicationCommandOptionType.Subcommand,
-      name: 'unmute',
-      description: 'Reenable all commands in a channel',
-      options: [
-        {
-          type: ApplicationCommandOptionType.Channel,
-          name: 'channel',
-          description: 'The channel to mute the bot in',
-          channel_types: CHANNEL_TYPES,
-        },
-      ],
-    },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'mute',
+    description: 'Disable all commands in a channel',
+    options: [
+      {
+        type: ApplicationCommandOptionType.Channel,
+        name: 'channel',
+        description: 'The channel to mute the bot in',
+        channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
+      },
+    ],
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'unmute',
+    description: 'Reenable all commands in a channel',
+    options: [
+      {
+        type: ApplicationCommandOptionType.Channel,
+        name: 'channel',
+        description: 'The channel to unmute the bot in',
+        channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
+      },
+    ],
+  },
 ] as const;
-
-const CHANNEL_TYPES: [ChannelType.GuildText, ChannelType.GuildNews] = [
-  ChannelType.GuildText,
-  ChannelType.GuildNews,
-];
 
 const settings: Command = {
   name: 'settings',
@@ -91,13 +106,7 @@ const settings: Command = {
       return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
 
     const channelId =
-      (ctx.getOption('channel') as ApplicationCommandInteractionDataOptionChannel)?.value ??
-      ctx.channelId;
-
-    const fetchedChannel = await ctx.client.functions.fetchChannel(channelId, ctx.client.token);
-
-    if (!(CHANNEL_TYPES as ChannelType[]).includes(fetchedChannel.type))
-      return ctx.reply('The channel must be a text channel');
+      ctx.getOption<Mutable<typeof options[0]['options'][0]>>('channel')?.value ?? ctx.channelId;
 
     const channelSettings =
       channelId === ctx.channelId

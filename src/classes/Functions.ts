@@ -4,6 +4,7 @@ import {
   RESTPostAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
+  RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
   ComponentType,
   ButtonStyle,
@@ -36,6 +37,7 @@ export function checkPerms(command: Command, ctx: Context) {
           true
         ),
       ],
+      flags: 64,
     });
     return false;
   }

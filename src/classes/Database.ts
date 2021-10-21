@@ -41,7 +41,7 @@ export default class Database {
 
   async migrate() {
     if (!this.client.devMode) throw new Error('Migrations in production');
-    //const result = await this.db.something.updateMany();
+    //const result = await this.db.something.updateMany({ data: {} });
     //this.client.console.log(`Migration complete. ${result.count} affected`);
   }
 
