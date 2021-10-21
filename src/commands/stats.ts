@@ -16,9 +16,10 @@ const stats: Command = {
           title: ctx.client.EMOTES.graph + ' Statistics',
           description: `Last Restart: <t:${
             (Date.now() / 1000 - process.uptime()) | 0
-          }:R>\nCommands/s: ${(ctx.client.stats.perMinuteCommandAverage / 60).toFixed(
-            2
-          )}\nMost Popular Command: ${ctx.client.functions.titleCase(
+          }:R>\nCommands/s: ${(
+            ctx.client.stats.pastCommandCounts.reduce((a, c) => a + c, 0) /
+            (ctx.client.stats.pastCommandCounts.length * 60)
+          ).toFixed(2)}\nMost Popular Command: ${ctx.client.functions.titleCase(
             Object.entries(ctx.client.stats.commands).reduce((a, c) => (a[1] > c[1] ? a : c))[0]
           )}\n\n__Commands Run So Far:__\n${Object.entries(ctx.client.stats.commands)
             .sort(([_, count1], [_2, count2]) => count2 - count1)

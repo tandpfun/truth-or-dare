@@ -39,6 +39,12 @@ export default class Database {
     }, 6 * 60 * 60 * 1000);
   }
 
+  async migrate() {
+    if (!this.client.devMode) throw new Error('Migrations in production');
+    //const result = await this.db.something.updateMany();
+    //this.client.console.log(`Migration complete. ${result.count} affected`);
+  }
+
   generateId(): string {
     return (
       Date.now().toString(36) +
