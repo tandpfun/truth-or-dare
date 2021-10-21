@@ -1,5 +1,5 @@
-import Command from '../classes/Command';
-import Context from '../classes/Context';
+import type Command from '../classes/Command';
+import type Context from '../classes/Context';
 
 const skip: Command = {
   name: 'skip',
@@ -22,8 +22,9 @@ const skip: Command = {
       {
         embeds: [
           {
-            title: 'Question skipped: ' + currentParanoia.questionText,
+            title: currentParanoia.questionText,
             color: ctx.client.COLORS.YELLOW,
+            description: 'Question skipped',
             footer: {
               text: `Type: PARANOIA | Rating: ${currentParanoia.questionRating} | ID: ${currentParanoia.questionId}`,
             },

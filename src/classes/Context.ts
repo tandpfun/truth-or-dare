@@ -1,19 +1,24 @@
-import { InteractionResponseType } from 'discord-interactions';
 import {
-  APIApplicationCommandInteraction,
+  ApplicationCommandInteractionDataOptionSubCommandGroup,
+  APIChatInputApplicationCommandInteractionDataResolved,
+  ApplicationCommandInteractionDataOptionSubCommand,
+  APIChatInputApplicationCommandInteractionData,
   APIApplicationCommandInteractionDataOption,
   APIChatInputApplicationCommandInteraction,
-  APIChatInputApplicationCommandInteractionData,
-  APIChatInputApplicationCommandInteractionDataResolved,
-  APIInteractionGuildMember,
   APIInteractionResponseCallbackData,
-  APIUser,
+  APIApplicationCommandInteraction,
   ApplicationCommandOptionType,
+  APIInteractionGuildMember,
+  InteractionResponseType,
   ApplicationCommandType,
-} from 'discord-api-types/v9';
-import { Response } from 'express';
-import Client from './Client';
-import { ChannelSettings } from '@prisma/client';
+  APIUser,
+  APIApplicationCommandOption,
+} from 'discord-api-types';
+import type { ChannelSettings } from '@prisma/client';
+import type { Response } from 'express';
+
+import type { OptionType } from './OptionTypes';
+import type Client from './Client';
 
 export default class Context {
   rawInteraction: APIApplicationCommandInteraction;
@@ -63,14 +68,47 @@ export default class Context {
     this.user = interaction.user || interaction.member.user;
   }
 
-  getOption(name: string) {
-    return this.options.find(o => o.name === name);
+  getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> {
+    const mainResult = this.options.find(o => o.name === name);
+    if (mainResult) return mainResult as OptionType<O>;
+    if (
+      ![
+        ApplicationCommandOptionType.Subcommand,
+        ApplicationCommandOptionType.SubcommandGroup,
+      ].includes(this.options[0]?.type)
+    )
+      return null;
+    const firstRes = (
+      (
+        this.options[0] as
+          | ApplicationCommandInteractionDataOptionSubCommandGroup
+          | ApplicationCommandInteractionDataOptionSubCommand
+      ).options as (
+        | ApplicationCommandInteractionDataOptionSubCommandGroup
+        | ApplicationCommandInteractionDataOptionSubCommand
+      )[]
+    )?.find(o => o.name === name);
+    if (firstRes) return firstRes as OptionType<O>;
+    if (
+      (
+        this.options[0] as
+          | ApplicationCommandInteractionDataOptionSubCommandGroup
+          | ApplicationCommandInteractionDataOptionSubCommand
+      ).options?.[0]?.type !== ApplicationCommandOptionType.Subcommand
+    )
+      return null;
+    const secondRes = (
+      (this.options[0] as ApplicationCommandInteractionDataOptionSubCommandGroup)
+        .options[0] as ApplicationCommandInteractionDataOptionSubCommand
+    ).options?.find(o => o.name === name);
+    if (secondRes) return secondRes as OptionType<O>;
+    return null;
   }
 
   reply(data: string | APIInteractionResponseCallbackData) {
     if (typeof data === 'string') data = { content: data };
     this.response.send({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      type: InteractionResponseType.ChannelMessageWithSource,
       data,
     });
   }

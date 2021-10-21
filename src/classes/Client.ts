@@ -1,13 +1,15 @@
 import { readdirSync } from 'fs';
+import os from 'os';
+
+import type { RESTPostAPIWebhookWithTokenJSONBody, APIApplicationCommand } from 'discord-api-types';
+import * as Sentry from '@sentry/node';
+import superagent from 'superagent';
+
+import * as functions from './Functions.js';
+import type Command from './Command.js';
+import Database from './Database.js';
 import Logger from './Logger.js';
 import Server from './Server.js';
-import Command from './Command.js';
-import * as functions from './Functions.js';
-import { APIApplicationCommand } from 'discord-api-types';
-import superagent from 'superagent';
-import Database from './Database.js';
-import * as Sentry from '@sentry/node';
-import os from 'os';
 
 export default class Client {
   token: string;
@@ -49,6 +51,8 @@ export default class Client {
     gear: ':gear:',
     warning: ':warning:',
     graph: ':chart_with_upwards_trend:',
+    sparkles: ':sparkles:',
+    info: ':information_source:',
   } as const;
 
   constructor({
@@ -189,6 +193,13 @@ export default class Client {
         bandwidth: 0,
       })
       .then(res => res.body)
+      .catch(_ => null);
+  }
+
+  async webhookLog(type: string, data: RESTPostAPIWebhookWithTokenJSONBody) {
+    await superagent
+      .post(process.env[type.toUpperCase() + '_HOOK'])
+      .send(data)
       .catch(_ => null);
   }
 }
