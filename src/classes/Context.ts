@@ -87,20 +87,20 @@ export default class Context {
         | ApplicationCommandInteractionDataOptionSubCommandGroup
         | ApplicationCommandInteractionDataOptionSubCommand
       )[]
-    ).find(o => o.name === name);
+    )?.find(o => o.name === name);
     if (firstRes) return firstRes as OptionType<O>;
     if (
       (
         this.options[0] as
           | ApplicationCommandInteractionDataOptionSubCommandGroup
           | ApplicationCommandInteractionDataOptionSubCommand
-      ).options[0]?.type !== ApplicationCommandOptionType.Subcommand
+      ).options?.[0]?.type !== ApplicationCommandOptionType.Subcommand
     )
       return null;
     const secondRes = (
       (this.options[0] as ApplicationCommandInteractionDataOptionSubCommandGroup)
         .options[0] as ApplicationCommandInteractionDataOptionSubCommand
-    ).options.find(o => o.name === name);
+    ).options?.find(o => o.name === name);
     if (secondRes) return secondRes as OptionType<O>;
     return null;
   }

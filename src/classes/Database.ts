@@ -35,6 +35,7 @@ export default class Database {
       this.channelCache = {};
       this.client.console.log(`Cleared ${cacheSize} entries from the channel cache`);
       await this.fetchAllQuestions();
+      await this.sweepCustomQuestions();
     }, 6 * 60 * 60 * 1000);
   }
 
@@ -123,12 +124,13 @@ export default class Database {
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
     const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
-    const questions = guildId
-      ? [
-          ...this.questionCache[type][chosenRating],
-          ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
-        ]
-      : this.questionCache[type][chosenRating];
+    const questions =
+      guildId && (await this.isPremiumGuild(guildId))
+        ? [
+            ...this.questionCache[type][chosenRating],
+            ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
+          ]
+        : this.questionCache[type][chosenRating];
     return questions[Math.floor(Math.random() * questions.length)];
   }
 
@@ -236,6 +238,17 @@ export default class Database {
         1
       );
     return question;
+  }
+
+  async sweepCustomQuestions() {
+    await this.db.customQuestion.deleteMany({
+      where: {
+        guildId: {
+          notIn: (await this.db.premiumUser.findMany()).map(u => u.premiumServers).flat(),
+        },
+      },
+    });
+    await this.fetchAllCustomQuestions();
   }
 
   async addParanoiaQuestion(questionData: Optional<ParanoiaQuestion, 'id' | 'time'>) {

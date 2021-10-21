@@ -1,5 +1,4 @@
 import { ApplicationCommandOptionType } from 'discord-api-types';
-import superagent from 'superagent';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -89,16 +88,14 @@ const suggest: Command = {
         ],
       });
 
-    await superagent.post(process.env.SUGGEST_HOOK).send({
+    await ctx.client.webhookLog('suggest', {
       username: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
       avatar_url: ctx.client.functions.avatarURL(ctx.user),
       embeds: [
         {
           color: ctx.client.COLORS.BLUE,
           title: question,
-          footer: {
-            text: `Type: ${type} | Rating: ${rating}`,
-          },
+          footer: { text: `Type: ${type} | Rating: ${rating}` },
         },
       ],
     });

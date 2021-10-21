@@ -106,6 +106,9 @@ const questions: Command = {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Custom questions cannot be edited in DMs`);
 
+    if (!(await ctx.client.database.isPremiumGuild(ctx.guildId)))
+      return ctx.reply(ctx.client.functions.premiumAd());
+
     if (ctx.args[0] === 'list') {
       const questionType =
         ctx.getOption<Mutable<typeof options[0]['options'][0]>>('type')?.value || 'ALL';
@@ -174,6 +177,19 @@ const questions: Command = {
             rating,
             question,
           }));
+
+      if (ctx.guildId !== MAIN_GUILD)
+        await ctx.client.webhookLog('suggest', {
+          username: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
+          avatar_url: ctx.client.functions.avatarURL(ctx.user),
+          embeds: [
+            {
+              color: ctx.client.COLORS.BLUE,
+              title: question,
+              footer: { text: `Type: ${type} | Rating: ${rating}` },
+            },
+          ],
+        });
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added. ID: ${addedQuestion.id}`);
     } else if (ctx.args[0] === 'remove') {

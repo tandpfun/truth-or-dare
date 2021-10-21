@@ -1,10 +1,13 @@
-import type {
+import {
   RESTPostAPICurrentUserCreateDMChannelResult,
   RESTPostAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
   RESTGetAPIGuildResult,
   APIEmbed,
+  ComponentType,
+  ButtonStyle,
+  APIInteractionResponseCallbackData,
 } from 'discord-api-types';
 import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
@@ -94,6 +97,32 @@ export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boo
 
 export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export function premiumAd(): APIInteractionResponseCallbackData {
+  return {
+    embeds: [
+      {
+        color: Client.COLORS.YELLOW,
+        title: `${Client.EMOTES.sparkles} Truth or Dare Premium`,
+        description:
+          'Help support the development of Truth or Dare with a one-time $5 donation and gain some awesome perks like custom questions! Click the button below for more information.',
+      },
+    ],
+    components: [
+      {
+        type: ComponentType.ActionRow,
+        components: [
+          {
+            type: ComponentType.Button,
+            label: 'Get Premium',
+            url: 'https://truthordarebot.xyz/premium',
+            style: ButtonStyle.Link,
+          },
+        ],
+      },
+    ],
+  };
 }
 
 export async function sendMessage(
