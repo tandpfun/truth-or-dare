@@ -29,7 +29,8 @@ const dare: Command = {
     const dare = await ctx.client.database.getRandomQuestion(
       'DARE',
       channelSettings.disabledRatings,
-      rating
+      rating,
+      ctx.guildId
     );
     ctx.reply({
       embeds: [

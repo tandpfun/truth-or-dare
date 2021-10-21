@@ -36,7 +36,8 @@ const paranoia: Command = {
     const paranoia = await ctx.client.database.getRandomQuestion(
       'PARANOIA',
       channelSettings.disabledRatings,
-      rating
+      rating,
+      ctx.guildId
     );
 
     if (!ctx.guildId || !targetUserId || !paranoia.id) {

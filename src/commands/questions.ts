@@ -137,9 +137,7 @@ const questions: Command = {
       return ctx.reply({
         embeds: [
           {
-            title: `${titleCase(questionType)} ${titleCase(
-              rating
-            )} Custom Questions | Page ${page}`,
+            title: `${titleCase(questionType)} ${rating === 'ALL' ? '' : rating} Custom Questions`,
             description:
               questionType === 'ALL'
                 ? Object.values(QuestionType)
@@ -152,12 +150,13 @@ const questions: Command = {
                     )
                     .join('\n')
                 : `Total ${titleCase(questionType)} Questions: ${questions.length}`,
+            color: ctx.client.COLORS.BLUE,
             fields: questions.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(q => ({
               name: q.question,
               value: `Type: ${q.type} | Rating: ${q.rating} | ID: ${q.id}`,
             })),
             footer: {
-              text: 'Page ' + page,
+              text: `Page ${page}/${Math.ceil(questions.length / PER_PAGE)}`,
             },
           },
         ],
@@ -167,7 +166,8 @@ const questions: Command = {
       const rating = ctx.getOption<Mutable<typeof options[1]['options'][1]>>('rating').value;
       const question = ctx.getOption<Mutable<typeof options[1]['options'][2]>>('question').value;
 
-      if (question.length > 256) return ctx.reply('Maximum question length is 256 characters');
+      if (question.length > 256)
+        return ctx.reply(ctx.client.EMOTES.xmark + ' Maximum question length is 256 characters');
 
       const addedQuestion = await (ctx.guildId === MAIN_GUILD
         ? ctx.client.database.updateQuestion('', { type, rating, question })
@@ -186,7 +186,7 @@ const questions: Command = {
             {
               color: ctx.client.COLORS.BLUE,
               title: question,
-              footer: { text: `Type: ${type} | Rating: ${rating}` },
+              footer: { text: `Type: ${type} | Rating: ${rating} | Custom Question` },
             },
           ],
         });
@@ -205,7 +205,7 @@ const questions: Command = {
               ? `Question removed. ID: ${deleted.id}`
               : 'Something went wrong, maybe the question has already been deleted?',
             ctx.user,
-            !!deleted
+            !deleted
           ),
         ],
       });

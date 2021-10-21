@@ -41,7 +41,7 @@ export default class Database {
 
   async migrate() {
     if (!this.client.devMode) throw new Error('Migrations in production');
-    //const result = await this.db.something.updateMany();
+    //const result = await this.db.something.updateMany({ data: {} });
     //this.client.console.log(`Migration complete. ${result.count} affected`);
   }
 
@@ -55,7 +55,7 @@ export default class Database {
   }
 
   defaultChannelSettings(id: string, dm = false): ChannelSettings {
-    return { id, disabledRatings: dm ? [] : ['R'] };
+    return { id, disabledRatings: dm ? [] : ['R'], muted: false };
   }
 
   async fetchChannelSettings(id: string, dm = false) {
@@ -226,7 +226,7 @@ export default class Database {
 
   async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
     const question = await this.db.customQuestion.create({
-      data: { id: this.generateId(), ...data },
+      data: { id: this.generateId() + '_c', ...data },
     });
     this.customQuestions[data.type][data.rating].push(question);
     return question;

@@ -8,11 +8,11 @@ import {
   APIInteractionResponseCallbackData,
   APIApplicationCommandInteraction,
   ApplicationCommandOptionType,
+  APIApplicationCommandOption,
   APIInteractionGuildMember,
   InteractionResponseType,
   ApplicationCommandType,
   APIUser,
-  APIApplicationCommandOption,
 } from 'discord-api-types';
 import type { ChannelSettings } from '@prisma/client';
 import type { Response } from 'express';

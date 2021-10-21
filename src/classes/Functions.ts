@@ -4,6 +4,7 @@ import {
   RESTPostAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
+  RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
   ComponentType,
   ButtonStyle,
@@ -36,6 +37,7 @@ export function checkPerms(command: Command, ctx: Context) {
           true
         ),
       ],
+      flags: 64,
     });
     return false;
   }
@@ -170,6 +172,17 @@ export async function fetchGuild(
 ): Promise<RESTGetAPIGuildResult | null> {
   return await superagent
     .get(`https://discord.com/api/guilds/${guildId}`)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body)
+    .catch(_ => null);
+}
+
+export async function fetchChannel(
+  channelId: string,
+  token: string
+): Promise<RESTGetAPIChannelResult | null> {
+  return await superagent
+    .get(`https://discord.com/api/channel/${channelId}`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(_ => null);

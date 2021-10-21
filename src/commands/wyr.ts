@@ -29,7 +29,8 @@ const wyr: Command = {
     const wyr = await ctx.client.database.getRandomQuestion(
       'WYR',
       channelSettings.disabledRatings,
-      rating
+      rating,
+      ctx.guildId
     );
     ctx.reply({
       embeds: [
