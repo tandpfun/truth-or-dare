@@ -11,6 +11,7 @@ import {
 import type Client from './Client';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
 
 export default class Database {
   client: Client;
@@ -109,8 +110,11 @@ export default class Database {
       .flat();
   }
 
-  async fetchSpecificQuestion(id: string) {
-    return await this.db.question.findUnique({ where: { id } });
+  fetchSpecificQuestion(id: string) {
+    return Object.values(this.questionCache)
+      .map(rate => Object.values(rate).flat())
+      .flat()
+      .find(q => q.id === id);
   }
 
   async getRandomQuestion(
@@ -224,12 +228,32 @@ export default class Database {
       .flat();
   }
 
+  specificCustomQuestion(guildId: string, id: string) {
+    return this.getCustomQuestions(guildId).find(q => q.id === id);
+  }
+
   async addCustomQuestion(data: Optional<CustomQuestion, 'id'>) {
     const question = await this.db.customQuestion.create({
       data: { id: this.generateId() + '_c', ...data },
     });
     this.customQuestions[data.type][data.rating].push(question);
     return question;
+  }
+
+  async updateCustomQuestion(data: Required<CustomQuestion, 'id'>) {
+    const quest = await this.db.customQuestion.update({
+      where: { id: data.id },
+      data: { ...data },
+    });
+
+    const questions = this.customQuestions[quest.type][quest.rating];
+    if (questions.some(q => q.id === quest.id))
+      questions.splice(
+        questions.findIndex(q => q.id === quest.id),
+        1,
+        quest
+      );
+    return quest;
   }
 
   async deleteCustomQuestion(id: string): Promise<CustomQuestion | null> {

@@ -94,6 +94,59 @@ const options = [
       },
     ],
   },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'view',
+    description: 'View a custom question from this server',
+    options: [
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'id',
+        description: 'The id of the question to view (get the ID using /customquestion list)',
+        required: true,
+      },
+    ],
+  },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'update',
+    description: 'Update a custom question from this server',
+    options: [
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'id',
+        description: 'The id of the question to update (get the ID using /customquestion list)',
+        required: true,
+      },
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'type',
+        description: 'The new type of question',
+        choices: [
+          { name: 'truth', value: 'TRUTH' },
+          { name: 'dare', value: 'DARE' },
+          { name: 'wyr', value: 'WYR' },
+          { name: 'nhie', value: 'NHIE' },
+          { name: 'paranoia', value: 'PARANOIA' },
+        ],
+      },
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'rating',
+        description: 'The new rating of question',
+        choices: [
+          { name: 'PG', value: 'PG' },
+          { name: 'PG13', value: 'PG13' },
+          { name: 'R', value: 'R' },
+        ],
+      },
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'question',
+        description: 'The new question text',
+      },
+    ],
+  },
 ] as const;
 
 const questions: Command = {
@@ -209,6 +262,47 @@ const questions: Command = {
           ),
         ],
       });
+    } else if (ctx.args[0] === 'view') {
+      const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id').value;
+      const question =
+        ctx.guildId === MAIN_GUILD
+          ? ctx.client.database.fetchSpecificQuestion(id)
+          : ctx.client.database.specificCustomQuestion(ctx.guildId, id);
+
+      return ctx.reply({
+        embeds: [
+          question
+            ? {
+                title: question.question,
+                color: ctx.client.COLORS.BLUE,
+                footer: {
+                  text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${question.id}`,
+                },
+              }
+            : ctx.client.functions.embed('Could not find that question', ctx.user, true),
+        ],
+      });
+    } else if (ctx.args[0] === 'update') {
+      const id = ctx.getOption<Mutable<typeof options[4]['options'][0]>>('id').value;
+      const type = ctx.getOption<Mutable<typeof options[4]['options'][1]>>('type')?.value;
+      const rating = ctx.getOption<Mutable<typeof options[4]['options'][2]>>('rating')?.value;
+      const question = ctx.getOption<Mutable<typeof options[4]['options'][3]>>('question')?.value;
+
+      const quest =
+        ctx.guildId === MAIN_GUILD
+          ? ctx.client.database.fetchSpecificQuestion(id)
+          : ctx.client.database.specificCustomQuestion(ctx.guildId, id);
+      if (!quest)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark +
+            " That question doesn't exist yet, perhaps you meant `/questions add`?"
+        );
+
+      await (ctx.guildId === MAIN_GUILD
+        ? ctx.client.database.updateQuestion(id, { type, rating, question })
+        : ctx.client.database.updateCustomQuestion({ id, type, rating, question }));
+
+      return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully updated the question ' + id);
     }
   },
 };
