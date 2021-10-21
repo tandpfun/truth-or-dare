@@ -179,7 +179,7 @@ const questions: Command = {
           }));
 
       if (ctx.guildId !== MAIN_GUILD)
-        await ctx.client.webhookLog('suggest', {
+        ctx.client.webhookLog('suggest', {
           username: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
           avatar_url: ctx.client.functions.avatarURL(ctx.user),
           embeds: [

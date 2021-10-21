@@ -58,15 +58,19 @@ const premium: Command = {
       if (!ctx.guildId) return ctx.reply(`${ctx.client.EMOTES.xmark} This is a DM.`);
       return ctx.reply({
         embeds: [
-          {
-            title: premiumGuild
-              ? `${ctx.client.EMOTES.checkmark} Premium Server`
-              : `${ctx.client.EMOTES.xmark} Basic Server`,
-            description: premiumGuild
-              ? 'This server has premium activated! Thank you so much for supporting the bot.'
-              : `Help support the development of Truth or Dare with a one-time $5 donation and gain some awesome perks like custom questions!\n\nTo activate a server, run \`/premium activate\`.`,
-            color: premiumGuild ? ctx.client.COLORS.GREEN : ctx.client.COLORS.RED,
-          },
+          premiumGuild
+            ? {
+                title: `${ctx.client.EMOTES.checkmark} Premium Server`,
+                description:
+                  'This server has premium activated! Thank you so much for supporting the bot.',
+                color: ctx.client.COLORS.GREEN,
+              }
+            : {
+                title: `${ctx.client.EMOTES.xmark} Basic Server`,
+                description:
+                  'Help support the development of Truth or Dare with a one-time $5 donation and gain some awesome perks like custom questions!\n\nTo activate a server, run `/premium activate`.',
+                color: ctx.client.COLORS.RED,
+              },
         ],
         components: premiumGuild
           ? null
@@ -85,18 +89,18 @@ const premium: Command = {
             ],
       });
     } else if (ctx.args[0] === 'list') {
-      const premiumServerData = (await Promise.all(
+      const premiumServerData = await Promise.all(
         premiumUser.premiumServers.map(
-          (serverID: string, index: number) =>
+          (id, index): Promise<APIGuild | string> =>
             new Promise(res => {
               setTimeout(() => {
                 ctx.client.functions
-                  .fetchGuild(serverID, ctx.client.token)
-                  .then(fetchResult => res(fetchResult || serverID));
+                  .fetchGuild(id, ctx.client.token)
+                  .then(fetchResult => res(fetchResult || id));
               }, index * 20);
             })
         )
-      )) as APIGuild[];
+      );
       return ctx.reply({
         embeds: [
           {
@@ -105,7 +109,11 @@ const premium: Command = {
             description: `**Slots:** ${premiumUser.premiumServers.length}/${
               premiumUser.premiumSlots
             }\n**Servers:**\n${premiumServerData
-              .map(serverData => `• ${serverData.name || serverData} (${serverData.id})`)
+              .map(serverData =>
+                typeof serverData === 'string'
+                  ? '• ' + serverData
+                  : `• ${serverData.name} (${serverData.id})`
+              )
               .join('\n')}`,
           },
         ],

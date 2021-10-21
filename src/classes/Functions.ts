@@ -1,13 +1,13 @@
 import {
   RESTPostAPICurrentUserCreateDMChannelResult,
+  APIInteractionResponseCallbackData,
   RESTPostAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
   RESTGetAPIGuildResult,
-  APIEmbed,
   ComponentType,
   ButtonStyle,
-  APIInteractionResponseCallbackData,
+  APIEmbed,
 } from 'discord-api-types';
 import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';

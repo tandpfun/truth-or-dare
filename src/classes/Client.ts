@@ -1,7 +1,7 @@
 import { readdirSync } from 'fs';
 import os from 'os';
 
-import type { APIApplicationCommand, RESTPostAPIWebhookWithTokenJSONBody } from 'discord-api-types';
+import type { RESTPostAPIWebhookWithTokenJSONBody, APIApplicationCommand } from 'discord-api-types';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
 
