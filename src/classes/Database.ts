@@ -150,19 +150,17 @@ export default class Database {
   }
 
   async updateQuestion(id: string, data: Optional<Question, 'id'>) {
+    const oldQuest = this.fetchSpecificQuestion(id);
     const quest = await this.db.question.upsert({
       where: { id },
       update: data,
       create: { id: this.generateId(), ...data },
     });
-    const questions = this.questionCache[data.type][data.rating];
-    if (questions.some(q => q.id === quest.id))
-      questions.splice(
-        questions.findIndex(q => q.id === quest.id),
-        1,
-        quest
-      );
-    else questions.push(quest);
+
+    const questions = oldQuest ? this.questionCache[oldQuest.type][oldQuest.rating] : null;
+    const index = questions ? questions.findIndex(q => q.id === quest.id) : -1;
+    if (index !== -1) questions.splice(index, 1);
+    this.questionCache[quest.type][quest.rating].push(quest);
     return quest;
   }
 
@@ -245,19 +243,17 @@ export default class Database {
     return question;
   }
 
-  async updateCustomQuestion(data: Required<CustomQuestion, 'id'>) {
+  async updateCustomQuestion(data: Required<CustomQuestion, 'id' | 'guildId'>) {
+    const oldQuest = this.specificCustomQuestion(data.guildId, data.id);
     const quest = await this.db.customQuestion.update({
       where: { id: data.id },
-      data: { ...data },
+      data: { ...data, id: undefined } as Omit<CustomQuestion, 'id'>,
     });
 
-    const questions = this.customQuestions[quest.type][quest.rating];
-    if (questions.some(q => q.id === quest.id))
-      questions.splice(
-        questions.findIndex(q => q.id === quest.id),
-        1,
-        quest
-      );
+    const questions = this.customQuestions[oldQuest.type][oldQuest.rating];
+    const index = questions.findIndex(q => q.id === quest.id);
+    if (index !== -1) questions.splice(index, 1);
+    this.customQuestions[quest.type][quest.rating].push(quest);
     return quest;
   }
 

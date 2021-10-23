@@ -300,7 +300,13 @@ const questions: Command = {
 
       await (ctx.guildId === MAIN_GUILD
         ? ctx.client.database.updateQuestion(id, { type, rating, question })
-        : ctx.client.database.updateCustomQuestion({ id, type, rating, question }));
+        : ctx.client.database.updateCustomQuestion({
+            id,
+            guildId: ctx.guildId,
+            type,
+            rating,
+            question,
+          }));
 
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully updated the question ' + id);
     }

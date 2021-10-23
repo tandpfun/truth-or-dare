@@ -12,7 +12,7 @@ const ping: Command = {
         {
           description:
             `${ctx.client.EMOTES.time} **Pong!** The bot is online.` +
-            `\n• Database: \`${await ctx.client.database.ping()}`,
+            `\n• Database: \`${await ctx.client.database.ping()}\``,
           color: ctx.client.COLORS.GREEN,
         },
       ],
