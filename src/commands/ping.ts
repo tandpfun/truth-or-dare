@@ -7,15 +7,12 @@ const ping: Command = {
   category: 'control',
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const now = Date.now();
-    ctx.reply({
+    return ctx.reply({
       embeds: [
         {
           description:
             `${ctx.client.EMOTES.time} **Pong!** The bot is online.` +
-            `\n• Database: \`${await ctx.client.database
-              .fetchSpecificQuestion('')
-              .then(() => Date.now() - now)}ms\``,
+            `\n• Database: \`${await ctx.client.database.ping()}`,
           color: ctx.client.COLORS.GREEN,
         },
       ],

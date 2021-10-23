@@ -55,6 +55,11 @@ export default class Database {
     );
   }
 
+  async ping() {
+    const now = Date.now();
+    return this.db.channelSettings.findUnique({ where: { id: '' } }).then(() => Date.now() - now);
+  }
+
   defaultChannelSettings(id: string, dm = false): ChannelSettings {
     return { id, disabledRatings: dm ? [] : ['R'], muted: false };
   }
