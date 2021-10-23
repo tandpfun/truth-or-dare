@@ -50,6 +50,11 @@ const options = [
       },
     ],
   },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'toggleglobals',
+    description: 'Disable/enable all global questions in this server',
+  },
 ] as const;
 
 const serverSettings: Command = {
@@ -70,9 +75,11 @@ const serverSettings: Command = {
             title: 'Server Settings',
             description: `Paranoia frequency ${
               settings.showParanoiaFrequency
-            }%\n__Disabled Questions:__\n${settings.disabledQuestions
-              .map(id => '`' + id + '`')
-              .join(', ')}`,
+            }%\n__Disabled Questions:__\n${
+              settings.disableGlobals
+                ? 'All global questions'
+                : settings.disabledQuestions.map(id => '`' + id + '`').join(', ')
+            }`,
             color: ctx.client.COLORS.BLUE,
           },
         ],
@@ -103,7 +110,12 @@ const serverSettings: Command = {
       const question = ctx.client.database.fetchSpecificQuestion(id);
       if (!question)
         return ctx.reply(ctx.client.EMOTES.xmark + ' I could not find that default question');
+
       const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      if (settings.disableGlobals)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server'
+        );
       if (settings.disabledQuestions.includes(id))
         return ctx.reply(ctx.client.EMOTES.xmark + ' That question is already disabled');
 
@@ -111,8 +123,12 @@ const serverSettings: Command = {
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully disabled question: ' + id);
     } else if (ctx.args[0] === 'enablequestion') {
       const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id').value;
-      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
 
+      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      if (settings.disableGlobals)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server'
+        );
       if (!settings.disabledQuestions.includes(id))
         return ctx.reply(ctx.client.EMOTES.xmark + ' That question is not currently disabled');
 
@@ -122,6 +138,17 @@ const serverSettings: Command = {
       });
 
       return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again');
+    } else if (ctx.args[0] === 'toggleglobals') {
+      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      await ctx.client.database.updateGuildSettings({
+        id: ctx.guildId,
+        disableGlobals: !settings.disableGlobals,
+      });
+      return ctx.reply(
+        `${ctx.client.EMOTES.checkmark} All global questions have been ${
+          settings.disableGlobals ? 'enabled' : 'disabled'
+        } in this server`
+      );
     }
   },
 };

@@ -140,19 +140,25 @@ export default class Database {
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
     const isPremiumGuild = guildId && (await this.isPremiumGuild(guildId));
-    const disabledQuestions = isPremiumGuild
-      ? (await this.getGuildSettings(guildId)).disabledQuestions
-      : [];
+    const guildSettings = isPremiumGuild ? await this.getGuildSettings(guildId) : null;
     const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
-    const questions = (
-      guildId && isPremiumGuild
-        ? [
-            ...this.questionCache[type][chosenRating],
-            ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
-          ]
-        : this.questionCache[type][chosenRating]
-    ).filter(q => !isPremiumGuild || !disabledQuestions.includes(q.id));
-    return questions[Math.floor(Math.random() * questions.length)];
+    const questions = guildSettings?.disableGlobals
+      ? this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId)
+      : (isPremiumGuild
+          ? [
+              ...this.questionCache[type][chosenRating],
+              ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
+            ]
+          : this.questionCache[type][chosenRating]
+        ).filter(q => !isPremiumGuild || !guildSettings.disabledQuestions.includes(q.id));
+    return questions.length
+      ? questions[Math.floor(Math.random() * questions.length)]
+      : ({
+          id: '',
+          type,
+          rating: 'NONE',
+          question: 'I dare you to tell the server admins to add questions',
+        } as Question & { rating: 'NONE' });
   }
 
   async updateQuestion(id: string, data: Optional<Question, 'id'>) {
@@ -358,7 +364,7 @@ export default class Database {
   }
 
   defaultGuildSettings(id: string): GuildSettings {
-    return { id, disabledQuestions: [], showParanoiaFrequency: 50 };
+    return { id, disableGlobals: false, disabledQuestions: [], showParanoiaFrequency: 50 };
   }
 
   async updateGuildSettings(data: Required<GuildSettings, 'id'>) {
