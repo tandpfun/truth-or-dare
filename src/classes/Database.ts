@@ -2,6 +2,7 @@ import {
   ParanoiaQuestion,
   ChannelSettings,
   CustomQuestion,
+  GuildSettings,
   PrismaClient,
   QuestionType,
   Question,
@@ -138,14 +139,19 @@ export default class Database {
         rating: 'NONE',
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
+    const isPremiumGuild = guildId && (await this.isPremiumGuild(guildId));
+    const disabledQuestions = isPremiumGuild
+      ? (await this.getGuildSettings(guildId)).disabledQuestions
+      : [];
     const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
-    const questions =
-      guildId && (await this.isPremiumGuild(guildId))
+    const questions = (
+      guildId && isPremiumGuild
         ? [
             ...this.questionCache[type][chosenRating],
             ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
           ]
-        : this.questionCache[type][chosenRating];
+        : this.questionCache[type][chosenRating]
+    ).filter(q => !isPremiumGuild || !disabledQuestions.includes(q.id));
     return questions[Math.floor(Math.random() * questions.length)];
   }
 
@@ -342,6 +348,32 @@ export default class Database {
     return await this.db.premiumUser.update({
       where: { id: userId },
       data: { premiumServers: premiumServers.filter(id => id !== guildId) },
+    });
+  }
+
+  async getGuildSettings(id: string) {
+    return id
+      ? (await this.db.guildSettings.findUnique({ where: { id } })) ?? this.defaultGuildSettings(id)
+      : this.defaultGuildSettings(id);
+  }
+
+  defaultGuildSettings(id: string): GuildSettings {
+    return { id, disabledQuestions: [], showParanoiaFrequency: 50 };
+  }
+
+  async updateGuildSettings(data: Required<GuildSettings, 'id'>) {
+    return await this.db.guildSettings.upsert({
+      where: { id: data.id },
+      update: { ...data, id: undefined } as Omit<GuildSettings, 'id'>,
+      create: { ...this.defaultGuildSettings(data.id), ...data },
+    });
+  }
+
+  async addDisabledQuestion(guild: string, questionId: string) {
+    return await this.db.guildSettings.upsert({
+      where: { id: guild },
+      update: { disabledQuestions: { push: questionId } },
+      create: { ...this.defaultGuildSettings(guild), disabledQuestions: [questionId] },
     });
   }
 }
