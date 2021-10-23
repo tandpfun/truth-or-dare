@@ -103,6 +103,9 @@ const serverSettings: Command = {
       const question = ctx.client.database.fetchSpecificQuestion(id);
       if (!question)
         return ctx.reply(ctx.client.EMOTES.xmark + ' I could not find that default question');
+      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      if (settings.disabledQuestions.includes(id))
+        return ctx.reply(ctx.client.EMOTES.xmark + ' That question is already disabled');
 
       await ctx.client.database.addDisabledQuestion(ctx.guildId, id);
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully disabled question: ' + id);
