@@ -47,9 +47,7 @@ const premium: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const premiumGuild = ctx.guildId
-      ? await ctx.client.database.isPremiumGuild(ctx.guildId)
-      : false;
+    const premiumGuild = ctx.guildId && ctx.client.database.isPremiumGuild(ctx.guildId);
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
 
     if (!premiumUser && ctx.args[0] !== 'check') return ctx.reply(ctx.client.functions.premiumAd());

@@ -64,7 +64,8 @@ const serverSettings: Command = {
   category: 'control',
   perms: [],
   run: async (ctx: Context) => {
-    if (!ctx.guildId || !(await ctx.client.database.isPremiumGuild(ctx.guildId)))
+    if (!ctx.guildId) return ctx.reply(ctx.client.EMOTES.xmark + ' This is a DM');
+    if (!ctx.client.database.isPremiumGuild(ctx.guildId))
       return ctx.reply(ctx.client.functions.premiumAd());
 
     if (ctx.args[0] === 'view') {

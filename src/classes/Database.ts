@@ -20,11 +20,13 @@ export default class Database {
   channelCache: Record<string, ChannelSettings | null>;
   questionCache: Record<QuestionType, Record<Rating, Question[]>>;
   customQuestions: Record<QuestionType, Record<Rating, CustomQuestion[]>>;
+  premiumGuilds: Set<string>;
 
   constructor(client: Client) {
     this.client = client;
     this.db = new PrismaClient();
     this.channelCache = {};
+    this.premiumGuilds = new Set();
   }
 
   async start() {
@@ -32,6 +34,7 @@ export default class Database {
     this.client.console.success('Connected to database!');
     await this.fetchAllQuestions();
     await this.fetchAllCustomQuestions();
+    await this.fetchPremiumGuilds();
     setInterval(async () => {
       const cacheSize = Object.keys(this.channelCache).length;
       this.channelCache = {};
@@ -139,7 +142,7 @@ export default class Database {
         rating: 'NONE',
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
-    const isPremiumGuild = guildId && (await this.isPremiumGuild(guildId));
+    const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.getGuildSettings(guildId) : null;
     const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
     const questions = guildSettings?.disableGlobals
@@ -330,12 +333,21 @@ export default class Database {
     await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
   }
 
+  async fetchPremiumGuilds() {
+    const users = await this.db.premiumUser.findMany();
+    for (const user of users) {
+      for (const guild of user.premiumServers) {
+        this.premiumGuilds.add(guild);
+      }
+    }
+  }
+
   async getPremiumUser(id: string) {
     return await this.db.premiumUser.findUnique({ where: { id } });
   }
 
-  async isPremiumGuild(guildId: string): Promise<boolean> {
-    return !!(await this.db.premiumUser.findFirst({ where: { premiumServers: { has: guildId } } }));
+  isPremiumGuild(guildId: string): boolean {
+    return this.premiumGuilds.has(guildId);
   }
 
   async getPremiumActivated(guildId: string) {
@@ -343,18 +355,23 @@ export default class Database {
   }
 
   async activatePremium(userId: string, guildId: string) {
-    return await this.db.premiumUser.update({
+    const user = await this.db.premiumUser.update({
       where: { id: userId },
       data: { premiumServers: { push: guildId } },
     });
+    this.premiumGuilds.add(guildId);
+    return user;
   }
 
   async deactivatePremium(userId: string, guildId: string) {
     const { premiumServers } = await this.db.premiumUser.findUnique({ where: { id: userId } });
-    return await this.db.premiumUser.update({
+    const user = await this.db.premiumUser.update({
       where: { id: userId },
       data: { premiumServers: premiumServers.filter(id => id !== guildId) },
     });
+    if (!(await this.db.premiumUser.findFirst({ where: { premiumServers: { has: guildId } } })))
+      this.premiumGuilds.delete(guildId);
+    return user;
   }
 
   async getGuildSettings(id: string) {
