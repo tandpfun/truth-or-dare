@@ -31,6 +31,13 @@ model ChannelSettings {
   muted           Boolean
 }
 
+model GuildSettings {
+  id                    String   @id @map("_id")
+  disableGlobals        Boolean
+  disabledQuestions     String[]
+  showParanoiaFrequency Int
+}
+
 model Question {
   id       String       @id @map("_id")
   type     QuestionType

@@ -47,9 +47,7 @@ const premium: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const premiumGuild = ctx.guildId
-      ? await ctx.client.database.isPremiumGuild(ctx.guildId)
-      : false;
+    const premiumGuild = ctx.guildId && ctx.client.database.isPremiumGuild(ctx.guildId);
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
 
     if (!premiumUser && ctx.args[0] !== 'check') return ctx.reply(ctx.client.functions.premiumAd());
@@ -108,13 +106,15 @@ const premium: Command = {
             color: ctx.client.COLORS.BLUE,
             description: `**Slots:** ${premiumUser.premiumServers.length}/${
               premiumUser.premiumSlots
-            }\n**Servers:**\n${premiumServerData
-              .map(serverData =>
-                typeof serverData === 'string'
-                  ? '• ' + serverData
-                  : `• ${serverData.name} (${serverData.id})`
-              )
-              .join('\n')}`,
+            }\n**Servers:**\n${
+              premiumServerData
+                .map(serverData =>
+                  typeof serverData === 'string'
+                    ? '• ' + serverData
+                    : `• ${serverData.name} (${serverData.id})`
+                )
+                .join('\n') || 'None'
+            }`,
           },
         ],
         flags: ctx.guildId ? 64 : 0,

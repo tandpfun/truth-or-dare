@@ -31,6 +31,10 @@ const answer: Command = {
     if (!paranoiaData)
       return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
+    const showFreq = ctx.client.database.isPremiumGuild(paranoiaData.guildId)
+      ? (await ctx.client.database.getGuildSettings(paranoiaData.guildId)).showParanoiaFrequency
+      : ctx.client.database.defaultGuildSettings(ctx.guildId).showParanoiaFrequency;
+
     // send answer to the channel the question was sent from
     const message = await ctx.client.functions.sendMessage(
       {
@@ -46,7 +50,7 @@ const answer: Command = {
               {
                 name: 'Question:',
                 value:
-                  Math.random() < 0.5
+                  Math.random() < showFreq / 100
                     ? paranoiaData.questionText
                     : `The user got lucky, question wasn't shared.`,
               },
