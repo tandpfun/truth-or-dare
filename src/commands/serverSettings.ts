@@ -72,13 +72,13 @@ const serverSettings: Command = {
       return ctx.reply({
         embeds: [
           {
-            title: 'Server Settings',
-            description: `Paranoia frequency ${
+            title: ctx.client.EMOTES.gear + ' Server Settings',
+            description: `__Paranoia frequency:__\n${
               settings.showParanoiaFrequency
-            }%\n__Disabled Questions:__\n${
+            }%\n\n__Disabled Questions:__\n${
               settings.disableGlobals
                 ? 'All global questions'
-                : settings.disabledQuestions.map(id => '`' + id + '`').join(', ')
+                : settings.disabledQuestions.map(id => '`' + id + '`').join(', ') || 'None'
             }`,
             color: ctx.client.COLORS.BLUE,
           },
@@ -99,7 +99,7 @@ const serverSettings: Command = {
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
-            `Paranoia questions will now be show ${freq}% of the time`,
+            `Paranoia questions will now be shown ${freq}% of the time`,
             ctx.user,
             false
           ),
@@ -145,9 +145,9 @@ const serverSettings: Command = {
         disableGlobals: !settings.disableGlobals,
       });
       return ctx.reply(
-        `${ctx.client.EMOTES.checkmark} All global questions have been ${
-          settings.disableGlobals ? 'enabled' : 'disabled'
-        } in this server`
+        `${ctx.client.EMOTES.checkmark} ${
+          settings.disableGlobals ? 'Enabled' : 'Disabled'
+        } global questions in this server.`
       );
     }
   },
