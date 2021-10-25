@@ -10,6 +10,7 @@ import type Command from './Command.js';
 import Database from './Database.js';
 import Logger from './Logger.js';
 import Server from './Server.js';
+import Metrics from './Metrics.js';
 
 export default class Client {
   token: string;
@@ -18,6 +19,7 @@ export default class Client {
   port: number;
   commands: Command[];
   console: Logger;
+  metrics: Metrics;
   functions: typeof functions;
   server: Server;
   database: Database;
@@ -80,6 +82,7 @@ export default class Client {
 
     this.commands = [];
     this.console = new Logger('ToD');
+    this.metrics = new Metrics(this);
     this.functions = functions;
     this.server = new Server(this.port, this);
     this.database = new Database(this);

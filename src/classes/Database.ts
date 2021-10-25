@@ -102,6 +102,8 @@ export default class Database {
         ),
       ])
     ) as Record<QuestionType, Record<Rating, Question[]>>;
+
+    this.client.metrics.updateQuestionCount(questions.length); // Track question count for metrics
     return this.questionCache;
   }
 
@@ -175,6 +177,7 @@ export default class Database {
     const questions = oldQuest ? this.questionCache[oldQuest.type][oldQuest.rating] : null;
     const index = questions ? questions.findIndex(q => q.id === quest.id) : -1;
     if (index !== -1) questions.splice(index, 1);
+    else this.client.metrics.questionCount.inc();
     this.questionCache[quest.type][quest.rating].push(quest);
     return quest;
   }
@@ -190,6 +193,8 @@ export default class Database {
         questions.findIndex(q => q.id === question.id),
         1
       );
+
+    this.client.metrics.questionCount.dec();
     return question;
   }
 
@@ -226,6 +231,8 @@ export default class Database {
         ),
       ])
     ) as Record<QuestionType, Record<Rating, CustomQuestion[]>>;
+
+    this.client.metrics.updateCustomQuestionCount(questions.length); // Track custom question count for metrics
     return this.customQuestions;
   }
 
@@ -255,6 +262,8 @@ export default class Database {
       data: { id: this.generateId() + '_c', ...data },
     });
     this.customQuestions[data.type][data.rating].push(question);
+
+    this.client.metrics.customQuestionCount.inc();
     return question;
   }
 
@@ -283,6 +292,8 @@ export default class Database {
         questions.findIndex(q => q.id === question.id),
         1
       );
+
+    this.client.metrics.customQuestionCount.dec();
     return question;
   }
 
