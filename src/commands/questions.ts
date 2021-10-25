@@ -239,7 +239,7 @@ const questions: Command = {
             {
               color: ctx.client.COLORS.BLUE,
               title: question,
-              footer: { text: `Type: ${type} | Rating: ${rating} | Custom Question` },
+              footer: { text: `Type: ${type} | Rating: ${rating} | ID: ${addedQuestion.id}` },
             },
           ],
         });
