@@ -162,7 +162,7 @@ export default class Database {
     const questions = oldQuest ? this.questionCache[oldQuest.type][oldQuest.rating] : null;
     const index = questions ? questions.findIndex(q => q.id === quest.id) : -1;
     if (index !== -1) questions.splice(index, 1);
-    else this.client.metrics.customQuestionCount.inc();
+    else this.client.metrics.questionCount.inc();
     this.questionCache[quest.type][quest.rating].push(quest);
     return quest;
   }
