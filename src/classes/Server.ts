@@ -3,6 +3,7 @@ import express, { Express, Request, Response } from 'express';
 import { QuestionType, Rating } from '.prisma/client';
 import rateLimiter from 'express-rate-limit';
 import * as Sentry from '@sentry/node';
+import { register } from 'prom-client';
 
 import type Client from './Client';
 import Context from './Context';
@@ -44,6 +45,13 @@ export default class Server {
 
     this.router.get('/api/:questionType', this.handleAPI.bind(this));
 
+    this.router.get('/metrics', async (req, res) => {
+      if (req.headers.authorization?.replace('Bearer ', '') !== process.env.PROMETHEUS_AUTH)
+        return res.sendStatus(401);
+      const metrics = await register.metrics();
+      res.send(metrics);
+    });
+
     this.router.get('/', (_, res) => res.redirect('https://docs.truthordarebot.xyz'));
   }
 
@@ -75,13 +83,20 @@ export default class Server {
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
     if (!this.client.functions.checkPerms(command, ctx)) return;
+
+    // Statistics
     this.client.stats.minuteCommandCount++;
     this.client.stats.commands[command.name]++;
     this.client.stats.minuteCommands[command.name]++;
+
+    let commandErrored;
     try {
       await command.run(ctx);
     } catch (err) {
+      commandErrored = true;
       this.client.console.error(err);
+
+      // Track error with Sentry
       Sentry.withScope(scope => {
         scope.setExtras({
           user: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
@@ -93,6 +108,14 @@ export default class Server {
       });
       ctx.reply(`${this.client.EMOTES.xmark} Something went wrong while running that command.`);
     }
+
+    this.client.metrics.trackCommandUse(
+      command.name,
+      ctx.user.id,
+      ctx.guildId || ctx.channelId,
+      !commandErrored
+    );
+
     /*this.client.console.log(
       `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
     );*/
