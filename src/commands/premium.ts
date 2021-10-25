@@ -106,13 +106,15 @@ const premium: Command = {
             color: ctx.client.COLORS.BLUE,
             description: `**Slots:** ${premiumUser.premiumServers.length}/${
               premiumUser.premiumSlots
-            }\n**Servers:**\n${premiumServerData
-              .map(serverData =>
-                typeof serverData === 'string'
-                  ? '• ' + serverData
-                  : `• ${serverData.name} (${serverData.id})`
-              )
-              .join('\n')}`,
+            }\n**Servers:**\n${
+              premiumServerData
+                .map(serverData =>
+                  typeof serverData === 'string'
+                    ? '• ' + serverData
+                    : `• ${serverData.name} (${serverData.id})`
+                )
+                .join('\n') || 'None'
+            }`,
           },
         ],
         flags: ctx.guildId ? 64 : 0,
