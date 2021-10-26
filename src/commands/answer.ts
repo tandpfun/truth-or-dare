@@ -8,14 +8,14 @@ const options = [
   {
     type: ApplicationCommandOptionType.String,
     name: 'answer',
-    description: 'The answer to the paranoia question',
+    description: 'The answer to the paranoia question.',
     required: true,
   },
 ] as const;
 
 const answer: Command = {
   name: 'answer',
-  description: 'Answers a paranoia question sent to you',
+  description: 'Answers a paranoia question sent to you.',
   category: 'question',
   options,
   perms: [],
@@ -53,7 +53,7 @@ const answer: Command = {
                 value:
                   Math.random() < showFreq / 100
                     ? paranoiaData.questionText
-                    : `The user got lucky, question wasn't shared.`,
+                    : `The user got lucky, and the question wasn't shared.`,
               },
               {
                 name: `${ctx.user.username}'s Answer:`,
@@ -83,7 +83,7 @@ const answer: Command = {
           {
             title: paranoiaData.questionText,
             color: ctx.client.COLORS.GREEN,
-            description: `Question answered: Check it out in <#${paranoiaData.channelId}>`,
+            description: `Question answered: Check it out in <#${paranoiaData.channelId}>.`,
             footer: {
               text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
             },

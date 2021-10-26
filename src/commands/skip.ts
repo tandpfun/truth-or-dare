@@ -3,7 +3,7 @@ import type Context from '../classes/Context';
 
 const skip: Command = {
   name: 'skip',
-  description: 'Skips a paranoia question sent to you if the question is stuck',
+  description: 'Skips a paranoia question sent to you if the question is stuck.',
   category: 'question',
   perms: [],
   run: async (ctx: Context) => {

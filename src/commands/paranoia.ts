@@ -8,7 +8,7 @@ const options = [
   {
     type: ApplicationCommandOptionType.User,
     name: 'target',
-    description: 'The user to send a paranoia question to',
+    description: 'The user to send a paranoia question to.',
   },
   {
     type: ApplicationCommandOptionType.String,

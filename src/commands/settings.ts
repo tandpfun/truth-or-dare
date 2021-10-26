@@ -14,7 +14,7 @@ const options = [
       {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
-        description: 'The channel to view the settings for',
+        description: 'The channel to view the settings for.',
         channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
       },
     ],
@@ -38,7 +38,7 @@ const options = [
       {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
-        description: 'The channel to disable the rating in',
+        description: 'The channel to disable the rating in.',
         channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
       },
     ],
@@ -62,7 +62,7 @@ const options = [
       {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
-        description: 'The channel to enable the rating in',
+        description: 'The channel to enable the rating in.',
         channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
       },
     ],
@@ -70,12 +70,12 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'mute',
-    description: 'Disable all commands in a channel',
+    description: 'Disable all commands in a channel.',
     options: [
       {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
-        description: 'The channel to mute the bot in',
+        description: 'The channel to mute the bot in.',
         channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
       },
     ],
@@ -83,12 +83,12 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'unmute',
-    description: 'Reenable all commands in a channel',
+    description: 'Reenable all commands in a channel.',
     options: [
       {
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
-        description: 'The channel to unmute the bot in',
+        description: 'The channel to unmute the bot in.',
         channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
       },
     ],
@@ -97,7 +97,7 @@ const options = [
 
 const settings: Command = {
   name: 'settings',
-  description: 'Show and configure the channel settings of a channel',
+  description: 'Show and configure the channel settings of a channel.',
   category: 'control',
   perms: ['ManageChannels'],
   options,
@@ -155,18 +155,18 @@ const settings: Command = {
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToEnable} rating was enabled here!`);
     } else if (ctx.args[0] === 'mute') {
       if (channelSettings.muted)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' I am already muted here');
+        return ctx.reply(ctx.client.EMOTES.xmark + ' I am already muted here.');
 
       channelSettings.muted = true;
       await ctx.client.database.updateChannelSettings(channelSettings);
-      ctx.reply(ctx.client.EMOTES.checkmark + ' Muted, use `/settings unmute` to unmute');
+      ctx.reply(ctx.client.EMOTES.checkmark + ' Muted, use `/settings unmute` to unmute.');
     } else if (ctx.args[0] === 'unmute') {
       if (!channelSettings.muted)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' I am already unmuted here');
+        return ctx.reply(ctx.client.EMOTES.xmark + ' I am already unmuted here.');
 
       channelSettings.muted = false;
       await ctx.client.database.updateChannelSettings(channelSettings);
-      ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted, use `/settings mute` to mute');
+      ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted, use `/settings mute` to mute.');
     }
   },
 };

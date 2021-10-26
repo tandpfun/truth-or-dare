@@ -64,7 +64,7 @@ const suggest: Command = {
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
-            "I can't seem to send the suggestion right now, please try again later",
+            "I can't seem to send the suggestion right now, please try again later.",
             ctx.user,
             true
           ),
