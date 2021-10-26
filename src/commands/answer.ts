@@ -23,9 +23,10 @@ const answer: Command = {
     const paranoiaAnswer = ctx.getOption<Mutable<typeof options[0]>>('answer').value;
 
     if (ctx.guildId)
-      return ctx.reply(
-        `${ctx.client.EMOTES.xmark} Paranoia questions can only be answered in DMs.`
-      );
+      return ctx.reply({
+        content: `${ctx.client.EMOTES.xmark} Paranoia questions can only be answered in DMs.`,
+        flags: 1 << 6,
+      });
 
     const paranoiaData = await ctx.client.database.getNextParanoia(ctx.user.id);
     if (!paranoiaData)

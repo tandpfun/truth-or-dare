@@ -57,6 +57,7 @@ const suggest: Command = {
             true
           ),
         ],
+        flags: 1 << 6,
       });
 
     if (!process.env.SUGGEST_HOOK)
@@ -68,6 +69,7 @@ const suggest: Command = {
             true
           ),
         ],
+        flags: 1 << 6,
       });
 
     if (!(ctx.user.id in ctx.client.suggestCooldowns)) {
@@ -86,6 +88,7 @@ const suggest: Command = {
             true
           ),
         ],
+        flags: 1 << 6,
       });
 
     await ctx.client.webhookLog('suggest', {

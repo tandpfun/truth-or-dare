@@ -293,10 +293,12 @@ const questions: Command = {
           ? ctx.client.database.fetchSpecificQuestion(id)
           : ctx.client.database.specificCustomQuestion(ctx.guildId, id);
       if (!quest)
-        return ctx.reply(
-          ctx.client.EMOTES.xmark +
-            " That question doesn't exist yet, perhaps you meant `/questions add`?"
-        );
+        return ctx.reply({
+          content:
+            ctx.client.EMOTES.xmark +
+            " That question doesn't exist yet, perhaps you meant `/questions add`?",
+          flags: 1 << 6,
+        });
 
       await (ctx.guildId === MAIN_GUILD
         ? ctx.client.database.updateQuestion(id, { type, rating, question })

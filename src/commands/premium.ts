@@ -117,7 +117,7 @@ const premium: Command = {
             }`,
           },
         ],
-        flags: ctx.guildId ? 64 : 0,
+        flags: ctx.guildId ? 1 << 6 : 0,
       });
     } else if (ctx.args[0] === 'activate') {
       if (!ctx.guildId)
