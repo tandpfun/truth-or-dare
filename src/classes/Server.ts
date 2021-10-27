@@ -106,7 +106,10 @@ export default class Server {
         });
         Sentry.captureException(err);
       });
-      ctx.reply(`${this.client.EMOTES.xmark} Something went wrong while running that command.`);
+      ctx.reply({
+        content: `${this.client.EMOTES.xmark} Something went wrong while running that command.`,
+        flags: 1 << 6,
+      });
     }
 
     this.client.metrics.trackCommandUse(command.name, !commandErrored);

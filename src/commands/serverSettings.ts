@@ -8,18 +8,18 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'view',
-    description: 'View premium server settings',
+    description: 'View premium server settings.',
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'showparanoia',
-    description: 'Set how often paranoia questions are shown',
+    description: 'Set how often paranoia questions are shown.',
     options: [
       {
         type: ApplicationCommandOptionType.Integer,
         name: 'frequency',
         description:
-          'How often questions are shown as a percent chance (0 for never, 100 for always)',
+          'How often questions are shown as a percent chance (0 for never, 100 for always).',
         required: true,
       },
     ],
@@ -27,12 +27,12 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'disablequestion',
-    description: 'Disable a global question from being shown in this server',
+    description: 'Disable a global question from being shown in this server.',
     options: [
       {
         type: ApplicationCommandOptionType.String,
         name: 'id',
-        description: 'The id of the question to disable',
+        description: 'The id of the question to disable.',
         required: true,
       },
     ],
@@ -40,12 +40,12 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'enablequestion',
-    description: 'Enable a global question that has been disabled',
+    description: 'Enable a global question that has been disabled.',
     options: [
       {
         type: ApplicationCommandOptionType.String,
         name: 'id',
-        description: 'The id of the question to enable',
+        description: 'The ID of the question to enable.',
         required: true,
       },
     ],
@@ -53,18 +53,19 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'toggleglobals',
-    description: 'Disable/enable all global questions in this server',
+    description: 'Disable/enable all global questions in this server.',
   },
 ] as const;
 
 const serverSettings: Command = {
   name: 'serversettings',
-  description: 'View and change the premium server settings',
+  description: 'View and change the premium server settings.',
   options,
   category: 'control',
   perms: [],
   run: async (ctx: Context) => {
-    if (!ctx.guildId) return ctx.reply(ctx.client.EMOTES.xmark + ' This is a DM');
+    if (!ctx.guildId)
+      return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');
     if (!ctx.client.database.isPremiumGuild(ctx.guildId))
       return ctx.reply(ctx.client.functions.premiumAd());
 
@@ -90,7 +91,7 @@ const serverSettings: Command = {
 
       if (freq < 0 || freq > 100)
         return ctx.reply(
-          ctx.client.EMOTES.xmark + ' Question show frequency must be between 0 and 100 percent'
+          ctx.client.EMOTES.xmark + ' Question show frequency must be between 0 and 100 percent.'
         );
 
       await ctx.client.database.updateGuildSettings({
@@ -100,7 +101,7 @@ const serverSettings: Command = {
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
-            `Paranoia questions will now be shown ${freq}% of the time`,
+            `Paranoia questions will now be shown ${freq}% of the time.`,
             ctx.user,
             false
           ),
@@ -110,15 +111,15 @@ const serverSettings: Command = {
       const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id').value;
       const question = ctx.client.database.fetchSpecificQuestion(id);
       if (!question)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' I could not find that default question');
+        return ctx.reply(ctx.client.EMOTES.xmark + ' I could not find that default question.');
 
       const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
       if (settings.disableGlobals)
         return ctx.reply(
-          ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server'
+          ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server.'
         );
       if (settings.disabledQuestions.includes(id))
-        return ctx.reply(ctx.client.EMOTES.xmark + ' That question is already disabled');
+        return ctx.reply(ctx.client.EMOTES.xmark + ' That question is already disabled.');
 
       await ctx.client.database.addDisabledQuestion(ctx.guildId, id);
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully disabled question: ' + id);
@@ -128,17 +129,17 @@ const serverSettings: Command = {
       const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
       if (settings.disableGlobals)
         return ctx.reply(
-          ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server'
+          ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server.'
         );
       if (!settings.disabledQuestions.includes(id))
-        return ctx.reply(ctx.client.EMOTES.xmark + ' That question is not currently disabled');
+        return ctx.reply(ctx.client.EMOTES.xmark + ' That question is not currently disabled.');
 
       await ctx.client.database.updateGuildSettings({
         id: ctx.guildId,
         disabledQuestions: settings.disabledQuestions.filter(q => q !== id),
       });
 
-      return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again');
+      return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again.');
     } else if (ctx.args[0] === 'toggleglobals') {
       const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
       await ctx.client.database.updateGuildSettings({

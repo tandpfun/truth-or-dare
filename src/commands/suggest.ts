@@ -57,17 +57,19 @@ const suggest: Command = {
             true
           ),
         ],
+        flags: 1 << 6,
       });
 
     if (!process.env.SUGGEST_HOOK)
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
-            "I can't seem to send the suggestion right now, please try again later",
+            "I can't seem to send the suggestion right now, please try again later.",
             ctx.user,
             true
           ),
         ],
+        flags: 1 << 6,
       });
 
     if (!(ctx.user.id in ctx.client.suggestCooldowns)) {
@@ -86,6 +88,7 @@ const suggest: Command = {
             true
           ),
         ],
+        flags: 1 << 6,
       });
 
     await ctx.client.webhookLog('suggest', {

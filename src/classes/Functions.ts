@@ -37,7 +37,7 @@ export function checkPerms(command: Command, ctx: Context) {
           true
         ),
       ],
-      flags: 64,
+      flags: 1 << 6,
     });
     return false;
   }

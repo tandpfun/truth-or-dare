@@ -13,28 +13,28 @@ const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'check',
-    description: 'Check if this current server has premium activated',
+    description: 'Check if this current server has premium activated.',
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'list',
-    description: 'List your premium servers',
+    description: 'List your premium servers.',
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'activate',
-    description: 'Add the current server as a premium server',
+    description: 'Add the current server as a premium server.',
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
     name: 'deactivate',
-    description: 'Remove a server from your premium slots',
+    description: 'Remove a server from your premium slots.',
     options: [
       {
         type: ApplicationCommandOptionType.String,
         name: 'server',
         description:
-          'The server id to remove from your premium slots (found from /premium list) default current server',
+          'The server id to remove from your premium slots (found from /premium list) default current server.',
       },
     ],
   },
@@ -42,7 +42,7 @@ const options = [
 
 const premium: Command = {
   name: 'premium',
-  description: 'Manage your premium servers for the bot',
+  description: 'Manage your premium servers for the bot.',
   category: 'control',
   options,
   perms: [],
@@ -53,7 +53,8 @@ const premium: Command = {
     if (!premiumUser && ctx.args[0] !== 'check') return ctx.reply(ctx.client.functions.premiumAd());
 
     if (ctx.args[0] === 'check') {
-      if (!ctx.guildId) return ctx.reply(`${ctx.client.EMOTES.xmark} This is a DM.`);
+      if (!ctx.guildId)
+        return ctx.reply(`${ctx.client.EMOTES.xmark} This command cannot be run in a DM.`);
       return ctx.reply({
         embeds: [
           premiumGuild
@@ -117,7 +118,7 @@ const premium: Command = {
             }`,
           },
         ],
-        flags: ctx.guildId ? 64 : 0,
+        flags: ctx.guildId ? 1 << 6 : 0,
       });
     } else if (ctx.args[0] === 'activate') {
       if (!ctx.guildId)
@@ -129,7 +130,7 @@ const premium: Command = {
         return ctx.reply({
           embeds: [
             ctx.client.functions.embed(
-              'This server is already activated in one of your premium slots',
+              'This server is already activated in one of your premium slots.',
               ctx.user,
               true
             ),
@@ -195,7 +196,7 @@ const premium: Command = {
         return ctx.reply({
           embeds: [
             ctx.client.functions.embed(
-              'This server is not in one of your premium slots',
+              'This server is not in one of your premium slots.',
               ctx.user,
               true
             ),
