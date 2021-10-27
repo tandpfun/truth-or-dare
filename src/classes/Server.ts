@@ -109,12 +109,7 @@ export default class Server {
       ctx.reply(`${this.client.EMOTES.xmark} Something went wrong while running that command.`);
     }
 
-    this.client.metrics.trackCommandUse(
-      command.name,
-      ctx.user.id,
-      ctx.guildId || ctx.channelId,
-      !commandErrored
-    );
+    this.client.metrics.trackCommandUse(command.name, !commandErrored);
 
     /*this.client.console.log(
       `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran the ${command.name} command.`
@@ -147,6 +142,9 @@ export default class Server {
           message: 'The rating must be one of the following: "PG" "PG13" "R"',
         })
         .status(400);
+
+    this.client.metrics.trackAPIRequest(questionType, rating as string); // Track API usage metrics
+
     res.send(
       await this.client.database.getRandomQuestion(
         questionType.toUpperCase() as QuestionType,

@@ -7,7 +7,13 @@ export default class Metrics {
   readonly commandsUsed = new Gauge({
     name: 'commands_used',
     help: 'The usage of each command',
-    labelNames: ['command', 'user', 'guild', 'success'],
+    labelNames: ['command', 'success'],
+  });
+
+  readonly apiRequests = new Gauge({
+    name: 'api_requests',
+    help: 'API request usage statistics',
+    labelNames: ['endpoint', 'rating'],
   });
 
   readonly questionCount = new Gauge({
@@ -26,8 +32,12 @@ export default class Metrics {
     collectDefaultMetrics();
   }
 
-  trackCommandUse(command: string, user: string, guild: string, success: boolean) {
-    this.commandsUsed.labels(command, user, guild, String(success)).inc();
+  trackCommandUse(command: string, success: boolean) {
+    this.commandsUsed.labels(command, String(success)).inc();
+  }
+
+  trackAPIRequest(endpoint: string, rating: string) {
+    this.apiRequests.labels(endpoint, rating).inc();
   }
 
   updateQuestionCount(questionCount: number) {
