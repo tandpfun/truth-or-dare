@@ -62,7 +62,7 @@ const serverSettings: Command = {
   description: 'View and change the premium server settings.',
   options,
   category: 'control',
-  perms: [],
+  perms: ['ManageGuild'],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
       return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');

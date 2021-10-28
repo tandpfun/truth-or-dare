@@ -299,6 +299,12 @@ const questions: Command = {
             " That question doesn't exist yet, perhaps you meant `/questions add`?",
           flags: 1 << 6,
         });
+      if (!type && !rating && !question)
+        return ctx.reply({
+          content:
+            ctx.client.EMOTES.checkmark + ' Well, that was easy (you provided nothing to update).',
+          flags: 1 << 6,
+        });
 
       await (ctx.guildId === MAIN_GUILD
         ? ctx.client.database.updateQuestion(id, { type, rating, question })
