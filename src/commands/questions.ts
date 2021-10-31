@@ -231,6 +231,7 @@ const questions: Command = {
             question,
           }));
 
+      /* Webhook logging for custom questions (depreciated)
       if (ctx.guildId !== MAIN_GUILD)
         ctx.client.webhookLog('suggest', {
           username: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
@@ -243,6 +244,7 @@ const questions: Command = {
             },
           ],
         });
+        */
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added! ID: ${addedQuestion.id}`);
     } else if (ctx.args[0] === 'remove') {
