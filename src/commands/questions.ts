@@ -309,7 +309,11 @@ const questions: Command = {
         });
 
       await (ctx.guildId === MAIN_GUILD
-        ? ctx.client.database.updateQuestion(id, { type, rating, question })
+        ? ctx.client.database.updateQuestion(id, {
+            type: type ?? quest.type,
+            rating: rating ?? quest.rating,
+            question: question ?? quest.question,
+          })
         : ctx.client.database.updateCustomQuestion({
             id,
             guildId: ctx.guildId,
