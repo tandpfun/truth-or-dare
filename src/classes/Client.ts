@@ -55,6 +55,7 @@ export default class Client {
     graph: ':chart_with_upwards_trend:',
     sparkles: ':sparkles:',
     info: ':information_source:',
+    arrowUp: ':arrow_up:',
   } as const;
 
   constructor({
