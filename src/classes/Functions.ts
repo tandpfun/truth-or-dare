@@ -127,6 +127,13 @@ export function premiumAd(): APIInteractionResponseCallbackData {
   };
 }
 
+export function upvoteAd() {
+  return Math.random() < 0.08
+    ? Client.EMOTES.arrowUp +
+        ' Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!'
+    : '';
+}
+
 export async function sendMessage(
   data: RESTPostAPIChannelMessageJSONBody,
   channelId: string,

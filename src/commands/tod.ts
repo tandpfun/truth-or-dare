@@ -34,11 +34,7 @@ const tod: Command = {
       ctx.guildId
     );
     ctx.reply({
-      content:
-        Math.random() > 0.92
-          ? ctx.client.EMOTES.arrowUp +
-            ' Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!'
-          : undefined,
+      content: ctx.client.functions.upvoteAd(),
       embeds: [
         {
           title: result.question,
