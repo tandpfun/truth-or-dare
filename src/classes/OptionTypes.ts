@@ -39,7 +39,8 @@ type DataOption<
   type: O['type'];
   value: O extends APIApplicationCommandArgumentOptions
     ? O['choices'] extends any[]
-      ? O['choices'][number]['value']
+      ? // @ts-ignore
+        O['choices'][number]['value']
       : ValueType<O>
     : ValueType<O>;
 };

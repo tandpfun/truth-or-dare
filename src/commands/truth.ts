@@ -42,7 +42,7 @@ const truth: Command = {
             ? {
                 text: `Type: ${truth.type} | Rating: ${truth.rating} | ID: ${truth.id}`,
               }
-            : null,
+            : undefined,
         },
       ],
     });

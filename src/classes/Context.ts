@@ -28,11 +28,11 @@ export default class Context {
   command: { id: string; name: string; type: ApplicationCommandType };
   options: APIApplicationCommandInteractionDataOption[];
   args: (string | number | boolean)[];
-  resolved: APIChatInputApplicationCommandInteractionDataResolved;
+  resolved?: APIChatInputApplicationCommandInteractionDataResolved;
   applicationId: string;
   channelId: string;
-  guildId: string;
-  member: APIInteractionGuildMember;
+  guildId?: string;
+  member?: APIInteractionGuildMember;
   user: APIUser;
 
   constructor(
@@ -65,10 +65,10 @@ export default class Context {
     this.guildId = interaction.guild_id;
 
     this.member = interaction.member;
-    this.user = interaction.user || interaction.member.user;
+    this.user = interaction.user || interaction.member!.user;
   }
 
-  getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> {
+  getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined {
     const mainResult = this.options.find(o => o.name === name);
     if (mainResult) return mainResult as OptionType<O>;
     if (
@@ -77,7 +77,7 @@ export default class Context {
         ApplicationCommandOptionType.SubcommandGroup,
       ].includes(this.options[0]?.type)
     )
-      return null;
+      return;
     const firstRes = (
       (
         this.options[0] as
@@ -96,13 +96,13 @@ export default class Context {
           | ApplicationCommandInteractionDataOptionSubCommand
       ).options?.[0]?.type !== ApplicationCommandOptionType.Subcommand
     )
-      return null;
+      return;
     const secondRes = (
       (this.options[0] as ApplicationCommandInteractionDataOptionSubCommandGroup)
         .options[0] as ApplicationCommandInteractionDataOptionSubCommand
     ).options?.find(o => o.name === name);
     if (secondRes) return secondRes as OptionType<O>;
-    return null;
+    return;
   }
 
   reply(data: string | APIInteractionResponseCallbackData) {

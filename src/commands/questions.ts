@@ -215,9 +215,9 @@ const questions: Command = {
         ],
       });
     } else if (ctx.args[0] === 'add') {
-      const type = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('type').value;
-      const rating = ctx.getOption<Mutable<typeof options[1]['options'][1]>>('rating').value;
-      const question = ctx.getOption<Mutable<typeof options[1]['options'][2]>>('question').value;
+      const type = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('type')!.value;
+      const rating = ctx.getOption<Mutable<typeof options[1]['options'][1]>>('rating')!.value;
+      const question = ctx.getOption<Mutable<typeof options[1]['options'][2]>>('question')!.value;
 
       if (question.length > 256)
         return ctx.reply(ctx.client.EMOTES.xmark + ' Maximum question length is 256 characters.');
@@ -248,7 +248,7 @@ const questions: Command = {
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added! ID: ${addedQuestion.id}`);
     } else if (ctx.args[0] === 'remove') {
-      const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id').value;
+      const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id')!.value;
 
       const deleted = await (ctx.guildId === MAIN_GUILD
         ? ctx.client.database.deleteQuestion(id)
@@ -265,7 +265,7 @@ const questions: Command = {
         ],
       });
     } else if (ctx.args[0] === 'view') {
-      const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id').value;
+      const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id')!.value;
       const question =
         ctx.guildId === MAIN_GUILD
           ? ctx.client.database.fetchSpecificQuestion(id)
@@ -285,7 +285,7 @@ const questions: Command = {
         ],
       });
     } else if (ctx.args[0] === 'update') {
-      const id = ctx.getOption<Mutable<typeof options[4]['options'][0]>>('id').value;
+      const id = ctx.getOption<Mutable<typeof options[4]['options'][0]>>('id')!.value;
       const type = ctx.getOption<Mutable<typeof options[4]['options'][1]>>('type')?.value;
       const rating = ctx.getOption<Mutable<typeof options[4]['options'][2]>>('rating')?.value;
       const question = ctx.getOption<Mutable<typeof options[4]['options'][3]>>('question')?.value;

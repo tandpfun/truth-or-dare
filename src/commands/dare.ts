@@ -42,7 +42,7 @@ const dare: Command = {
             ? {
                 text: `Type: ${dare.type} | Rating: ${dare.rating} | ID: ${dare.id}`,
               }
-            : null,
+            : undefined,
         },
       ],
     });

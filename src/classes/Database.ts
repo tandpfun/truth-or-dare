@@ -27,6 +27,18 @@ export default class Database {
     this.db = new PrismaClient();
     this.channelCache = {};
     this.premiumGuilds = new Set();
+    this.questionCache = Object.fromEntries(
+      Object.keys(QuestionType).map(type => [
+        type,
+        Object.fromEntries(Object.entries(Rating).map(rating => [rating, []])),
+      ])
+    ) as Record<QuestionType, Record<Rating, Question[]>>;
+    this.customQuestions = Object.fromEntries(
+      Object.keys(QuestionType).map(type => [
+        type,
+        Object.fromEntries(Object.entries(Rating).map(rating => [rating, []])),
+      ])
+    ) as Record<QuestionType, Record<Rating, CustomQuestion[]>>;
   }
 
   async start() {
@@ -75,11 +87,11 @@ export default class Database {
   }
 
   async updateChannelSettings(update: ChannelSettings) {
-    const withoutID = { ...update };
-    delete withoutID.id;
+    const withoutId: Optional<ChannelSettings, 'id'> = { ...update };
+    delete withoutId.id;
     return (this.channelCache[update.id] = await this.db.channelSettings.upsert({
       where: { id: update.id },
-      update: withoutID,
+      update: withoutId,
       create: update,
     }));
   }
@@ -155,7 +167,7 @@ export default class Database {
               ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
             ]
           : this.questionCache[type][chosenRating]
-        ).filter(q => !isPremiumGuild || !guildSettings.disabledQuestions.includes(q.id));
+        ).filter(q => !isPremiumGuild || !guildSettings!.disabledQuestions.includes(q.id));
     return questions.length
       ? questions[Math.floor(Math.random() * questions.length)]
       : ({
@@ -176,7 +188,7 @@ export default class Database {
 
     const questions = oldQuest ? this.questionCache[oldQuest.type][oldQuest.rating] : null;
     const index = questions ? questions.findIndex(q => q.id === quest.id) : -1;
-    if (index !== -1) questions.splice(index, 1);
+    if (index !== -1) questions!.splice(index, 1);
     else this.client.metrics.questionCount.inc();
     this.questionCache[quest.type][quest.rating].push(quest);
     return quest;
@@ -274,7 +286,7 @@ export default class Database {
       data: { ...data, id: undefined } as Omit<CustomQuestion, 'id'>,
     });
 
-    const questions = this.customQuestions[oldQuest.type][oldQuest.rating];
+    const questions = this.customQuestions[oldQuest!.type][oldQuest!.rating];
     const index = questions.findIndex(q => q.id === quest.id);
     if (index !== -1) questions.splice(index, 1);
     this.customQuestions[quest.type][quest.rating].push(quest);
@@ -375,10 +387,11 @@ export default class Database {
   }
 
   async deactivatePremium(userId: string, guildId: string) {
-    const { premiumServers } = await this.db.premiumUser.findUnique({ where: { id: userId } });
+    const oldUser = await this.db.premiumUser.findUnique({ where: { id: userId } });
+    if (!oldUser) return;
     const user = await this.db.premiumUser.update({
       where: { id: userId },
-      data: { premiumServers: premiumServers.filter(id => id !== guildId) },
+      data: { premiumServers: oldUser.premiumServers.filter(id => id !== guildId) },
     });
     if (!(await this.db.premiumUser.findFirst({ where: { premiumServers: { has: guildId } } })))
       this.premiumGuilds.delete(guildId);

@@ -50,13 +50,13 @@ const paranoia: Command = {
               ? {
                   text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
                 }
-              : null,
+              : undefined,
           },
         ],
       });
     }
 
-    if (ctx.resolved.users[targetUserId].bot)
+    if (ctx.resolved!.users![targetUserId].bot)
       return ctx.reply(
         `${ctx.client.EMOTES.xmark} Bots can't answer paranoia questions, no matter how hard they try.`
       );

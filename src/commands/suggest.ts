@@ -44,9 +44,9 @@ const suggest: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const type = ctx.getOption<Mutable<typeof options[0]>>('type').value;
-    const rating = ctx.getOption<Mutable<typeof options[1]>>('rating').value;
-    const question = ctx.getOption<Mutable<typeof options[2]>>('question').value;
+    const type = ctx.getOption<Mutable<typeof options[0]>>('type')!.value;
+    const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')!.value;
+    const question = ctx.getOption<Mutable<typeof options[2]>>('question')!.value;
 
     if (question.length > 256)
       return ctx.reply({

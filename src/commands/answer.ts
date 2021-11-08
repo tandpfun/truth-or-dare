@@ -20,7 +20,7 @@ const answer: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const paranoiaAnswer = ctx.getOption<Mutable<typeof options[0]>>('answer').value;
+    const paranoiaAnswer = ctx.getOption<Mutable<typeof options[0]>>('answer')!.value;
 
     if (ctx.guildId)
       return ctx.reply({
@@ -34,7 +34,7 @@ const answer: Command = {
 
     const showFreq = ctx.client.database.isPremiumGuild(paranoiaData.guildId)
       ? (await ctx.client.database.getGuildSettings(paranoiaData.guildId)).showParanoiaFrequency
-      : ctx.client.database.defaultGuildSettings(ctx.guildId).showParanoiaFrequency;
+      : ctx.client.database.defaultGuildSettings(ctx.guildId!).showParanoiaFrequency;
 
     // send answer to the channel the question was sent from
     const message = await ctx.client.functions.sendMessage(
@@ -91,7 +91,7 @@ const answer: Command = {
         ],
       },
       ctx.channelId,
-      paranoiaData.dmMessageId,
+      paranoiaData.dmMessageId!,
       ctx.client.token
     );
     if (!editedMessage)

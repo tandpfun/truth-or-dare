@@ -43,7 +43,7 @@ const tod: Command = {
             ? {
                 text: `Type: ${result.type} | Rating: ${result.rating} | ID: ${result.id}`,
               }
-            : null,
+            : undefined,
         },
       ],
     });

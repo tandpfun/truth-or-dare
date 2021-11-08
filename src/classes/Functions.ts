@@ -18,13 +18,13 @@ import type Context from './Context';
 import Client from './Client';
 
 export function checkPerms(command: Command, ctx: Context) {
-  if (!ctx.guildId) return true;
+  if (!ctx.member) return true;
   const required = command.perms
     .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
     .reduce((a, c) => a | c, 0n);
   const missing = required & ~BigInt(ctx.member.permissions);
   const missingNames = Object.keys(PermissionFlagsBits).filter(
-    key => PermissionFlagsBits[key] & missing
+    key => PermissionFlagsBits[key as keyof typeof PermissionFlagsBits] & missing
   );
   if (missing) {
     ctx.reply({
@@ -63,8 +63,8 @@ export function avatarURL({
 
 export function embed(
   description: string,
-  user?: { id: string; username: string; avatar: string; discriminator: string },
-  fail: boolean = null
+  user?: { id: string; username: string; avatar: string | null; discriminator: string },
+  fail: boolean | null = null
 ): APIEmbed {
   return {
     description: `${
@@ -75,7 +75,7 @@ export function embed(
           name: `${user.username}#${user.discriminator}`,
           icon_url: avatarURL(user),
         }
-      : null,
+      : undefined,
     color: fail ? Client.COLORS.RED : fail === null ? Client.COLORS.BLUE : Client.COLORS.GREEN,
   };
 }

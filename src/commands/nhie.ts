@@ -42,7 +42,7 @@ const nhie: Command = {
             ? {
                 text: `Type: ${nhie.type} | Rating: ${nhie.rating} | ID: ${nhie.id}`,
               }
-            : null,
+            : undefined,
         },
       ],
     });

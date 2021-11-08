@@ -35,7 +35,7 @@ const skip: Command = {
         ],
       },
       ctx.channelId,
-      currentParanoia.dmMessageId,
+      currentParanoia.dmMessageId!,
       ctx.client.token
     );
     if (!editedMessage)

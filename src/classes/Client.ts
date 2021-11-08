@@ -202,7 +202,7 @@ export default class Client {
 
   async webhookLog(type: string, data: RESTPostAPIWebhookWithTokenJSONBody) {
     await superagent
-      .post(process.env[type.toUpperCase() + '_HOOK'])
+      .post(process.env[type.toUpperCase() + '_HOOK'] ?? '')
       .send(data)
       .catch(_ => null);
   }

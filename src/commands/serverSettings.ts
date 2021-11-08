@@ -87,7 +87,7 @@ const serverSettings: Command = {
         ],
       });
     } else if (ctx.args[0] === 'showparanoia') {
-      const freq = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('frequency').value;
+      const freq = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('frequency')!.value;
 
       if (freq < 0 || freq > 100)
         return ctx.reply(
@@ -108,7 +108,7 @@ const serverSettings: Command = {
         ],
       });
     } else if (ctx.args[0] === 'disablequestion') {
-      const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id').value;
+      const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id')!.value;
       const question = ctx.client.database.fetchSpecificQuestion(id);
       if (!question)
         return ctx.reply(ctx.client.EMOTES.xmark + ' I could not find that default question.');
@@ -124,7 +124,7 @@ const serverSettings: Command = {
       await ctx.client.database.addDisabledQuestion(ctx.guildId, id);
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully disabled question: ' + id);
     } else if (ctx.args[0] === 'enablequestion') {
-      const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id').value;
+      const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id')!.value;
 
       const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
       if (settings.disableGlobals)

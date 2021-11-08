@@ -72,7 +72,7 @@ const premium: Command = {
               },
         ],
         components: premiumGuild
-          ? null
+          ? undefined
           : [
               {
                 type: ComponentType.ActionRow,
@@ -89,7 +89,7 @@ const premium: Command = {
       });
     } else if (ctx.args[0] === 'list') {
       const premiumServerData = await Promise.all(
-        premiumUser.premiumServers.map(
+        premiumUser!.premiumServers.map(
           (id, index): Promise<APIGuild | string> =>
             new Promise(res => {
               setTimeout(() => {
@@ -105,8 +105,8 @@ const premium: Command = {
           {
             title: ctx.client.EMOTES.info + ' Your Premium Information',
             color: ctx.client.COLORS.BLUE,
-            description: `**Slots:** ${premiumUser.premiumServers.length}/${
-              premiumUser.premiumSlots
+            description: `**Slots:** ${premiumUser!.premiumServers.length}/${
+              premiumUser!.premiumSlots
             }\n**Servers:**\n${
               premiumServerData
                 .map(serverData =>
@@ -126,7 +126,7 @@ const premium: Command = {
           `${ctx.client.EMOTES.xmark} Run this in the server you want to activate premium for!`
         );
 
-      if (premiumUser.premiumServers.includes(ctx.guildId))
+      if (premiumUser!.premiumServers.includes(ctx.guildId))
         return ctx.reply({
           embeds: [
             ctx.client.functions.embed(
@@ -137,7 +137,7 @@ const premium: Command = {
           ],
         });
 
-      if (premiumUser.premiumServers.length >= premiumUser.premiumSlots)
+      if (premiumUser!.premiumServers.length >= premiumUser!.premiumSlots)
         return ctx.reply({
           content: `All of your premium slots have been filled, click the button below to get more!`,
           components: [
@@ -168,7 +168,7 @@ const premium: Command = {
             title: `Premium Activated`,
             description: `**User:** <@${ctx.user.id}> (${ctx.user.id})\n**Guild:** ${ctx.guildId}`,
             footer: {
-              text: `Slots: ${premiumUser.premiumServers.length + 1}/${premiumUser.premiumSlots}`,
+              text: `Slots: ${premiumUser!.premiumServers.length + 1}/${premiumUser!.premiumSlots}`,
             },
           },
         ],
@@ -179,8 +179,8 @@ const premium: Command = {
           {
             title: `${ctx.client.EMOTES.checkmark} Premium Activated!`,
             description: `You've activated premium features for this server! Thank you so much for supporting the bot.\n\n**Slots:** ${
-              premiumUser.premiumServers.length + 1
-            }/${premiumUser.premiumSlots}${
+              premiumUser!.premiumServers.length + 1
+            }/${premiumUser!.premiumSlots}${
               premiumGuild
                 ? '\nThis server already had premium activated by another person. If they remove this server from one of their slots, it will now still remain as premium because it is now in one of yours as well.'
                 : ''
@@ -191,8 +191,8 @@ const premium: Command = {
       });
     } else if (ctx.args[0] === 'deactivate') {
       const guildId =
-        ctx.getOption<Mutable<typeof options[3]['options'][0]>>('server')?.value || ctx.guildId;
-      if (!premiumUser.premiumServers.includes(guildId))
+        ctx.getOption<Mutable<typeof options[3]['options'][0]>>('server')?.value ?? ctx.guildId;
+      if (!guildId || !premiumUser!.premiumServers.includes(guildId))
         return ctx.reply({
           embeds: [
             ctx.client.functions.embed(
@@ -216,7 +216,7 @@ const premium: Command = {
             title: `Premium Deactivated`,
             description: `**User:** <@${ctx.user.id}> (${ctx.user.id})\n**Guild:** ${guildId}`,
             footer: {
-              text: `Slots: ${premiumUser.premiumServers.length - 1}/${premiumUser.premiumSlots}`,
+              text: `Slots: ${premiumUser!.premiumServers.length - 1}/${premiumUser!.premiumSlots}`,
             },
           },
         ],
@@ -229,7 +229,7 @@ const premium: Command = {
             description: `${
               ctx.guildId === guildId ? 'This server' : guildId
             } has been removed from one of your premium slots. You now have ${
-              premiumUser.premiumSlots - premiumUser.premiumServers.length + 1
+              premiumUser!.premiumSlots - premiumUser!.premiumServers.length + 1
             } available slots.`,
             color: ctx.client.COLORS.GREEN,
           },

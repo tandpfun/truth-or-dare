@@ -42,7 +42,7 @@ const wyr: Command = {
             ? {
                 text: `Type: ${wyr.type} | Rating: ${wyr.rating} | ID: ${wyr.id}`,
               }
-            : null,
+            : undefined,
         },
       ],
     });
