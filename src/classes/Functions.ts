@@ -9,6 +9,7 @@ import {
   ComponentType,
   ButtonStyle,
   APIEmbed,
+  RESTGetAPIGuildChannelsResult,
 } from 'discord-api-types';
 import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
@@ -193,4 +194,15 @@ export async function fetchChannel(
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(_ => null);
+}
+
+export async function fetchGuildChannels(
+  guildId: string,
+  token: string
+): Promise<RESTGetAPIGuildChannelsResult | null> {
+  return await superagent
+    .get(`https://discord.com/api/guild/${guildId}/channels`)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body)
+    .catch(_ => null)
 }
