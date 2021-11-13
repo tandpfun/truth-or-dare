@@ -178,41 +178,47 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted, use `/settings mute` to mute.');
     } else if (ctx.args[0] === 'muteserver') {
-      const allChannels = await ctx.client.functions.fetchGuildChannels(ctx.guildId, ctx.client.token)
-      const textChannels = allChannels?.filter(c => c.type === ChannelType.GuildText || c.type === ChannelType.GuildNews)
+      const allChannels = await ctx.client.functions.fetchGuildChannels(
+        ctx.guildId,
+        ctx.client.token
+      );
+      const textChannels = allChannels?.filter(
+        c => c.type === ChannelType.GuildText || c.type === ChannelType.GuildNews
+      );
       if (!textChannels)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' Failed to fetch channels, try again later')
+        return ctx.reply(ctx.client.EMOTES.xmark + ' Failed to fetch channels, try again later');
 
-      await Promise.all(textChannels.map(
-        async c => {
-          const currentSettings = await ctx.client.database.fetchChannelSettings(c.id)
-          const newSettings = {
-            ...currentSettings,
-            muted: true
-          }
-          return ctx.client.database.updateChannelSettings(newSettings)
-        })
-      )
+      await Promise.all(
+        textChannels.map(async c =>
+          ctx.client.database.updateChannelSettings({ id: c.id, muted: true })
+        )
+      );
 
-      ctx.reply(ctx.client.EMOTES.checkmark + ' Muted in all channels serverwide. Use `/settings unmuteserver to unmute.`')
+      ctx.reply(
+        ctx.client.EMOTES.checkmark +
+          ' Muted in all channels serverwide. Use `/settings unmuteserver to unmute.`'
+      );
     } else if (ctx.args[0] === 'unmuteserver') {
-      const allChannels = await ctx.client.functions.fetchGuildChannels(ctx.guildId, ctx.client.token)
-      const textChannels = allChannels?.filter(c => c.type === ChannelType.GuildText || c.type === ChannelType.GuildNews)
+      const allChannels = await ctx.client.functions.fetchGuildChannels(
+        ctx.guildId,
+        ctx.client.token
+      );
+      const textChannels = allChannels?.filter(
+        c => c.type === ChannelType.GuildText || c.type === ChannelType.GuildNews
+      );
       if (!textChannels)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' Failed to fetch channels, try again later')
+        return ctx.reply(ctx.client.EMOTES.xmark + ' Failed to fetch channels, try again later');
 
-      await Promise.all(textChannels.map(
-        async c => {
-          const currentSettings = await ctx.client.database.fetchChannelSettings(c.id)
-          const newSettings = {
-            ...currentSettings,
-            muted: false
-          }
-          return ctx.client.database.updateChannelSettings(newSettings)
-        })
-      )
+      await Promise.all(
+        textChannels.map(async c =>
+          ctx.client.database.updateChannelSettings({ id: c.id, muted: false })
+        )
+      );
 
-      ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted in all channels serverwide. Use `/settings unmuteserver to unmute.`')
+      ctx.reply(
+        ctx.client.EMOTES.checkmark +
+          ' Unmuted in all channels serverwide. Use `/settings unmuteserver to unmute.`'
+      );
     }
   },
 };
