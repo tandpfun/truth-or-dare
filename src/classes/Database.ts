@@ -144,6 +144,7 @@ export default class Database {
     type: QuestionType,
     disabledRatings: Rating[] = [],
     rating?: Rating,
+    category?: string,
     guildId?: string
   ): Promise<Question> {
     const ratings = (rating ? [rating] : Object.values(Rating)).filter(
@@ -163,18 +164,23 @@ export default class Database {
       ? this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId)
       : (isPremiumGuild
           ? [
-              ...this.questionCache[type][chosenRating],
+              ...this.questionCache[type][chosenRating].filter(q => !category || q.categories.includes(category)),
               ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
             ]
-          : this.questionCache[type][chosenRating]
+          : this.questionCache[type][chosenRating].filter(q => !category || q.categories.includes(category))
         ).filter(q => !isPremiumGuild || !guildSettings!.disabledQuestions.includes(q.id));
     return questions.length
-      ? questions[Math.floor(Math.random() * questions.length)]
+      ? {
+          categories: [],
+          ...questions[Math.floor(Math.random() * questions.length)]
+        }
       : ({
           id: '',
           type,
           rating: 'NONE',
-          question: 'I dare you to tell the server admins to add questions',
+          question: category
+            ? 'There are no questions of the available types and ratings with that category'
+            : 'I dare you to tell the server admins to add questions',
         } as Question & { rating: 'NONE' });
   }
 

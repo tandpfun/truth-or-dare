@@ -39,10 +39,11 @@ model GuildSettings {
 }
 
 model Question {
-  id       String       @id @map("_id")
-  type     QuestionType
-  rating   Rating
-  question String
+  id          String       @id @map("_id")
+  type        QuestionType
+  rating      Rating
+  question    String
+  categories  String[]
 }
 
 model ParanoiaQuestion {
