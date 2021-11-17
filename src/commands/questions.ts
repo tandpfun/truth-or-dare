@@ -102,7 +102,7 @@ const options = [
       {
         type: ApplicationCommandOptionType.String,
         name: 'id',
-        description: 'The id of the question to view (get the ID using /customquestion list).',
+        description: 'The id of the question to view (get the ID using /questions list).',
         required: true,
       },
     ],
