@@ -39,11 +39,11 @@ model GuildSettings {
 }
 
 model Question {
-  id          String       @id @map("_id")
-  type        QuestionType
-  rating      Rating
-  question    String
-  categories  String[]
+  id         String       @id @map("_id")
+  type       QuestionType
+  rating     Rating
+  question   String
+  categories String[]
 }
 
 model ParanoiaQuestion {
@@ -59,11 +59,12 @@ model ParanoiaQuestion {
 }
 
 model CustomQuestion {
-  id       String       @id @map("_id")
-  guildId  String
-  type     QuestionType
-  rating   Rating
-  question String
+  id         String       @id @map("_id")
+  guildId    String
+  type       QuestionType
+  rating     Rating
+  question   String
+  categories String[]
 }
 
 model PremiumUser {

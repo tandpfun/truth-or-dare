@@ -4,7 +4,7 @@ import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
-const truthCategories: string[] = []
+const truthCategories: string[] = [];
 
 const options = [
   {
@@ -21,7 +21,7 @@ const options = [
     type: ApplicationCommandOptionType.String,
     name: 'category',
     description: 'The topic that that the question relates to.',
-    choices: truthCategories.map(c => ({ name: c, value: c }))
+    choices: truthCategories.map(c => ({ name: c, value: c })),
   },
 ] as const;
 
@@ -34,7 +34,7 @@ const truth: Command = {
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const category = ctx.getOption<Mutable<typeof options[1]>>('category')?.value
+    const category = ctx.getOption<Mutable<typeof options[1]>>('category')?.value;
     const truth = await ctx.client.database.getRandomQuestion(
       'TRUTH',
       channelSettings.disabledRatings,

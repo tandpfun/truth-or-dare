@@ -4,7 +4,7 @@ import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
-const paranoiaCategories: string[] = []
+const paranoiaCategories: string[] = [];
 
 const options = [
   {
@@ -26,7 +26,7 @@ const options = [
     type: ApplicationCommandOptionType.String,
     name: 'category',
     description: 'The topic that that the question relates to.',
-    choices: paranoiaCategories.map(c => ({ name: c, value: c }))
+    choices: paranoiaCategories.map(c => ({ name: c, value: c })),
   },
 ] as const;
 
@@ -40,7 +40,7 @@ const paranoia: Command = {
     const channelSettings = await ctx.channelSettings;
     const targetUserId = ctx.getOption<Mutable<typeof options[0]>>('target')?.value;
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')?.value;
-    const category = ctx.getOption<Mutable<typeof options[1]>>('category')?.value
+    const category = ctx.getOption<Mutable<typeof options[1]>>('category')?.value;
 
     const paranoia = await ctx.client.database.getRandomQuestion(
       'PARANOIA',

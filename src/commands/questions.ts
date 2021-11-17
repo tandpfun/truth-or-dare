@@ -38,6 +38,11 @@ const options = [
         ],
       },
       {
+        type: ApplicationCommandOptionType.String,
+        name: 'category',
+        description: 'The category of question to look for.',
+      },
+      {
         type: ApplicationCommandOptionType.Integer,
         name: 'page',
         description: 'The page number of questions of list.',
@@ -78,6 +83,11 @@ const options = [
         name: 'question',
         description: 'The question to add.',
         required: true,
+      },
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'categories',
+        description: 'The categories (separated by commas) the question falls under.',
       },
     ],
   },
@@ -145,6 +155,11 @@ const options = [
         name: 'question',
         description: 'The new question text.',
       },
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'categories',
+        description: 'The new set of categories (separated by commas) for the question.',
+      },
     ],
   },
 ] as const;
@@ -164,24 +179,26 @@ const questions: Command = {
 
     if (ctx.args[0] === 'list') {
       const questionType =
-        ctx.getOption<Mutable<typeof options[0]['options'][0]>>('type')?.value || 'ALL';
+        ctx.getOption<Mutable<typeof options[0]['options'][0]>>('type')?.value ?? 'ALL';
       const rating =
-        ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value || 'ALL';
+        ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value ?? 'ALL';
+      const category = ctx.getOption<Mutable<typeof options[0]['options'][2]>>('category')?.value;
 
       const questions =
         ctx.guildId === MAIN_GUILD
-          ? ctx.client.database.getQuestions(
-              questionType === 'ALL' ? undefined : questionType,
-              rating === 'ALL' ? undefined : rating
-            )
-          : ctx.client.database.getCustomQuestions(
-              ctx.guildId,
-              questionType === 'ALL' ? undefined : questionType,
-              rating === 'ALL' ? undefined : rating
-            );
+          ? ctx.client.database.getQuestions({
+              type: questionType === 'ALL' ? undefined : questionType,
+              rating: rating === 'ALL' ? undefined : rating,
+              category,
+            })
+          : ctx.client.database.getCustomQuestions(ctx.guildId, {
+              type: questionType === 'ALL' ? undefined : questionType,
+              rating: rating === 'ALL' ? undefined : rating,
+              category,
+            });
 
       const page = Math.min(
-        Math.max(ctx.getOption<Mutable<typeof options[0]['options'][2]>>('page')?.value || 1, 1),
+        Math.max(ctx.getOption<Mutable<typeof options[0]['options'][3]>>('page')?.value ?? 1, 1),
         Math.ceil(questions.length / PER_PAGE)
       );
 
@@ -206,7 +223,9 @@ const questions: Command = {
             color: ctx.client.COLORS.BLUE,
             fields: questions.slice((page - 1) * PER_PAGE, page * PER_PAGE).map(q => ({
               name: q.question,
-              value: `Type: ${q.type} | Rating: ${q.rating} | ID: ${q.id}`,
+              value: `Type: ${q.type} | Rating: ${q.rating} | ID: ${
+                q.id
+              } | Categories: ${q.categories.join(', ')}`,
             })),
             footer: {
               text: `Page ${page}/${Math.ceil(questions.length / PER_PAGE)}`,
@@ -218,17 +237,24 @@ const questions: Command = {
       const type = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('type')!.value;
       const rating = ctx.getOption<Mutable<typeof options[1]['options'][1]>>('rating')!.value;
       const question = ctx.getOption<Mutable<typeof options[1]['options'][2]>>('question')!.value;
+      const categories = (
+        ctx.getOption<Mutable<typeof options[1]['options'][3]>>('categories')?.value ?? ''
+      )
+        .split(',')
+        .map(c => c.trim().toLowerCase())
+        .filter(c => c);
 
       if (question.length > 256)
         return ctx.reply(ctx.client.EMOTES.xmark + ' Maximum question length is 256 characters.');
 
       const addedQuestion = await (ctx.guildId === MAIN_GUILD
-        ? ctx.client.database.updateQuestion('', { type, rating, question })
+        ? ctx.client.database.updateQuestion('', { type, rating, question, categories })
         : ctx.client.database.addCustomQuestion({
             guildId: ctx.guildId,
             type,
             rating,
             question,
+            categories,
           }));
 
       /* Webhook logging for custom questions (depreciated)
@@ -278,7 +304,9 @@ const questions: Command = {
                 title: question.question,
                 color: ctx.client.COLORS.BLUE,
                 footer: {
-                  text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${question.id}`,
+                  text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${
+                    question.id
+                  } | Categories: ${question.categories.join(', ')}`,
                 },
               }
             : ctx.client.functions.embed('Could not find that question', ctx.user, true),
@@ -289,6 +317,11 @@ const questions: Command = {
       const type = ctx.getOption<Mutable<typeof options[4]['options'][1]>>('type')?.value;
       const rating = ctx.getOption<Mutable<typeof options[4]['options'][2]>>('rating')?.value;
       const question = ctx.getOption<Mutable<typeof options[4]['options'][3]>>('question')?.value;
+      const categories = ctx
+        .getOption<Mutable<typeof options[4]['options'][4]>>('categories')
+        ?.value.split(',')
+        .map(c => c.trim().toLowerCase())
+        .filter(c => c);
 
       const quest =
         ctx.guildId === MAIN_GUILD
@@ -301,7 +334,7 @@ const questions: Command = {
             " That question doesn't exist yet, perhaps you meant `/questions add`?",
           flags: 1 << 6,
         });
-      if (!type && !rating && !question)
+      if (!type && !rating && !question && !categories)
         return ctx.reply({
           content:
             ctx.client.EMOTES.checkmark + ' Well, that was easy (you provided nothing to update).',
@@ -313,6 +346,7 @@ const questions: Command = {
             type: type ?? quest.type,
             rating: rating ?? quest.rating,
             question: question ?? quest.question,
+            categories: categories ?? quest.categories,
           })
         : ctx.client.database.updateCustomQuestion({
             id,
@@ -320,6 +354,7 @@ const questions: Command = {
             type,
             rating,
             question,
+            categories,
           }));
 
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully updated the question ' + id);

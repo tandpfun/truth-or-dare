@@ -18,8 +18,8 @@ export default class Database {
   client: Client;
   db: PrismaClient;
   channelCache: Record<string, ChannelSettings | null>;
-  questionCache: Record<QuestionType, Record<Rating, Question[]>>;
-  customQuestions: Record<QuestionType, Record<Rating, CustomQuestion[]>>;
+  questionCache: Question[];
+  customQuestions: CustomQuestion[];
   premiumGuilds: Set<string>;
 
   constructor(client: Client) {
@@ -27,18 +27,8 @@ export default class Database {
     this.db = new PrismaClient();
     this.channelCache = {};
     this.premiumGuilds = new Set();
-    this.questionCache = Object.fromEntries(
-      Object.keys(QuestionType).map(type => [
-        type,
-        Object.fromEntries(Object.entries(Rating).map(rating => [rating, []])),
-      ])
-    ) as Record<QuestionType, Record<Rating, Question[]>>;
-    this.customQuestions = Object.fromEntries(
-      Object.keys(QuestionType).map(type => [
-        type,
-        Object.fromEntries(Object.entries(Rating).map(rating => [rating, []])),
-      ])
-    ) as Record<QuestionType, Record<Rating, CustomQuestion[]>>;
+    this.questionCache = [];
+    this.customQuestions = [];
   }
 
   async start() {
@@ -58,8 +48,11 @@ export default class Database {
 
   async migrate() {
     if (!this.client.devMode) throw new Error('Migrations in production');
-    //const result = await this.db.something.updateMany({ data: {} });
-    //this.client.console.log(`Migration complete. ${result.count} affected`);
+    // const result1 = await this.db.question.updateMany({ data: { categories: [] } });
+    // const result2 = await this.db.customQuestion.updateMany({ data: { categories: [] } });
+    // this.client.console.log(
+    //   `Migration complete. ${result1.count} questions and ${result2.count} custom questions affected`
+    // );
   }
 
   generateId(): string {
@@ -102,42 +95,31 @@ export default class Database {
   }
 
   async fetchAllQuestions() {
-    const questions: Question[] = await this.db.question.findMany();
-    this.questionCache = Object.fromEntries(
-      Object.values(QuestionType).map(type => [
-        type,
-        Object.fromEntries(
-          Object.values(Rating).map(rating => [
-            rating,
-            questions.filter(q => q.type === type && q.rating === rating),
-          ])
-        ),
-      ])
-    ) as Record<QuestionType, Record<Rating, Question[]>>;
+    this.questionCache = await this.db.question.findMany();
 
-    this.client.metrics.updateQuestionCount(questions.length); // Track question count for metrics
+    this.client.metrics.updateQuestionCount(this.questionCache.length); // Track question count for metrics
     return this.questionCache;
   }
 
-  getQuestions(type?: QuestionType, rating?: Rating) {
-    return Object.values(QuestionType)
-      .map(t =>
-        Object.values(Rating)
-          .map(r =>
-            this.questionCache[t][r].filter(
-              q => (!type || q.type === type) && (!rating || q.rating === rating)
-            )
-          )
-          .flat()
-      )
-      .flat();
+  getQuestions({
+    type,
+    rating,
+    category,
+  }: {
+    type?: QuestionType;
+    rating?: Rating;
+    category?: string;
+  } = {}) {
+    return this.questionCache.filter(
+      q =>
+        (!type || q.type === type) &&
+        (!rating || q.rating === rating) &&
+        (!category || q.categories.includes(category))
+    );
   }
 
   fetchSpecificQuestion(id: string) {
-    return Object.values(this.questionCache)
-      .map(rate => Object.values(rate).flat())
-      .flat()
-      .find(q => q.id === id);
+    return this.questionCache.find(q => q.id === id);
   }
 
   async getRandomQuestion(
@@ -146,7 +128,7 @@ export default class Database {
     rating?: Rating,
     category?: string,
     guildId?: string
-  ): Promise<Question> {
+  ): Promise<Question | CustomQuestion> {
     const ratings = (rating ? [rating] : Object.values(Rating)).filter(
       r => !disabledRatings.includes(r)
     );
@@ -157,23 +139,30 @@ export default class Database {
         rating: 'NONE',
         question: 'That rating is disabled in this channel',
       } as Question & { rating: 'NONE' };
-    const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
+    const isPremiumGuild = !!(guildId && this.isPremiumGuild(guildId));
     const guildSettings = isPremiumGuild ? await this.getGuildSettings(guildId) : null;
     const chosenRating = ratings[Math.floor(Math.random() * ratings.length)];
+
+    const globalFilter = (q: Question) =>
+      q.type === type &&
+      q.rating === chosenRating &&
+      (!category || q.categories.includes(category));
+    const customFilter = (q: CustomQuestion) =>
+      q.guildId === guildId &&
+      q.type === type &&
+      q.rating === chosenRating &&
+      (!category || q.categories.includes(category));
     const questions = guildSettings?.disableGlobals
-      ? this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId)
+      ? this.customQuestions.filter(customFilter)
       : (isPremiumGuild
           ? [
-              ...this.questionCache[type][chosenRating].filter(q => !category || q.categories.includes(category)),
-              ...this.customQuestions[type][chosenRating].filter(q => q.guildId === guildId),
+              ...this.questionCache.filter(globalFilter),
+              ...this.customQuestions.filter(customFilter),
             ]
-          : this.questionCache[type][chosenRating].filter(q => !category || q.categories.includes(category))
+          : this.questionCache.filter(globalFilter)
         ).filter(q => !isPremiumGuild || !guildSettings!.disabledQuestions.includes(q.id));
     return questions.length
-      ? {
-          categories: [],
-          ...questions[Math.floor(Math.random() * questions.length)]
-        }
+      ? questions[Math.floor(Math.random() * questions.length)]
       : ({
           id: '',
           type,
@@ -192,11 +181,10 @@ export default class Database {
       create: { id: this.generateId(), ...data },
     });
 
-    const questions = oldQuest ? this.questionCache[oldQuest.type][oldQuest.rating] : null;
-    const index = questions ? questions.findIndex(q => q.id === quest.id) : -1;
-    if (index !== -1) questions!.splice(index, 1);
+    const index = oldQuest ? this.questionCache.findIndex(q => q.id === quest.id) : -1;
+    if (index !== -1) this.questionCache!.splice(index, 1);
     else this.client.metrics.questionCount.inc();
-    this.questionCache[quest.type][quest.rating].push(quest);
+    this.questionCache.push(quest);
     return quest;
   }
 
@@ -205,10 +193,9 @@ export default class Database {
       .delete({ where: { id } })
       .catch(_ => null);
     if (!question) return null;
-    const questions = this.questionCache[question.type][question.rating];
-    if (questions.some(q => q.id === question.id))
-      questions.splice(
-        questions.findIndex(q => q.id === question.id),
+    if (this.questionCache.some(q => q.id === question.id))
+      this.questionCache.splice(
+        this.questionCache.findIndex(q => q.id === question.id),
         1
       );
 
@@ -237,38 +224,23 @@ export default class Database {
   }
 
   async fetchAllCustomQuestions() {
-    const questions = await this.db.customQuestion.findMany();
-    this.customQuestions = Object.fromEntries(
-      Object.values(QuestionType).map(type => [
-        type,
-        Object.fromEntries(
-          Object.values(Rating).map(rating => [
-            rating,
-            questions.filter(q => q.type === type && q.rating === rating),
-          ])
-        ),
-      ])
-    ) as Record<QuestionType, Record<Rating, CustomQuestion[]>>;
+    this.customQuestions = await this.db.customQuestion.findMany();
 
-    this.client.metrics.updateCustomQuestionCount(questions.length); // Track custom question count for metrics
+    this.client.metrics.updateCustomQuestionCount(this.customQuestions.length); // Track custom question count for metrics
     return this.customQuestions;
   }
 
-  getCustomQuestions(guildId: string, type?: QuestionType, rating?: Rating) {
-    return Object.values(QuestionType)
-      .map(t =>
-        Object.values(Rating)
-          .map(r =>
-            this.customQuestions[t][r].filter(
-              q =>
-                q.guildId === guildId &&
-                (!type || q.type === type) &&
-                (!rating || q.rating === rating)
-            )
-          )
-          .flat()
-      )
-      .flat();
+  getCustomQuestions(
+    guildId: string,
+    { type, rating, category }: { type?: QuestionType; rating?: Rating; category?: string } = {}
+  ) {
+    return this.customQuestions.filter(
+      q =>
+        q.guildId === guildId &&
+        (!type || q.type === type) &&
+        (!rating || q.rating === rating) &&
+        (!category || q.categories.includes(category))
+    );
   }
 
   specificCustomQuestion(guildId: string, id: string) {
@@ -279,7 +251,7 @@ export default class Database {
     const question = await this.db.customQuestion.create({
       data: { id: this.generateId() + '_c', ...data },
     });
-    this.customQuestions[data.type][data.rating].push(question);
+    this.customQuestions.push(question);
 
     this.client.metrics.customQuestionCount.inc();
     return question;
@@ -287,15 +259,15 @@ export default class Database {
 
   async updateCustomQuestion(data: Required<CustomQuestion, 'id' | 'guildId'>) {
     const oldQuest = this.specificCustomQuestion(data.guildId, data.id);
+    if (!oldQuest) return;
     const quest = await this.db.customQuestion.update({
       where: { id: data.id },
       data: { ...data, id: undefined } as Omit<CustomQuestion, 'id'>,
     });
 
-    const questions = this.customQuestions[oldQuest!.type][oldQuest!.rating];
-    const index = questions.findIndex(q => q.id === quest.id);
-    if (index !== -1) questions.splice(index, 1);
-    this.customQuestions[quest.type][quest.rating].push(quest);
+    const index = this.customQuestions.findIndex(q => q.id === quest.id);
+    if (index !== -1) this.customQuestions.splice(index, 1);
+    this.customQuestions.push(quest);
     return quest;
   }
 
@@ -304,10 +276,9 @@ export default class Database {
       .delete({ where: { id } })
       .catch(_ => null);
     if (!question) return null;
-    const questions = this.customQuestions[question.type][question.rating];
-    if (questions.some(q => q.id === question.id))
-      questions.splice(
-        questions.findIndex(q => q.id === question.id),
+    if (this.customQuestions.some(q => q.id === question.id))
+      this.customQuestions.splice(
+        this.customQuestions.findIndex(q => q.id === question.id),
         1
       );
 
