@@ -74,7 +74,7 @@ export default class Client {
     this.publicKey = publicKey;
     this.port = port;
 
-    if (!this.devMode || !process.env.SENTRY_DSN) {
+    if (!this.devMode && process.env.SENTRY_DSN) {
       Sentry.init({ dsn: process.env.SENTRY_DSN });
       process.on('unhandledRejection', err => {
         Sentry.captureException(err);
