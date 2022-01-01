@@ -166,7 +166,7 @@ export default class Client {
     if (!(await this.compareCommands())) return;
     this.console.log('Updating commands...');
 
-    /* await superagent
+    await superagent
       .put(`https://discord.com/api/v9/applications/${this.id}/commands`)
       .set('Authorization', 'Bot ' + this.token)
       .send(
@@ -174,7 +174,7 @@ export default class Client {
           ...c,
           perms: undefined,
         }))
-      );*/
+      );
     this.console.success(`Updated ${this.commands.length} slash commands`);
   }
 
