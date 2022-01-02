@@ -10,6 +10,7 @@ const help: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({
+      content: 'Find other players: https://discord.gg/vBERMvVaRt',
       embeds: [
         {
           title: 'Commands List:',
@@ -45,7 +46,7 @@ const help: Command = {
             {
               type: ComponentType.Button,
               label: 'Support Server',
-              url: 'https://discord.gg/mwKZq2y',
+              url: 'https://discord.gg/vBERMvVaRt',
               style: ButtonStyle.Link,
             },
             {

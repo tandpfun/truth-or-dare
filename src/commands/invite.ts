@@ -30,7 +30,7 @@ const invite: Command = {
             {
               type: ComponentType.Button,
               label: 'Support Server',
-              url: 'https://discord.gg/mwKZq2y',
+              url: 'https://discord.gg/vBERMvVaRt',
               style: ButtonStyle.Link,
             },
             {
