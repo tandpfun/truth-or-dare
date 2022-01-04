@@ -154,7 +154,8 @@ export default class Database {
         id: '',
         type,
         rating: 'NONE',
-        question: 'That rating is disabled in this channel',
+        question:
+          'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
       } as Question & { rating: 'NONE' };
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.getGuildSettings(guildId) : null;
