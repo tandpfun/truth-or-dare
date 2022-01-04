@@ -124,15 +124,27 @@ const paranoia: Command = {
       });
 
     // create db object
-    await ctx.client.database.addParanoiaQuestion({
-      userId: targetUserId,
-      questionText: paranoia.question,
-      questionRating: paranoia.rating,
-      questionId: paranoia.id,
-      guildId: ctx.guildId,
-      channelId: ctx.channelId,
-      dmMessageId: status.queueEmpty ? message.id : null,
-    });
+    const createQuestion = await ctx.client.database
+      .addParanoiaQuestion({
+        userId: targetUserId,
+        questionText: paranoia.question,
+        questionRating: paranoia.rating,
+        questionId: paranoia.id,
+        guildId: ctx.guildId,
+        channelId: ctx.channelId,
+        dmMessageId: status.queueEmpty ? message.id : null,
+      })
+      .then(_ => true)
+      .catch(_ => null);
+
+    if (!createQuestion) {
+      ctx.client.console.error(
+        `Paranoia uniqueness failed with document ID "${targetUserId}-${ctx.guildId}" and channel id "${ctx.channelId}"`
+      );
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} An internal error occurred while saving the question. Help us resolve this issue by reaching out in our Support Server: https://discord.gg/vBERMvVaRt`
+      );
+    }
 
     ctx.reply(
       status.queueEmpty
