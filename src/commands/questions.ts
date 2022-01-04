@@ -253,17 +253,11 @@ const questions: Command = {
       const deleted = await (ctx.guildId === MAIN_GUILD
         ? ctx.client.database.deleteQuestion(id)
         : ctx.client.database.deleteCustomQuestion(id));
-      return ctx.reply({
-        embeds: [
-          ctx.client.functions.embed(
-            deleted
-              ? `Question removed. ID: ${deleted.id}`
-              : 'Something went wrong, maybe the question has already been deleted?',
-            ctx.user,
-            !deleted
-          ),
-        ],
-      });
+      return ctx.reply(
+        deleted
+          ? `${ctx.client.EMOTES.delete} Question removed! ID: ${deleted.id}`
+          : `${ctx.client.EMOTES.xmark} Something went wrong, was the question already deleted?`
+      );
     } else if (ctx.args[0] === 'view') {
       const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id')!.value;
       const question =

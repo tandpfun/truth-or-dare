@@ -56,6 +56,7 @@ export default class Client {
     sparkles: ':sparkles:',
     info: ':information_source:',
     arrowUp: ':arrow_up:',
+    delete: '<:delete:927979243844038657>',
   } as const;
 
   constructor({
