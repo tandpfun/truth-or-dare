@@ -164,24 +164,23 @@ const questions: Command = {
 
     if (ctx.args[0] === 'list') {
       const questionType =
-        ctx.getOption<Mutable<typeof options[0]['options'][0]>>('type')?.value || 'ALL';
+        ctx.getOption<Mutable<typeof options[0]['options'][0]>>('type')?.value ?? 'ALL';
       const rating =
-        ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value || 'ALL';
+        ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value ?? 'ALL';
 
       const questions =
         ctx.guildId === MAIN_GUILD
-          ? ctx.client.database.getQuestions(
-              questionType === 'ALL' ? undefined : questionType,
-              rating === 'ALL' ? undefined : rating
-            )
-          : ctx.client.database.getCustomQuestions(
-              ctx.guildId,
-              questionType === 'ALL' ? undefined : questionType,
-              rating === 'ALL' ? undefined : rating
-            );
+          ? ctx.client.database.getQuestions({
+              type: questionType === 'ALL' ? undefined : questionType,
+              rating: rating === 'ALL' ? undefined : rating,
+            })
+          : ctx.client.database.getCustomQuestions(ctx.guildId, {
+              type: questionType === 'ALL' ? undefined : questionType,
+              rating: rating === 'ALL' ? undefined : rating,
+            });
 
       const page = Math.min(
-        Math.max(ctx.getOption<Mutable<typeof options[0]['options'][2]>>('page')?.value || 1, 1),
+        Math.max(ctx.getOption<Mutable<typeof options[0]['options'][2]>>('page')?.value ?? 1, 1),
         Math.ceil(questions.length / PER_PAGE)
       );
 
