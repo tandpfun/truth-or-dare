@@ -182,11 +182,19 @@ const settings: Command = {
         ctx.guildId,
         ctx.client.token
       );
-      const textChannels = allChannels?.filter(
+      if (!allChannels)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark +
+            " I can't seem to fetch your channels, make sure I'm in the server by inviting me again from `/invite` then maybe try again."
+        );
+      const textChannels = allChannels.filter(
         c => c.type === ChannelType.GuildText || c.type === ChannelType.GuildNews
       );
-      if (!textChannels)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' Failed to fetch channels, try again later');
+      if (!textChannels.length)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark +
+            " I can't seem to find any text or announcement channels to mute, let the devs know in the support server found in `/help` if you think there's something wrong here."
+        );
 
       await Promise.all(
         textChannels.map(async c =>
@@ -196,18 +204,26 @@ const settings: Command = {
 
       ctx.reply(
         ctx.client.EMOTES.checkmark +
-          ' Muted in all channels serverwide. Use `/settings unmuteserver to unmute.`'
+          ' Muted in all channels serverwide. Use `/settings unmuteserver` to unmute.'
       );
     } else if (ctx.args[0] === 'unmuteserver') {
       const allChannels = await ctx.client.functions.fetchGuildChannels(
         ctx.guildId,
         ctx.client.token
       );
-      const textChannels = allChannels?.filter(
+      if (!allChannels)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark +
+            " I can't seem to fetch your channels, make sure I'm in the server by inviting me again from `/invite` then maybe try again."
+        );
+      const textChannels = allChannels.filter(
         c => c.type === ChannelType.GuildText || c.type === ChannelType.GuildNews
       );
-      if (!textChannels)
-        return ctx.reply(ctx.client.EMOTES.xmark + ' Failed to fetch channels, try again later');
+      if (!textChannels.length)
+        return ctx.reply(
+          ctx.client.EMOTES.xmark +
+            " I can't seem to find any text or announcement channels to unmute, let the devs know in the support server found in `/help` if you think there's something wrong here."
+        );
 
       await Promise.all(
         textChannels.map(async c =>
@@ -217,7 +233,7 @@ const settings: Command = {
 
       ctx.reply(
         ctx.client.EMOTES.checkmark +
-          ' Unmuted in all channels serverwide. Use `/settings unmuteserver to unmute.`'
+          ' Unmuted in all channels serverwide. Use `/settings unmuteserver` to unmute.'
       );
     }
   },
