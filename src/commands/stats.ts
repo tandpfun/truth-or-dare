@@ -1,4 +1,5 @@
 import { ButtonStyle, ComponentType } from 'discord-api-types';
+import { QuestionType, Rating } from '@prisma/client';
 
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
@@ -27,17 +28,18 @@ const stats: Command = {
               ([command, count]) =>
                 `${ctx.client.functions.titleCase(command)}: ${count.toLocaleString()}`
             )
-            .join('\n')}\n\n__Question Counts:__ (${Object.values(
-            ctx.client.database.questionCache
-          ).reduce(
-            (total, type) =>
-              total + Object.values(type).reduce((tot, rating) => tot + rating.length, 0),
-            0
-          )})\n${Object.entries(ctx.client.database.questionCache)
+            .join('\n')}\n\n__Question Counts:__ (${
+            ctx.client.database.questionCache.length // total number of questions
+          })\n${Object.values(QuestionType)
             .map(
-              ([type, rates]) =>
-                `${type}: ${Object.entries(rates)
-                  .map(([rate, quests]) => `${rate}: ${quests.length.toLocaleString()}`)
+              type =>
+                `${type}: ${Object.values(Rating)
+                  .map(
+                    rate =>
+                      `${rate}: ${ctx.client.database.questionCache
+                        .filter(q => q.type === type && q.rating === rate)
+                        .length.toLocaleString()}`
+                  )
                   .join(' | ')}`
             )
             .join('\n')}`,

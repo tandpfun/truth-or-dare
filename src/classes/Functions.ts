@@ -4,12 +4,12 @@ import {
   RESTPostAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
+  RESTGetAPIGuildChannelsResult,
   RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
   ComponentType,
   ButtonStyle,
   APIEmbed,
-  RESTGetAPIGuildChannelsResult,
 } from 'discord-api-types';
 import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
