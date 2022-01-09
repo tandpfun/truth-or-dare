@@ -190,7 +190,7 @@ export async function fetchChannel(
   token: string
 ): Promise<RESTGetAPIChannelResult | null> {
   return await superagent
-    .get(`https://discord.com/api/channel/${channelId}`)
+    .get(`https://discord.com/api/channels/${channelId}`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(_ => null);
@@ -201,8 +201,8 @@ export async function fetchGuildChannels(
   token: string
 ): Promise<RESTGetAPIGuildChannelsResult | null> {
   return await superagent
-    .get(`https://discord.com/api/guild/${guildId}/channels`)
+    .get(`https://discord.com/api/guilds/${guildId}/channels`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
-    .catch(_ => null)
+    .catch(console.log);
 }
