@@ -70,7 +70,7 @@ const answer: Command = {
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
-            `Message failed to send, please make sure I can send messages in <#${paranoiaData.channelId}> and then try again.`,
+            `Message failed to send, please make sure I can send messages in <#${paranoiaData.channelId}> and then try again. If that's not the issue, try running \`/skip\` to skip the question.`,
             ctx.user,
             true
           ),
