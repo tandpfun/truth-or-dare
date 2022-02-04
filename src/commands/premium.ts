@@ -67,7 +67,7 @@ const premium: Command = {
             : {
                 title: `${ctx.client.EMOTES.xmark} Basic Server`,
                 description:
-                  'Help support the development of Truth or Dare with a one-time $5 donation and gain some awesome perks like custom questions!\n\nTo activate a server, run `/premium activate`.',
+                  'Help support the development of Truth or Dare with premium and gain some awesome perks like custom questions!\n\nTo activate a server, run `/premium activate`.',
                 color: ctx.client.COLORS.RED,
               },
         ],
