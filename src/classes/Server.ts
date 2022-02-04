@@ -24,7 +24,7 @@ export default class Server {
       '/api/',
       rateLimiter({
         windowMs: 5 * 1000,
-        max: 5,
+        max: 10,
         skipFailedRequests: true,
         handler: (_: Request, res: Response) => {
           res
