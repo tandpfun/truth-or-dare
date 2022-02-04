@@ -20,6 +20,8 @@ export default class Server {
     this.client = client;
     this.router = express();
 
+    this.router.set('trust proxy', 1);
+
     this.router.use(
       '/api/',
       rateLimiter({
@@ -27,12 +29,10 @@ export default class Server {
         max: 10,
         skipFailedRequests: true,
         handler: (_: Request, res: Response) => {
-          res
-            .send({
-              error: true,
-              message: 'Too many requests, please try again later.',
-            })
-            .status(429);
+          res.status(429).send({
+            error: true,
+            message: 'Too many requests, please try again later.',
+          });
         },
       })
     );
