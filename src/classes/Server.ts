@@ -130,8 +130,9 @@ export default class Server {
     )
       return res.status(400).send({
         error: true,
-        message:
-          'The question type must be one of the following: "dare" "truth" "nhie" "wyr" "paranoia"',
+        message: `The question type must be one of the following: ${Object.values(QuestionType)
+          .map(q => `'${q}'`)
+          .join(' ')}`,
       });
 
     if (!rating)
@@ -139,17 +140,16 @@ export default class Server {
         await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType)
       );
 
-    let ratingArray = rating as Array<Rating>;
-    if (!Array.isArray(rating)) ratingArray = [rating as Rating];
+    let ratingArray = (Array.isArray(rating) ? rating : [rating]) as Rating[];
     for (const rating of ratingArray) {
-      if (!Object.values(Rating).includes((rating as string).toUpperCase?.() as Rating))
+      if (!Object.values(Rating).includes(rating.toUpperCase() as Rating))
         return res.status(400).send({
           error: true,
           message: 'The rating must be one of the following: "PG" "PG13" "R"',
         });
     }
 
-    ratingArray = ratingArray.map(r => r.toUpperCase()) as Array<Rating>;
+    ratingArray = ratingArray.map(r => r.toUpperCase()) as Rating[];
 
     const disabledRatings = Object.values(Rating).filter(a => !ratingArray.includes(a));
 
