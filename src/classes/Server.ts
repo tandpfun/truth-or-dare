@@ -121,13 +121,10 @@ export default class Server {
   }
 
   async handleAPI(req: Request, res: Response) {
-    const questionType = req.params.questionType;
+    const questionType = req.params.questionType.toUpperCase() as QuestionType;
     const rating = req.query.rating;
-    if (
-      !Object.values(QuestionType).includes(
-        (questionType as string).toUpperCase?.() as QuestionType
-      )
-    )
+    console.log(rating);
+    if (!Object.values(QuestionType).includes(questionType))
       return res.status(400).send({
         error: true,
         message: `The question type must be one of the following: ${Object.values(QuestionType)
@@ -135,19 +132,17 @@ export default class Server {
           .join(' ')}`,
       });
 
-    if (!rating)
-      return res.send(
-        await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType, [
-          'R',
-        ])
-      );
+    if (!rating) return res.send(await this.client.database.getRandomQuestion(questionType, ['R']));
 
     let ratingArray = (Array.isArray(rating) ? rating : [rating]) as Rating[];
+
     for (const rating of ratingArray) {
-      if (!Object.values(Rating).includes(rating.toUpperCase() as Rating))
+      if (!Object.values(Rating).includes(rating.toUpperCase?.() as Rating))
         return res.status(400).send({
           error: true,
-          message: 'The rating must be one of the following: "PG" "PG13" "R"',
+          message: `The rating must be one of the following: ${Object.values(Rating)
+            .map(r => `'${r}'`)
+            .join(' ')}`,
         });
     }
 
@@ -155,12 +150,9 @@ export default class Server {
 
     const disabledRatings = Object.values(Rating).filter(a => !ratingArray.includes(a));
 
-    const question = await this.client.database.getRandomQuestion(
-      questionType.toUpperCase() as QuestionType,
-      disabledRatings
-    );
+    const question = await this.client.database.getRandomQuestion(questionType, disabledRatings);
 
-    this.client.metrics.trackAPIRequest(question.type, rating as string); // Track API usage metrics
+    this.client.metrics.trackAPIRequest(question.type, question.rating); // Track API usage metrics
 
     res.send(question);
   }
