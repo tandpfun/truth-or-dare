@@ -123,7 +123,7 @@ export default class Server {
   async handleAPI(req: Request, res: Response) {
     const questionType = req.params.questionType.toUpperCase() as QuestionType;
     const rating = req.query.rating;
-    console.log(rating);
+
     if (!Object.values(QuestionType).includes(questionType))
       return res.status(400).send({
         error: true,
