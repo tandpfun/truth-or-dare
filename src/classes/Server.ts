@@ -10,6 +10,18 @@ import Context from './Context';
 
 const passthroughCommands = ['settings'];
 
+const APIRateLimit = rateLimiter({
+  windowMs: 5 * 1000,
+  max: 5,
+  skipFailedRequests: true,
+  handler: (_: Request, res: Response) => {
+    res.status(429).send({
+      error: true,
+      message: 'Too many requests, please try again later.',
+    });
+  },
+});
+
 export default class Server {
   port: number;
   client: Client;
@@ -22,20 +34,8 @@ export default class Server {
 
     this.router.set('trust proxy', 1);
 
-    this.router.use(
-      '/api/',
-      rateLimiter({
-        windowMs: 5 * 1000,
-        max: 5,
-        skipFailedRequests: true,
-        handler: (_: Request, res: Response) => {
-          res.status(429).send({
-            error: true,
-            message: 'Too many requests, please try again later.',
-          });
-        },
-      })
-    );
+    this.router.use('/api/', APIRateLimit);
+    this.router.use('/v1/', APIRateLimit);
 
     this.router.post(
       '/interactions',
@@ -44,6 +44,7 @@ export default class Server {
     );
 
     this.router.get('/api/:questionType', this.handleAPI.bind(this));
+    this.router.get('/v1/:questionType', this.handleAPI.bind(this));
 
     this.router.get('/metrics', async (req, res) => {
       if (req.headers.authorization?.replace('Bearer ', '') !== process.env.PROMETHEUS_AUTH)
@@ -127,33 +128,38 @@ export default class Server {
         (questionType as string).toUpperCase?.() as QuestionType
       )
     )
-      return res
-        .send({
-          error: true,
-          message:
-            'The question type must be one of the following: "dare" "truth" "nhie" "wyr" "paranoia"',
-        })
-        .status(400);
+      return res.status(400).send({
+        error: true,
+        message:
+          'The question type must be one of the following: "dare" "truth" "nhie" "wyr" "paranoia"',
+      });
+
     if (!rating)
       return res.send(
         await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType)
       );
-    if (!Object.values(Rating).includes((rating as string).toUpperCase?.() as Rating))
-      return res
-        .send({
+
+    let ratingArray = rating as Array<Rating>;
+    if (!Array.isArray(rating)) ratingArray = [rating as Rating];
+    for (const rating of ratingArray) {
+      if (!Object.values(Rating).includes((rating as string).toUpperCase?.() as Rating))
+        return res.status(400).send({
           error: true,
           message: 'The rating must be one of the following: "PG" "PG13" "R"',
-        })
-        .status(400);
+        });
+    }
 
-    this.client.metrics.trackAPIRequest(questionType, rating as string); // Track API usage metrics
+    ratingArray = ratingArray.map(r => r.toUpperCase()) as Array<Rating>;
 
-    res.send(
-      await this.client.database.getRandomQuestion(
-        questionType.toUpperCase() as QuestionType,
-        [],
-        (rating as string).toUpperCase() as Rating
-      )
+    const disabledRatings = Object.values(Rating).filter(a => !ratingArray.includes(a));
+
+    const question = await this.client.database.getRandomQuestion(
+      questionType.toUpperCase() as QuestionType,
+      disabledRatings
     );
+
+    this.client.metrics.trackAPIRequest(question.type, rating as string); // Track API usage metrics
+
+    res.send(question);
   }
 }
