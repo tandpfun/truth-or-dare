@@ -53,7 +53,7 @@ export default class Server {
       res.send(metrics);
     });
 
-    this.router.get('/', (_, res) => res.redirect('https://docs.truthordarebot.xyz'));
+    this.router.get('/', (_, res) => res.redirect('https://docs.truthordarebot.xyz/api-docs'));
   }
 
   start() {
