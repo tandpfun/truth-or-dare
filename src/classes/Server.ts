@@ -137,7 +137,9 @@ export default class Server {
 
     if (!rating)
       return res.send(
-        await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType)
+        await this.client.database.getRandomQuestion(questionType.toUpperCase() as QuestionType, [
+          'R',
+        ])
       );
 
     let ratingArray = (Array.isArray(rating) ? rating : [rating]) as Rating[];
