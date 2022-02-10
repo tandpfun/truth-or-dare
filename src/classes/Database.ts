@@ -20,12 +20,11 @@ export default class Database {
   channelCache: Record<string, ChannelSettings | null> = {};
   questionCache: Question[] = [];
   customQuestions: CustomQuestion[] = [];
-  premiumGuilds: Set<string>;
+  premiumGuilds: Set<string> = new Set();
 
   constructor(client: Client) {
     this.client = client;
     this.db = new PrismaClient();
-    this.premiumGuilds = new Set();
   }
 
   async start() {
@@ -39,6 +38,7 @@ export default class Database {
       this.channelCache = {};
       this.client.console.log(`Cleared ${cacheSize} entries from the channel cache`);
       await this.fetchAllQuestions();
+      await this.fetchPremiumGuilds();
       await this.sweepCustomQuestions();
     }, 6 * 60 * 60 * 1000);
   }
@@ -259,11 +259,7 @@ export default class Database {
 
   async sweepCustomQuestions() {
     await this.db.customQuestion.deleteMany({
-      where: {
-        guildId: {
-          notIn: (await this.db.premiumUser.findMany()).map(u => u.premiumServers).flat(),
-        },
-      },
+      where: { guildId: { notIn: [...this.premiumGuilds] } },
     });
     await this.fetchAllCustomQuestions();
   }
@@ -306,11 +302,7 @@ export default class Database {
 
   async fetchPremiumGuilds() {
     const users = await this.db.premiumUser.findMany();
-    for (const user of users) {
-      for (const guild of user.premiumServers) {
-        this.premiumGuilds.add(guild);
-      }
-    }
+    this.premiumGuilds = new Set(users.flatMap(user => user.premiumServers));
   }
 
   async getPremiumUser(id: string) {
