@@ -7,7 +7,7 @@ import {
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const options = [
   {
@@ -46,7 +46,7 @@ const premium: Command = {
   category: 'control',
   options,
   perms: [],
-  run: async (ctx: Context): Promise<void> => {
+  run: async (ctx: CommandContext): Promise<void> => {
     const premiumGuild = ctx.guildId && ctx.client.database.isPremiumGuild(ctx.guildId);
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
 

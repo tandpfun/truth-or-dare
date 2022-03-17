@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const options = [
   {
@@ -23,7 +23,7 @@ const truth: Command = {
   category: 'question',
   options,
   perms: [],
-  run: async (ctx: Context): Promise<void> => {
+  run: async (ctx: CommandContext): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const truth = await ctx.client.database.getRandomQuestion(
@@ -45,6 +45,7 @@ const truth: Command = {
             : undefined,
         },
       ],
+      components: ctx.client.server.buttonHandler.components('TOD'),
     });
   },
 };

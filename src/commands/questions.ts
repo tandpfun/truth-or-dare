@@ -3,7 +3,7 @@ import { QuestionType } from '.prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const { MAIN_GUILD } = process.env;
 const PER_PAGE = 15;
@@ -155,7 +155,7 @@ const questions: Command = {
   category: 'control',
   perms: ['ManageGuild'],
   options,
-  run: async (ctx: Context) => {
+  run: async (ctx: CommandContext) => {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Custom questions cannot be edited in DMs.`);
 

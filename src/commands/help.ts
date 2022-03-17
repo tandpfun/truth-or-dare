@@ -1,14 +1,14 @@
 import { ButtonStyle, ComponentType } from 'discord-api-types';
 
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const help: Command = {
   name: 'help',
   description: 'Get a list of commands.',
   category: 'control',
   perms: [],
-  run: async (ctx: Context): Promise<void> => {
+  run: async (ctx: CommandContext): Promise<void> => {
     ctx.reply({
       content: 'Find other players: https://discord.gg/vBERMvVaRt',
       embeds: [

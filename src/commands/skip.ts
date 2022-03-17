@@ -1,12 +1,12 @@
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const skip: Command = {
   name: 'skip',
   description: 'Skips a paranoia question sent to you if the question is stuck.',
   category: 'question',
   perms: [],
-  run: async (ctx: Context) => {
+  run: async (ctx: CommandContext) => {
     if (ctx.guildId)
       return ctx.reply({
         content: `${ctx.client.EMOTES.xmark} Paranoia questions can only be skipped in DMs.`,

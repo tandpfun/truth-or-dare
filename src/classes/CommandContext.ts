@@ -20,7 +20,7 @@ import type { Response } from 'express';
 import type { OptionType } from './OptionTypes';
 import type Client from './Client';
 
-export default class Context {
+export default class CommandContext {
   rawInteraction: APIApplicationCommandInteraction;
   rawData: APIChatInputApplicationCommandInteractionData;
   response: Response;

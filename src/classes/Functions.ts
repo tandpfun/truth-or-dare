@@ -15,10 +15,10 @@ import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
 import type Command from './Command';
-import type Context from './Context';
+import type CommandContext from './CommandContext';
 import Client from './Client';
 
-export function checkPerms(command: Command, ctx: Context) {
+export function checkPerms(command: Command, ctx: CommandContext) {
   if (!ctx.member) return true;
   const required = command.perms
     .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))

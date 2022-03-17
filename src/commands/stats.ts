@@ -2,14 +2,14 @@ import { ButtonStyle, ComponentType } from 'discord-api-types';
 import { QuestionType, Rating } from '@prisma/client';
 
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const stats: Command = {
   name: 'stats',
   description: 'List some statistics on the bot!',
   category: 'control',
   perms: [],
-  run: async (ctx: Context): Promise<void> => {
+  run: async (ctx: CommandContext): Promise<void> => {
     ctx.reply({
       embeds: [
         {

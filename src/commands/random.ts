@@ -3,7 +3,7 @@ import { QuestionType } from '@prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const options = [
   {
@@ -24,7 +24,7 @@ const tod: Command = {
   category: 'question',
   options,
   perms: [],
-  run: async (ctx: Context): Promise<void> => {
+  run: async (ctx: CommandContext): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
     const types = Object.values(QuestionType);
     const type = types[Math.floor(Math.random() * types.length)];

@@ -1,4 +1,12 @@
-import { verifyKeyMiddleware, InteractionType } from 'discord-interactions';
+import { verifyKeyMiddleware } from 'discord-interactions';
+import {
+  APIChatInputApplicationCommandInteraction,
+  APIInteraction,
+  APIMessageComponentInteraction,
+  ApplicationCommandType,
+  ComponentType,
+  InteractionType,
+} from 'discord-api-types';
 import express, { Express, Request, Response } from 'express';
 import { QuestionType, Rating } from '.prisma/client';
 import rateLimiter from 'express-rate-limit';
@@ -6,7 +14,9 @@ import * as Sentry from '@sentry/node';
 import { register } from 'prom-client';
 
 import type Client from './Client';
-import Context from './Context';
+import CommandContext from './CommandContext';
+import ButtonContext from './ButtonContext';
+import ButtonHandler from './ButtonHandler';
 
 const passthroughCommands = ['settings'];
 
@@ -26,11 +36,13 @@ export default class Server {
   port: number;
   client: Client;
   router: Express;
+  buttonHandler: ButtonHandler;
 
   constructor(port: number, client: Client) {
     this.port = port;
     this.client = client;
     this.router = express();
+    this.buttonHandler = new ButtonHandler(this.client);
 
     this.router.set('trust proxy', 1);
 
@@ -63,9 +75,17 @@ export default class Server {
   }
 
   async handleRequest(req: Request, res: Response) {
-    const interaction = req.body;
-    if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-      const ctx = new Context(interaction, this.client, res);
+    const interaction = req.body as APIInteraction;
+    if (
+      interaction.type === InteractionType.ApplicationCommand &&
+      interaction.data.type === ApplicationCommandType.ChatInput
+    ) {
+      if (interaction.data.type !== ApplicationCommandType.ChatInput) return;
+      const ctx = new CommandContext(
+        interaction as APIChatInputApplicationCommandInteraction,
+        this.client,
+        res
+      );
       if ((await ctx.channelSettings).muted && !passthroughCommands.includes(ctx.command.name))
         return ctx.reply({
           content:
@@ -74,10 +94,27 @@ export default class Server {
           flags: 1 << 6,
         });
       await this.handleCommand(ctx);
+    } else if (
+      interaction.type === InteractionType.MessageComponent &&
+      interaction.data.component_type === ComponentType.Button
+    ) {
+      const ctx = new ButtonContext(
+        interaction as APIMessageComponentInteraction,
+        this.client,
+        res
+      );
+      if ((await ctx.channelSettings).muted)
+        return ctx.reply({
+          content:
+            this.client.EMOTES.xmark +
+            ' I am muted in this channel. Use `/settings unmute` to unmute me.',
+          flags: 1 << 6,
+        });
+      await this.buttonHandler.handleButton(ctx);
     }
   }
 
-  async handleCommand(ctx: Context) {
+  async handleCommand(ctx: CommandContext) {
     const command = this.client.commands.find(c => c.name === ctx.command.name);
     if (!command)
       return this.client.console.error(

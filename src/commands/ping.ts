@@ -1,12 +1,12 @@
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type CommandContext from '../classes/CommandContext';
 
 const ping: Command = {
   name: 'ping',
   description: 'Check if the bot is online.',
   category: 'control',
   perms: [],
-  run: async (ctx: Context): Promise<void> => {
+  run: async (ctx: CommandContext): Promise<void> => {
     return ctx.reply({
       embeds: [
         {
