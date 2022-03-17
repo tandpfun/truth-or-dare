@@ -109,7 +109,7 @@ export function premiumAd(): APIInteractionResponseCallbackData {
         color: Client.COLORS.YELLOW,
         title: `${Client.EMOTES.sparkles} Truth or Dare Premium`,
         description:
-          'Help support the development of Truth or Dare with a one-time $5 donation and gain some awesome perks like custom questions! Click the button below for more information.',
+          'Help support the development and hosting of Truth or Dare with premium! Get some awesome perks like custom questions. Click the button below for more information.',
       },
     ],
     components: [
