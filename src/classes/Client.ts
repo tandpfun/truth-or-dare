@@ -49,6 +49,7 @@ export default class Client {
     checkmark: ':white_check_mark:',
     xmark: ':x:',
     time: ':stopwatch:',
+    trackball: ':trackball:',
     question: ':question:',
     gear: ':gear:',
     warning: ':warning:',

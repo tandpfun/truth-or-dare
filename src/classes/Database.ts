@@ -123,7 +123,7 @@ export default class Database {
           'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
       } as Question & { rating: 'NONE' };
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
-    const guildSettings = isPremiumGuild ? await this.getGuildSettings(guildId) : null;
+    const guildSettings = isPremiumGuild && guildId ? await this.getGuildSettings(guildId) : null;
 
     const globalFilter = (q: Question) => q.type === type && ratings.includes(q.rating);
     const customFilter = (q: CustomQuestion) =>
