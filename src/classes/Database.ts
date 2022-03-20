@@ -38,9 +38,9 @@ export default class Database {
       this.channelCache = {};
       this.client.console.log(`Cleared ${cacheSize} entries from the channel cache`);
       await this.fetchAllQuestions();
-      await this.fetchPremiumGuilds();
       await this.sweepCustomQuestions();
-    }, 6 * 60 * 60 * 1000);
+      await this.fetchPremiumGuilds();
+    }, 24 * 60 * 60 * 1000);
   }
 
   async migrate() {
