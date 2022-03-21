@@ -34,6 +34,7 @@ model ChannelSettings {
 model GuildSettings {
   id                    String   @id @map("_id")
   disableGlobals        Boolean
+  disableButtons        Boolean
   disabledQuestions     String[]
   showParanoiaFrequency Int
 }

@@ -10,6 +10,12 @@ export default class Metrics {
     labelNames: ['command', 'success'],
   });
 
+  readonly buttonsPressed = new Gauge({
+    name: 'buttons_pressed',
+    help: 'The number of buttons pressed',
+    labelNames: ['type'],
+  });
+
   readonly apiRequests = new Gauge({
     name: 'api_requests',
     help: 'API request usage statistics',
@@ -34,6 +40,10 @@ export default class Metrics {
 
   trackCommandUse(command: string, success: boolean) {
     this.commandsUsed.labels(command, String(success)).inc();
+  }
+
+  trackButtonPress(type: string) {
+    this.buttonsPressed.labels(type).inc();
   }
 
   trackAPIRequest(endpoint: string, rating: string) {

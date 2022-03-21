@@ -10,6 +10,7 @@ import {
   ComponentType,
   ButtonStyle,
   APIEmbed,
+  APIInteractionGuildMember,
 } from 'discord-api-types';
 import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
@@ -17,6 +18,10 @@ import superagent from 'superagent';
 import type Command from './Command';
 import type CommandContext from './CommandContext';
 import Client from './Client';
+
+type Permission =
+  | keyof typeof PermissionFlagsBits
+  | typeof PermissionFlagsBits[keyof typeof PermissionFlagsBits];
 
 export function checkPerms(command: Command, ctx: CommandContext) {
   if (!ctx.member) return true;
@@ -43,6 +48,16 @@ export function checkPerms(command: Command, ctx: CommandContext) {
     return false;
   }
   return true;
+}
+
+export function hasPermission(
+  permission: Permission,
+  member: APIInteractionGuildMember | undefined
+) {
+  if (!member) return true;
+  const required = typeof permission === 'bigint' ? permission : PermissionFlagsBits[permission];
+  const missing = required & ~BigInt(member.permissions);
+  return !missing;
 }
 
 export function avatarURL({

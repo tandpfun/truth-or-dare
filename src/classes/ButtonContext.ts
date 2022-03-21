@@ -13,7 +13,7 @@ import type { Response } from 'express';
 import type Client from './Client';
 
 export default class ButtonContext {
-  rawInteraction: APIMessageComponentInteraction;
+  interaction: APIMessageComponentInteraction;
   data: APIMessageButtonInteractionData;
   response: Response;
   client: Client;
@@ -29,7 +29,7 @@ export default class ButtonContext {
     if (interaction.data.component_type !== ComponentType.Button)
       throw new Error('The component type is not a button.');
 
-    this.rawInteraction = interaction;
+    this.interaction = interaction;
     this.data = interaction.data;
     this.response = response;
     this.client = client;

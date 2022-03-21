@@ -18,11 +18,22 @@ export default class ButtonHandler {
   }
 
   async handleButton(ctx: ButtonContext) {
-    if (!this.buttonIds.includes(ctx.data.custom_id as ButtonIds)) return;
-    const channelSettings = await ctx.channelSettings;
+    if (!this.buttonIds.includes(ctx.data.custom_id as ButtonIds))
+      return this.client.console.error(
+        `Button ${ctx.data.custom_id} was pressed with no corresponding question type.`
+      );
 
+    const channelSettings = await ctx.channelSettings;
     const isPremium = ctx.guildId ? this.client.database.isPremiumGuild(ctx.guildId) : false;
 
+    // Statistics
+    const buttonName = ctx.data.custom_id.toLowerCase();
+    this.client.stats.minuteCommandCount++;
+    this.client.stats.commands[`${buttonName}-button`]++;
+    this.client.stats.minuteCommands[`${buttonName}-button`]++;
+    this.client.metrics.trackButtonPress(buttonName);
+
+    // Cooldown
     if (this.buttonCooldown.has(ctx.channelId) && !isPremium)
       return ctx.reply({
         content: `${ctx.client.EMOTES.time} Buttons can only be pressed once every two seconds per channel to prevent spam!\n${ctx.client.EMOTES.sparkles} You can bypass this with premium.`,
@@ -42,6 +53,11 @@ export default class ButtonHandler {
         flags: 1 << 6,
       });
 
+    this.buttonCooldown.add(ctx.channelId);
+    setTimeout(() => {
+      this.buttonCooldown.delete(ctx.channelId);
+    }, 2000);
+
     let type;
     if (ctx.data.custom_id === 'TOD') {
       type = (Math.random() < 0.5 ? 'TRUTH' : 'DARE') as QuestionType;
@@ -54,13 +70,20 @@ export default class ButtonHandler {
       ctx.guildId
     );
 
-    let name = ctx.data.custom_id;
-    if (name === 'TOD') name = 'RANDOM';
+    let label = ctx.client.functions.titleCase(ctx.data.custom_id);
+    if (ctx.data.custom_id === 'TOD') label = 'Random';
+
+    const isMod = this.client.functions.hasPermission('ManageGuild', ctx.member);
+    const settings = ctx.guildId ? await ctx.client.database.getGuildSettings(ctx.guildId) : null;
 
     ctx.reply({
-      content: `${ctx.client.EMOTES.trackball} **${ctx.user.username}#${
+      content: `${this.client.EMOTES.beta1}${
+        this.client.EMOTES.beta2
+      } Buttons are a beta feature. ${
+        isMod ? 'Toggle them with `/serversettings togglebuttons`.' : ''
+      }\n${ctx.client.EMOTES.trackball} **${ctx.user.username}#${
         ctx.user.discriminator
-      }** clicked on **${ctx.client.functions.titleCase(name)}**`,
+      }** clicked on **${label}**`,
       embeds: [
         {
           title: result.question,
@@ -72,22 +95,20 @@ export default class ButtonHandler {
             : undefined,
         },
       ],
-      components: ctx.client.server.buttonHandler.components('TOD'),
+      components: settings?.disableButtons ? [] : ctx.client.server.buttonHandler.components('TOD'),
     });
 
     ctx.client.functions.editMessage(
       {
         components: [],
+        content: ctx.interaction.message.content
+          ? ctx.interaction.message.content.split('\n').slice(-1)[0]
+          : undefined,
       },
       ctx.channelId,
       ctx.messageId,
       ctx.client.token
     );
-
-    this.buttonCooldown.add(ctx.channelId);
-    setTimeout(() => {
-      this.buttonCooldown.delete(ctx.channelId);
-    }, 2000);
   }
 
   components(type: CommandComponentTypes): APIActionRowComponent[] | undefined {

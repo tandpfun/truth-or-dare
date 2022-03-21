@@ -25,6 +25,9 @@ const truth: Command = {
   perms: [],
   run: async (ctx: CommandContext): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const serverSettings = ctx.guildId
+      ? await ctx.client.database.getGuildSettings(ctx.guildId)
+      : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const truth = await ctx.client.database.getRandomQuestion(
       'TRUTH',
@@ -45,7 +48,9 @@ const truth: Command = {
             : undefined,
         },
       ],
-      components: ctx.client.server.buttonHandler.components('TOD'),
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components('TOD'),
     });
   },
 };

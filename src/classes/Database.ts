@@ -345,7 +345,13 @@ export default class Database {
   }
 
   defaultGuildSettings(id: string): GuildSettings {
-    return { id, disableGlobals: false, disabledQuestions: [], showParanoiaFrequency: 50 };
+    return {
+      id,
+      disableGlobals: false,
+      disableButtons: false,
+      disabledQuestions: [],
+      showParanoiaFrequency: 50,
+    };
   }
 
   async updateGuildSettings(data: Required<GuildSettings, 'id'>) {

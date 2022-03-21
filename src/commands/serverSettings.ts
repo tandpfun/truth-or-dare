@@ -55,6 +55,11 @@ const options = [
     name: 'toggleglobals',
     description: 'Disable/enable all global questions in this server.',
   },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'togglebuttons',
+    description: 'Disable/enable buttons showing on question messages.',
+  },
 ] as const;
 
 const serverSettings: Command = {
@@ -66,7 +71,11 @@ const serverSettings: Command = {
   run: async (ctx: CommandContext) => {
     if (!ctx.guildId)
       return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');
-    if (!ctx.client.database.isPremiumGuild(ctx.guildId))
+    if (
+      !ctx.client.database.isPremiumGuild(ctx.guildId) &&
+      ctx.args[0] !== 'view' &&
+      ctx.args[0] !== 'togglebuttons'
+    )
       return ctx.reply(ctx.client.functions.premiumAd());
 
     if (ctx.args[0] === 'view') {
@@ -75,13 +84,26 @@ const serverSettings: Command = {
         embeds: [
           {
             title: ctx.client.EMOTES.gear + ' Server Settings',
-            description: `__Paranoia frequency:__\n${
-              settings.showParanoiaFrequency
-            }%\n\n__Disabled Questions:__\n${
-              settings.disableGlobals
-                ? 'All global questions'
-                : settings.disabledQuestions.map(id => '`' + id + '`').join(', ') || 'None'
-            }`,
+            description:
+              'Configure how the bot functions on a server-wide level.\nModify a setting with `/serversettings <setting>`',
+            fields: [
+              {
+                name: `• Paranoia Frequency: ${settings.showParanoiaFrequency}%`,
+                value: `How often the question is shown in the paranoia game.\n\`/serversettings showparanoia\``,
+              },
+              {
+                name: `• Question Buttons: ${settings.disableButtons ? 'Disabled' : 'Enabled'}`,
+                value: `Add buttons to question messages to get another question.\n\`/serversettings togglebuttons\``,
+              },
+              {
+                name: `• Disabled Questions:`,
+                value:
+                  (settings.disableGlobals
+                    ? 'All global questions'
+                    : settings.disabledQuestions.map(id => '`' + id + '`').join(', ') || 'None') +
+                  '\n`/serversettings disablequestion`',
+              },
+            ],
             color: ctx.client.COLORS.BLUE,
           },
         ],
@@ -150,6 +172,17 @@ const serverSettings: Command = {
         `${ctx.client.EMOTES.checkmark} ${
           settings.disableGlobals ? 'Enabled' : 'Disabled'
         } global questions in this server.`
+      );
+    } else if (ctx.args[0] === 'togglebuttons') {
+      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      await ctx.client.database.updateGuildSettings({
+        id: ctx.guildId,
+        disableButtons: !settings.disableButtons,
+      });
+      return ctx.reply(
+        `${ctx.client.EMOTES.checkmark} ${
+          settings.disableButtons ? 'Enabled' : 'Disabled'
+        } buttons in this server.`
       );
     }
   },
