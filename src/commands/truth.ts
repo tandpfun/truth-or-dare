@@ -26,7 +26,7 @@ const truth: Command = {
   run: async (ctx: CommandContext): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
     const serverSettings = ctx.guildId
-      ? await ctx.client.database.getGuildSettings(ctx.guildId)
+      ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const truth = await ctx.client.database.getRandomQuestion(

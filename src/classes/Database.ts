@@ -18,6 +18,7 @@ export default class Database {
   client: Client;
   db: PrismaClient;
   channelCache: Record<string, ChannelSettings | null> = {};
+  guildCache: Record<string, GuildSettings | null> = {};
   questionCache: Question[] = [];
   customQuestions: CustomQuestion[] = [];
   premiumGuilds: Set<string> = new Set();
@@ -34,9 +35,13 @@ export default class Database {
     await this.fetchAllCustomQuestions();
     await this.fetchPremiumGuilds();
     setInterval(async () => {
-      const cacheSize = Object.keys(this.channelCache).length;
+      const channelCacheSize = Object.keys(this.channelCache).length;
+      const guildCacheSize = Object.keys(this.guildCache).length;
       this.channelCache = {};
-      this.client.console.log(`Cleared ${cacheSize} entries from the channel cache`);
+      this.guildCache = {};
+      this.client.console.log(
+        `Cleared ${channelCacheSize} channels and ${guildCacheSize} guilds from the settings cache`
+      );
       await this.fetchAllQuestions();
       await this.fetchPremiumGuilds();
       await this.sweepCustomQuestions();
@@ -88,6 +93,33 @@ export default class Database {
     return await this.db.channelSettings.delete({ where: { id } });
   }
 
+  defaultGuildSettings(id: string): GuildSettings {
+    return {
+      id,
+      disableGlobals: false,
+      disableButtons: false,
+      disabledQuestions: [],
+      showParanoiaFrequency: 50,
+    };
+  }
+
+  async fetchGuildSettings(id: string, bypassCache?: boolean) {
+    if (bypassCache || !(id in this.guildCache)) console.log('fetching cause not in cache');
+    if (bypassCache || !(id in this.guildCache))
+      this.guildCache[id] = await this.db.guildSettings.findUnique({ where: { id } });
+    return this.guildCache[id] ?? this.defaultGuildSettings(id);
+  }
+
+  async updateGuildSettings(update: Required<GuildSettings, 'id'>) {
+    const withoutId: Partial<ChannelSettings> = { ...update };
+    delete withoutId.id;
+    return (this.guildCache[update.id] = await this.db.guildSettings.upsert({
+      where: { id: update.id },
+      update: withoutId,
+      create: { ...this.defaultGuildSettings(update.id), ...update },
+    }));
+  }
+
   async fetchAllQuestions() {
     this.questionCache = await this.db.question.findMany();
 
@@ -123,7 +155,7 @@ export default class Database {
           'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
       } as Question & { rating: 'NONE' };
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
-    const guildSettings = isPremiumGuild && guildId ? await this.getGuildSettings(guildId) : null;
+    const guildSettings = isPremiumGuild && guildId ? await this.fetchGuildSettings(guildId) : null;
 
     const globalFilter = (q: Question) => q.type === type && ratings.includes(q.rating);
     const customFilter = (q: CustomQuestion) =>
@@ -336,30 +368,6 @@ export default class Database {
     if (!(await this.db.premiumUser.findFirst({ where: { premiumServers: { has: guildId } } })))
       this.premiumGuilds.delete(guildId);
     return user;
-  }
-
-  async getGuildSettings(id: string) {
-    return id
-      ? (await this.db.guildSettings.findUnique({ where: { id } })) ?? this.defaultGuildSettings(id)
-      : this.defaultGuildSettings(id);
-  }
-
-  defaultGuildSettings(id: string): GuildSettings {
-    return {
-      id,
-      disableGlobals: false,
-      disableButtons: false,
-      disabledQuestions: [],
-      showParanoiaFrequency: 50,
-    };
-  }
-
-  async updateGuildSettings(data: Required<GuildSettings, 'id'>) {
-    return await this.db.guildSettings.upsert({
-      where: { id: data.id },
-      update: { ...data, id: undefined } as Omit<GuildSettings, 'id'>,
-      create: { ...this.defaultGuildSettings(data.id), ...data },
-    });
   }
 
   async addDisabledQuestion(guild: string, questionId: string) {

@@ -79,7 +79,7 @@ const serverSettings: Command = {
       return ctx.reply(ctx.client.functions.premiumAd());
 
     if (ctx.args[0] === 'view') {
-      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
       return ctx.reply({
         embeds: [
           {
@@ -135,7 +135,7 @@ const serverSettings: Command = {
       if (!question)
         return ctx.reply(ctx.client.EMOTES.xmark + ' I could not find that default question.');
 
-      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
       if (settings.disableGlobals)
         return ctx.reply(
           ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server.'
@@ -148,7 +148,7 @@ const serverSettings: Command = {
     } else if (ctx.args[0] === 'enablequestion') {
       const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id')!.value;
 
-      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
       if (settings.disableGlobals)
         return ctx.reply(
           ctx.client.EMOTES.xmark + ' Global questions are currently disabled in this server.'
@@ -163,7 +163,7 @@ const serverSettings: Command = {
 
       return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again.');
     } else if (ctx.args[0] === 'toggleglobals') {
-      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
       await ctx.client.database.updateGuildSettings({
         id: ctx.guildId,
         disableGlobals: !settings.disableGlobals,
@@ -174,7 +174,7 @@ const serverSettings: Command = {
         } global questions in this server.`
       );
     } else if (ctx.args[0] === 'togglebuttons') {
-      const settings = await ctx.client.database.getGuildSettings(ctx.guildId);
+      const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
       await ctx.client.database.updateGuildSettings({
         id: ctx.guildId,
         disableButtons: !settings.disableButtons,

@@ -74,7 +74,7 @@ export default class ButtonHandler {
     if (ctx.data.custom_id === 'TOD') label = 'Random';
 
     const isMod = this.client.functions.hasPermission('ManageGuild', ctx.member);
-    const settings = ctx.guildId ? await ctx.client.database.getGuildSettings(ctx.guildId) : null;
+    const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
 
     ctx.reply({
       content: `${this.client.EMOTES.beta1}${
