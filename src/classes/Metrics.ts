@@ -1,4 +1,5 @@
 import { collectDefaultMetrics, Gauge } from 'prom-client';
+
 import Client from './Client';
 
 export default class Metrics {

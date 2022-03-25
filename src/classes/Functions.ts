@@ -5,25 +5,26 @@ import {
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
   RESTGetAPIGuildChannelsResult,
+  APIInteractionGuildMember,
   RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
+  PermissionFlagsBits,
   ComponentType,
   ButtonStyle,
   APIEmbed,
-  APIInteractionGuildMember,
 } from 'discord-api-types';
-import { PermissionFlagsBits } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
 import type Command from './Command';
-import type CommandContext from './CommandContext';
+import type Context from './Context';
 import Client from './Client';
 
-type Permission =
+export type Permission =
   | keyof typeof PermissionFlagsBits
   | typeof PermissionFlagsBits[keyof typeof PermissionFlagsBits];
 
-export function checkPerms(command: Command, ctx: CommandContext) {
+// bad design with side effect & return type
+export function checkPerms(command: Command, ctx: Context) {
   if (!ctx.member) return true;
   const required = command.perms
     .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
@@ -50,10 +51,7 @@ export function checkPerms(command: Command, ctx: CommandContext) {
   return true;
 }
 
-export function hasPermission(
-  permission: Permission,
-  member: APIInteractionGuildMember | undefined
-) {
+export function hasPermission(permission: Permission, member?: APIInteractionGuildMember) {
   if (!member) return true;
   const required = typeof permission === 'bigint' ? permission : PermissionFlagsBits[permission];
   const missing = required & ~BigInt(member.permissions);

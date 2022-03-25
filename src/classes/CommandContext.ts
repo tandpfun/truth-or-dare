@@ -18,9 +18,10 @@ import type { ChannelSettings } from '@prisma/client';
 import type { Response } from 'express';
 
 import type { OptionType } from './OptionTypes';
+import type Context from './Context';
 import type Client from './Client';
 
-export default class CommandContext {
+export default class CommandContext implements Context {
   rawInteraction: APIApplicationCommandInteraction;
   rawData: APIChatInputApplicationCommandInteractionData;
   response: Response;

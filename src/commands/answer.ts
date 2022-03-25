@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type CommandContext from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -19,7 +19,7 @@ const answer: Command = {
   category: 'question',
   options,
   perms: [],
-  run: async (ctx: CommandContext): Promise<void> => {
+  run: async (ctx: Context): Promise<void> => {
     const paranoiaAnswer = ctx.getOption<Mutable<typeof options[0]>>('answer')!.value;
 
     if (ctx.guildId)

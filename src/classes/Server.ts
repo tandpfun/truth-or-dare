@@ -1,13 +1,13 @@
-import { verifyKeyMiddleware } from 'discord-interactions';
 import {
   APIChatInputApplicationCommandInteraction,
-  APIInteraction,
   APIMessageComponentInteraction,
   ApplicationCommandType,
-  ComponentType,
   InteractionType,
+  APIInteraction,
+  ComponentType,
 } from 'discord-api-types';
 import express, { Express, Request, Response } from 'express';
+import { verifyKeyMiddleware } from 'discord-interactions';
 import { QuestionType, Rating } from '.prisma/client';
 import rateLimiter from 'express-rate-limit';
 import * as Sentry from '@sentry/node';
@@ -18,7 +18,7 @@ import CommandContext from './CommandContext';
 import ButtonContext from './ButtonContext';
 import ButtonHandler from './ButtonHandler';
 
-const passthroughCommands = ['settings'];
+const PASSTHROUGH_COMMANDS = ['settings'];
 
 const APIRateLimit = rateLimiter({
   windowMs: 5 * 1000,
@@ -86,7 +86,7 @@ export default class Server {
         this.client,
         res
       );
-      if ((await ctx.channelSettings).muted && !passthroughCommands.includes(ctx.command.name))
+      if ((await ctx.channelSettings).muted && !PASSTHROUGH_COMMANDS.includes(ctx.command.name))
         return ctx.reply({
           content:
             this.client.EMOTES.xmark +
@@ -98,11 +98,7 @@ export default class Server {
       interaction.type === InteractionType.MessageComponent &&
       interaction.data.component_type === ComponentType.Button
     ) {
-      const ctx = new ButtonContext(
-        interaction as APIMessageComponentInteraction,
-        this.client,
-        res
-      );
+      const ctx = new ButtonContext(interaction, this.client, res);
       if ((await ctx.channelSettings).muted)
         return ctx.reply({
           content:

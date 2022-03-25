@@ -1,5 +1,6 @@
-import { QuestionType } from '@prisma/client';
 import { APIActionRowComponent, ButtonStyle, ComponentType } from 'discord-api-types';
+import { QuestionType } from '@prisma/client';
+
 import ButtonContext from './ButtonContext';
 import type Client from './Client';
 
@@ -24,7 +25,7 @@ export default class ButtonHandler {
       );
 
     const channelSettings = await ctx.channelSettings;
-    const isPremium = ctx.guildId ? this.client.database.isPremiumGuild(ctx.guildId) : false;
+    const isPremium = ctx.guildId && this.client.database.isPremiumGuild(ctx.guildId);
 
     // Statistics
     const buttonName = ctx.data.custom_id.toLowerCase();

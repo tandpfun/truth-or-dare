@@ -79,10 +79,9 @@ export default class Database {
   }
 
   async updateChannelSettings(update: Required<ChannelSettings, 'id'>) {
-    const withoutId: Partial<ChannelSettings> = { ...update };
-    delete withoutId.id;
+    const { id, ...withoutId } = update;
     return (this.channelCache[update.id] = await this.db.channelSettings.upsert({
-      where: { id: update.id },
+      where: { id },
       update: withoutId,
       create: { ...this.defaultChannelSettings(update.id), ...update },
     }));
@@ -103,27 +102,28 @@ export default class Database {
     };
   }
 
-  async fetchGuildSettings(id: string, bypassCache?: boolean) {
-    if (bypassCache || !(id in this.guildCache)) console.log('fetching cause not in cache');
-    if (bypassCache || !(id in this.guildCache))
+  async fetchGuildSettings(id: string, force?: boolean) {
+    // TODO: remove this line for production
+    if (force || !(id in this.guildCache)) console.log('fetching cause not in cache');
+    if (force || !(id in this.guildCache))
       this.guildCache[id] = await this.db.guildSettings.findUnique({ where: { id } });
     return this.guildCache[id] ?? this.defaultGuildSettings(id);
   }
 
   async updateGuildSettings(update: Required<GuildSettings, 'id'>) {
-    const withoutId: Partial<ChannelSettings> = { ...update };
-    delete withoutId.id;
+    const { id, ...withoutId } = update;
     return (this.guildCache[update.id] = await this.db.guildSettings.upsert({
-      where: { id: update.id },
+      where: { id },
       update: withoutId,
-      create: { ...this.defaultGuildSettings(update.id), ...update },
+      create: { ...this.defaultGuildSettings(id), ...update },
     }));
   }
 
   async fetchAllQuestions() {
     this.questionCache = await this.db.question.findMany();
 
-    this.client.metrics.updateQuestionCount(this.questionCache.length); // Track question count for metrics
+    // Track question count for metrics
+    this.client.metrics.updateQuestionCount(this.questionCache.length);
     return this.questionCache;
   }
 
@@ -138,28 +138,31 @@ export default class Database {
   }
 
   async getRandomQuestion(
-    type: QuestionType,
+    type?: QuestionType,
     disabledRatings: Rating[] = [],
     rating?: Rating,
     guildId?: string
-  ): Promise<Question | CustomQuestion> {
+  ): Promise<
+    | Question
+    | { id: null; type: QuestionType | 'RANDOM'; rating: Rating | 'NONE'; question: string }
+  > {
     const ratings = (rating ? [rating] : Object.values(Rating)).filter(
       r => !disabledRatings.includes(r)
     );
     if (!ratings.length)
       return {
-        id: '',
-        type,
+        id: null,
+        type: type ?? 'RANDOM',
         rating: 'NONE',
         question:
           'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
-      } as Question & { rating: 'NONE' };
+      };
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
-    const guildSettings = isPremiumGuild && guildId ? await this.fetchGuildSettings(guildId) : null;
+    const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
 
-    const globalFilter = (q: Question) => q.type === type && ratings.includes(q.rating);
+    const globalFilter = (q: Question) => (!type || q.type === type) && ratings.includes(q.rating);
     const customFilter = (q: CustomQuestion) =>
-      q.guildId === guildId && q.type === type && ratings.includes(q.rating);
+      q.guildId === guildId && (!type || q.type === type) && ratings.includes(q.rating);
 
     const questions = guildSettings?.disableGlobals
       ? this.customQuestions.filter(customFilter)
@@ -169,15 +172,15 @@ export default class Database {
               ...this.customQuestions.filter(customFilter),
             ]
           : this.questionCache.filter(globalFilter)
-        ).filter(q => !isPremiumGuild || !guildSettings!.disabledQuestions.includes(q.id));
+        ).filter(q => !guildSettings?.disabledQuestions.includes(q.id));
     return questions.length
       ? questions[Math.floor(Math.random() * questions.length)]
-      : ({
-          id: '',
-          type,
+      : {
+          id: null,
+          type: type ?? 'RANDOM',
           rating: 'NONE',
           question: 'I dare you to tell the server admins to add questions',
-        } as Question & { rating: 'NONE' });
+        };
   }
 
   async updateQuestion(id: string, data: Optional<Question, 'id'>) {
@@ -189,16 +192,14 @@ export default class Database {
     });
 
     const index = oldQuest ? this.questionCache.findIndex(q => q.id === quest.id) : -1;
-    if (index !== -1) this.questionCache!.splice(index, 1);
+    if (index !== -1) this.questionCache.splice(index, 1);
     else this.client.metrics.questionCount.inc();
     this.questionCache.push(quest);
     return quest;
   }
 
   async deleteQuestion(id: string): Promise<Question | null> {
-    const question: Question | null = await this.db.question
-      .delete({ where: { id } })
-      .catch(_ => null);
+    const question = await this.db.question.delete({ where: { id } }).catch(_ => null);
     if (!question) return null;
     if (this.questionCache.some(q => q.id === question.id))
       this.questionCache.splice(
@@ -214,8 +215,8 @@ export default class Database {
     if (!this.client.devMode || (await this.db.question.count()) > 0)
       throw new Error('Example questions in production database');
     for (let i = 0; i < 100; i++) {
-      for (const type of ['DARE', 'NHIE', 'TRUTH', 'WYR'] as QuestionType[]) {
-        for (const rating of ['PG', 'PG13', 'R'] as Rating[]) {
+      for (const type of Object.values(QuestionType)) {
+        for (const rating of Object.values(Rating)) {
           await this.db.question.create({
             data: {
               id: this.generateId(),
@@ -261,12 +262,10 @@ export default class Database {
   }
 
   async updateCustomQuestion(data: Required<CustomQuestion, 'id' | 'guildId'>) {
+    const { id, ...withoutId } = data;
     const oldQuest = this.specificCustomQuestion(data.guildId, data.id);
     if (!oldQuest) return;
-    const quest = await this.db.customQuestion.update({
-      where: { id: data.id },
-      data: { ...data, id: undefined } as Omit<CustomQuestion, 'id'>,
-    });
+    const quest = await this.db.customQuestion.update({ where: { id }, data: withoutId });
 
     const index = this.customQuestions.findIndex(q => q.id === quest.id);
     if (index !== -1) this.customQuestions.splice(index, 1);
@@ -275,9 +274,7 @@ export default class Database {
   }
 
   async deleteCustomQuestion(id: string): Promise<CustomQuestion | null> {
-    const question: CustomQuestion | null = await this.db.customQuestion
-      .delete({ where: { id } })
-      .catch(_ => null);
+    const question = await this.db.customQuestion.delete({ where: { id } }).catch(_ => null);
     if (!question) return null;
     if (this.customQuestions.some(q => q.id === question.id))
       this.customQuestions.splice(

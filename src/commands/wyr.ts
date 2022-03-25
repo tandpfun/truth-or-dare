@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type CommandContext from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -23,7 +23,7 @@ const wyr: Command = {
   category: 'question',
   options,
   perms: [],
-  run: async (ctx: CommandContext): Promise<void> => {
+  run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const wyr = await ctx.client.database.getRandomQuestion(

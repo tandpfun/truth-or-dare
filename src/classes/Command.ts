@@ -1,16 +1,14 @@
-import { APIApplicationCommandOption, PermissionFlagsBits } from 'discord-api-types';
+import type { APIApplicationCommandOption } from 'discord-api-types';
 
 import type { ReadOnly } from './OptionTypes';
-import type CommandContext from './CommandContext';
+import type { Permission } from './Functions';
+import type Context from './Context';
 
 export default interface Command {
   name: string;
   description: string;
   category: 'question' | 'control';
   options?: ReadOnly<APIApplicationCommandOption[]>;
-  perms: (
-    | keyof typeof PermissionFlagsBits
-    | typeof PermissionFlagsBits[keyof typeof PermissionFlagsBits]
-  )[];
-  run: (ctx: CommandContext) => Promise<void>;
+  perms: Permission[];
+  run: (ctx: Context) => Promise<void>;
 }

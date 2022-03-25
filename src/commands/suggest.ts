@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type CommandContext from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -43,7 +43,7 @@ const suggest: Command = {
   category: 'control',
   options,
   perms: [],
-  run: async (ctx: CommandContext): Promise<void> => {
+  run: async (ctx: Context): Promise<void> => {
     const type = ctx.getOption<Mutable<typeof options[0]>>('type')!.value;
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')!.value;
     const question = ctx.getOption<Mutable<typeof options[2]>>('question')!.value;

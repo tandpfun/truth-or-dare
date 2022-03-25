@@ -1,29 +1,32 @@
 import {
-  APIChatInputApplicationCommandInteractionDataResolved,
   APIInteractionResponseCallbackData,
+  APIMessageButtonInteractionData,
+  APIMessageComponentInteraction,
   APIInteractionGuildMember,
   InteractionResponseType,
-  APIUser,
-  APIMessageComponentInteraction,
-  APIMessageButtonInteractionData,
   ComponentType,
+  APIUser,
+  APIApplicationCommandOption,
 } from 'discord-api-types';
 import type { ChannelSettings } from '@prisma/client';
 import type { Response } from 'express';
+
+import type { OptionType } from './OptionTypes';
+import type Context from './Context';
 import type Client from './Client';
 
-export default class ButtonContext {
+export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;
   data: APIMessageButtonInteractionData;
   response: Response;
   client: Client;
-  resolved?: APIChatInputApplicationCommandInteractionDataResolved;
   applicationId: string;
   channelId: string;
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
   messageId: string;
+  args: (string | number | boolean)[] = [];
 
   constructor(interaction: APIMessageComponentInteraction, client: Client, response: Response) {
     if (interaction.data.component_type !== ComponentType.Button)
@@ -41,6 +44,9 @@ export default class ButtonContext {
 
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
+  }
+  getOption<O extends APIApplicationCommandOption>(_name: string): OptionType<O> | undefined {
+    return;
   }
 
   reply(data: string | APIInteractionResponseCallbackData) {

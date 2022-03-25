@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types';
 
 import { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type CommandContext from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -68,7 +68,7 @@ const serverSettings: Command = {
   options,
   category: 'control',
   perms: ['ManageGuild'],
-  run: async (ctx: CommandContext) => {
+  run: async (ctx: Context) => {
     if (!ctx.guildId)
       return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');
     if (

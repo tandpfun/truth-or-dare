@@ -1,9 +1,8 @@
 import { ApplicationCommandOptionType } from 'discord-api-types';
-import { QuestionType } from '@prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type CommandContext from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -24,13 +23,11 @@ const tod: Command = {
   category: 'question',
   options,
   perms: [],
-  run: async (ctx: CommandContext): Promise<void> => {
+  run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
-    const types = Object.values(QuestionType);
-    const type = types[Math.floor(Math.random() * types.length)];
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const result = await ctx.client.database.getRandomQuestion(
-      type,
+      undefined,
       channelSettings.disabledRatings,
       rating,
       ctx.guildId

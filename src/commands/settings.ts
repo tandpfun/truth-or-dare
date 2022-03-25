@@ -3,7 +3,7 @@ import { Rating } from '.prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type CommandContext from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -111,7 +111,7 @@ const settings: Command = {
   category: 'control',
   perms: ['ManageChannels'],
   options,
-  run: async (ctx: CommandContext): Promise<void> => {
+  run: async (ctx: Context): Promise<void> => {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
 
