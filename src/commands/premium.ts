@@ -46,7 +46,7 @@ const premium: Command = {
   category: 'control',
   options,
   perms: [],
-  run: async (ctx: CommandContext): Promise<void> => {
+  run: async (ctx: Context): Promise<void> => {
     const premiumGuild = ctx.guildId && ctx.client.database.isPremiumGuild(ctx.guildId);
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
 
