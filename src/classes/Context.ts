@@ -4,7 +4,7 @@ import type {
   APIApplicationCommandOption,
   APIInteractionGuildMember,
   APIUser,
-} from 'discord-api-types';
+} from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 
 import { OptionType } from './OptionTypes';

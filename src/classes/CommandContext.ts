@@ -13,7 +13,7 @@ import {
   InteractionResponseType,
   ApplicationCommandType,
   APIUser,
-} from 'discord-api-types';
+} from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { Response } from 'express';
 

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType } from 'discord-api-types';
+import { ApplicationCommandOptionType, ChannelType } from 'discord-api-types/v9';
 import { Rating } from '.prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';

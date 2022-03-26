@@ -4,7 +4,7 @@ import {
   InteractionType,
   APIInteraction,
   ComponentType,
-} from 'discord-api-types';
+} from 'discord-api-types/v9';
 import express, { Express, Request, Response } from 'express';
 import { verifyKeyMiddleware } from 'discord-interactions';
 import { QuestionType, Rating } from '.prisma/client';

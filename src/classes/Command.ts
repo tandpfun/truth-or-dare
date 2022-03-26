@@ -1,4 +1,4 @@
-import type { APIApplicationCommandOption } from 'discord-api-types';
+import type { APIApplicationCommandOption } from 'discord-api-types/v9';
 
 import type { ReadOnly } from './OptionTypes';
 import type { Permission } from './Functions';

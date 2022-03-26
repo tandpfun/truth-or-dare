@@ -12,7 +12,7 @@ import {
   ComponentType,
   ButtonStyle,
   APIEmbed,
-} from 'discord-api-types';
+} from 'discord-api-types/v9';
 import superagent from 'superagent';
 
 import type Command from './Command';

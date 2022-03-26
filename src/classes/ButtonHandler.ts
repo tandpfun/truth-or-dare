@@ -1,4 +1,4 @@
-import { APIActionRowComponent, ButtonStyle, ComponentType } from 'discord-api-types';
+import { APIActionRowComponent, ButtonStyle, ComponentType } from 'discord-api-types/v9';
 import { QuestionType } from '@prisma/client';
 
 import ButtonContext from './ButtonContext';
