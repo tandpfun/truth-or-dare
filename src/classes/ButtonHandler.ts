@@ -59,9 +59,9 @@ export default class ButtonHandler {
       this.buttonCooldown.delete(ctx.channelId);
     }, 2000);
 
-    let type;
+    let type: QuestionType;
     if (ctx.data.custom_id === 'TOD') {
-      type = (Math.random() < 0.5 ? 'TRUTH' : 'DARE') as QuestionType;
+      type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
     } else type = ctx.data.custom_id as QuestionType;
 
     const result = await ctx.client.database.getRandomQuestion(
