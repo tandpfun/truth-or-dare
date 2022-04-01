@@ -17,17 +17,17 @@ const options = [
   },
 ] as const;
 
-const dare: Command = {
-  name: 'dare',
-  description: 'Gives a dare that has to be completed.',
+const truth: Command = {
+  name: 'truth',
+  description: 'Gives a random question that has to be answered truthfully.',
   category: 'question',
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const dare = await ctx.client.database.getRandomQuestion(
-      'DARE',
+    const truth = await ctx.client.database.getRandomQuestion(
+      'TRUTH',
       channelSettings.disabledRatings,
       rating,
       ctx.guildId
@@ -36,11 +36,11 @@ const dare: Command = {
       content: ctx.client.functions.upvoteAd(),
       embeds: [
         {
-          title: dare.question,
+          title: truth.question,
           color: ctx.client.COLORS.BLUE,
-          footer: dare.id
+          footer: truth.id
             ? {
-                text: `Type: ${dare.type} | Rating: ${dare.rating} | ID: ${dare.id}`,
+                text: `Type: ${truth.type} | Rating: ${truth.rating} | ID: ${truth.id}`,
               }
             : undefined,
         },
@@ -49,4 +49,4 @@ const dare: Command = {
   },
 };
 
-export default dare;
+export default truth;
