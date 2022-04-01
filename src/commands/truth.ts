@@ -18,7 +18,7 @@ const options = [
 ] as const;
 
 const truth: Command = {
-  name: 'dare',
+  name: 'truth',
   description: 'Gives a random question that has to be answered truthfully.',
   category: 'question',
   options,
