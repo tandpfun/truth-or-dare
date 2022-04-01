@@ -18,7 +18,7 @@ const options = [
 ] as const;
 
 const dare: Command = {
-  name: 'dare',
+  name: 'truth',
   description: 'Gives a dare that has to be completed.',
   category: 'question',
   options,

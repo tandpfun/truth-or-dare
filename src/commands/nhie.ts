@@ -18,7 +18,7 @@ const options = [
 ] as const;
 
 const nhie: Command = {
-  name: 'nhie',
+  name: 'paranoia',
   description: 'Gives a random Never Have I Ever question to be answered.',
   category: 'question',
   options: options,

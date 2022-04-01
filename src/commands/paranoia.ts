@@ -23,7 +23,7 @@ const options = [
 ] as const;
 
 const paranoia: Command = {
-  name: 'paranoia',
+  name: 'nhie',
   description: 'Gives a paranoia question or sends one to a user.',
   category: 'question',
   options,
