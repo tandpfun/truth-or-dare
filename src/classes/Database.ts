@@ -96,7 +96,7 @@ export default class Database {
     return {
       id,
       disableGlobals: false,
-      disableButtons: false,
+      disableButtons: true,
       disabledQuestions: [],
       showParanoiaFrequency: 50,
     };
