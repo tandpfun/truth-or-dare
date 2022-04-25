@@ -57,6 +57,12 @@ export default class ButtonContext implements Context {
     });
   }
 
+  defer() {
+    this.response.send({
+      type: InteractionResponseType.DeferredMessageUpdate
+    })
+  }
+
   get channelSettings(): Promise<ChannelSettings> {
     return this.client.database.fetchChannelSettings(this.channelId, !this.guildId);
   }

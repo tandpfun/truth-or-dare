@@ -28,7 +28,6 @@ export default class ButtonHandler {
       );
 
     const channelSettings = await ctx.channelSettings;
-    const isPremium = ctx.guildId && this.client.database.isPremiumGuild(ctx.guildId);
 
     // Statistics
     const buttonName = ctx.data.custom_id.toLowerCase();
@@ -38,24 +37,7 @@ export default class ButtonHandler {
     this.client.metrics.trackButtonPress(buttonName);
 
     // Cooldown
-    if (this.buttonCooldown.has(ctx.channelId) && !isPremium)
-      return ctx.reply({
-        content: `${ctx.client.EMOTES.time} Buttons can only be pressed once every two seconds per channel to prevent spam!\n${ctx.client.EMOTES.sparkles} You can bypass this with premium.`,
-        components: [
-          {
-            type: ComponentType.ActionRow,
-            components: [
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Link,
-                label: 'Get Premium',
-                url: 'https://truthordarebot.xyz/premium',
-              },
-            ],
-          },
-        ],
-        flags: 1 << 6,
-      });
+    if (this.buttonCooldown.has(ctx.channelId)) return ctx.defer();
 
     this.buttonCooldown.add(ctx.channelId);
     setTimeout(() => {
