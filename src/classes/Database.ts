@@ -103,8 +103,6 @@ export default class Database {
   }
 
   async fetchGuildSettings(id: string, force?: boolean) {
-    // TODO: remove this line for production
-    if (force || !(id in this.guildCache)) console.log('fetching cause not in cache');
     if (force || !(id in this.guildCache))
       this.guildCache[id] = await this.db.guildSettings.findUnique({ where: { id } });
     return this.guildCache[id] ?? this.defaultGuildSettings(id);
