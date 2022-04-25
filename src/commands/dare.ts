@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types';
+import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -25,6 +25,9 @@ const dare: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const serverSettings = ctx.guildId
+      ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
+      : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const dare = await ctx.client.database.getRandomQuestion(
       'DARE',
@@ -45,6 +48,9 @@ const dare: Command = {
             : undefined,
         },
       ],
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components('TOD'),
     });
   },
 };

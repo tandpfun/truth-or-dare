@@ -1,7 +1,10 @@
 import { readdirSync } from 'fs';
 import os from 'os';
 
-import type { RESTPostAPIWebhookWithTokenJSONBody, APIApplicationCommand } from 'discord-api-types';
+import type {
+  RESTPostAPIWebhookWithTokenJSONBody,
+  APIApplicationCommand,
+} from 'discord-api-types/v9';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
 
@@ -49,6 +52,7 @@ export default class Client {
     checkmark: ':white_check_mark:',
     xmark: ':x:',
     time: ':stopwatch:',
+    trackball: ':trackball:',
     question: ':question:',
     gear: ':gear:',
     warning: ':warning:',
@@ -57,6 +61,8 @@ export default class Client {
     info: ':information_source:',
     arrowUp: ':arrow_up:',
     delete: '<:delete:927979243844038657>',
+    beta1: '<:beta1:955232478463930398>',
+    beta2: '<:beta2:955232478434586645>',
   } as const;
 
   constructor({

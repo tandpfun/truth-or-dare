@@ -1,4 +1,5 @@
 import { collectDefaultMetrics, Gauge } from 'prom-client';
+
 import Client from './Client';
 
 export default class Metrics {
@@ -8,6 +9,12 @@ export default class Metrics {
     name: 'commands_used',
     help: 'The usage of each command',
     labelNames: ['command', 'success'],
+  });
+
+  readonly buttonsPressed = new Gauge({
+    name: 'buttons_pressed',
+    help: 'The number of buttons pressed',
+    labelNames: ['type'],
   });
 
   readonly apiRequests = new Gauge({
@@ -34,6 +41,10 @@ export default class Metrics {
 
   trackCommandUse(command: string, success: boolean) {
     this.commandsUsed.labels(command, String(success)).inc();
+  }
+
+  trackButtonPress(type: string) {
+    this.buttonsPressed.labels(type).inc();
   }
 
   trackAPIRequest(endpoint: string, rating: string) {

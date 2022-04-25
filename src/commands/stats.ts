@@ -1,4 +1,4 @@
-import { ButtonStyle, ComponentType } from 'discord-api-types';
+import { ButtonStyle, ComponentType } from 'discord-api-types/v9';
 import { QuestionType, Rating } from '@prisma/client';
 
 import type Command from '../classes/Command';

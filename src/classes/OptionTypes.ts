@@ -6,7 +6,7 @@ import type {
   ApplicationCommandOptionType,
   APIApplicationCommandOption,
   Snowflake,
-} from 'discord-api-types';
+} from 'discord-api-types/v9';
 
 export type Mutable<D> = {
   -readonly [key in keyof D]: Mutable<D[key]>;
@@ -39,8 +39,7 @@ type DataOption<
   type: O['type'];
   value: O extends APIApplicationCommandArgumentOptions
     ? O['choices'] extends any[]
-      ? // @ts-ignore
-        O['choices'][number]['value']
+      ? O['choices'][number]['value']
       : ValueType<O>
     : ValueType<O>;
 };

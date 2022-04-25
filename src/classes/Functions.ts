@@ -5,19 +5,25 @@ import {
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
   RESTGetAPIGuildChannelsResult,
+  APIInteractionGuildMember,
   RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
+  PermissionFlagsBits,
   ComponentType,
   ButtonStyle,
   APIEmbed,
-} from 'discord-api-types';
-import { PermissionFlagsBits } from 'discord-api-types/v9';
+} from 'discord-api-types/v9';
 import superagent from 'superagent';
 
 import type Command from './Command';
 import type Context from './Context';
 import Client from './Client';
 
+export type Permission =
+  | keyof typeof PermissionFlagsBits
+  | typeof PermissionFlagsBits[keyof typeof PermissionFlagsBits];
+
+// bad design with side effect & return type
 export function checkPerms(command: Command, ctx: Context) {
   if (!ctx.member) return true;
   const required = command.perms
@@ -43,6 +49,13 @@ export function checkPerms(command: Command, ctx: Context) {
     return false;
   }
   return true;
+}
+
+export function hasPermission(permission: Permission, member?: APIInteractionGuildMember) {
+  if (!member) return true;
+  const required = typeof permission === 'bigint' ? permission : PermissionFlagsBits[permission];
+  const missing = required & ~BigInt(member.permissions);
+  return !missing;
 }
 
 export function avatarURL({

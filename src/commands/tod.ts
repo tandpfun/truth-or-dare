@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types';
+import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -25,6 +25,9 @@ const tod: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const serverSettings = ctx.guildId
+      ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
+      : null;
     const type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const result = await ctx.client.database.getRandomQuestion(
@@ -46,6 +49,9 @@ const tod: Command = {
             : undefined,
         },
       ],
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components('TOD'),
     });
   },
 };

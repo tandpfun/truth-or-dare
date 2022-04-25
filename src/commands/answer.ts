@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types';
+import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -33,7 +33,7 @@ const answer: Command = {
       return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
     const showFreq = ctx.client.database.isPremiumGuild(paranoiaData.guildId)
-      ? (await ctx.client.database.getGuildSettings(paranoiaData.guildId)).showParanoiaFrequency
+      ? (await ctx.client.database.fetchGuildSettings(paranoiaData.guildId)).showParanoiaFrequency
       : ctx.client.database.defaultGuildSettings(ctx.guildId!).showParanoiaFrequency;
 
     // send answer to the channel the question was sent from
