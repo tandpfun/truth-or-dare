@@ -25,6 +25,9 @@ const wyr: Command = {
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     const channelSettings = await ctx.channelSettings;
+    const serverSettings = ctx.guildId
+      ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
+      : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
     const wyr = await ctx.client.database.getRandomQuestion(
       'WYR',
@@ -45,6 +48,9 @@ const wyr: Command = {
             : undefined,
         },
       ],
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components('WYR'),
     });
   },
 };

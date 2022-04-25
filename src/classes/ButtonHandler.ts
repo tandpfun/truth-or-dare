@@ -3,9 +3,12 @@ import { QuestionType } from '@prisma/client';
 
 import ButtonContext from './ButtonContext';
 import type Client from './Client';
+import { avatarURL } from './Functions';
 
-type ButtonIds = 'TRUTH' | 'DARE' | 'TOD';
-type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'RANDOM';
+type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
+type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
+
+const hasSeenBetaMessage = new Set<string>();
 
 export default class ButtonHandler {
   client: Client;
@@ -14,7 +17,7 @@ export default class ButtonHandler {
 
   constructor(client: Client) {
     this.client = client;
-    this.buttonIds = ['TRUTH', 'DARE', 'TOD'];
+    this.buttonIds = ['TRUTH', 'DARE', 'TOD', 'WYR', 'NHIE', 'PARANOIA', 'RANDOM'];
     this.buttonCooldown = new Set();
   }
 
@@ -59,10 +62,14 @@ export default class ButtonHandler {
       this.buttonCooldown.delete(ctx.channelId);
     }, 2000);
 
-    let type: QuestionType;
-    if (ctx.data.custom_id === 'TOD') {
-      type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
-    } else type = ctx.data.custom_id as QuestionType;
+    let buttonCommandType: CommandComponentTypes;
+    if (ctx.data.custom_id === 'TRUTH' || ctx.data.custom_id === 'DARE') buttonCommandType = 'TOD';
+    else buttonCommandType = ctx.data.custom_id as CommandComponentTypes;
+
+    let type: QuestionType | undefined;
+    if (ctx.data.custom_id === 'TOD') type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
+    else if (ctx.data.custom_id === 'RANDOM') type = undefined;
+    else type = ctx.data.custom_id as QuestionType;
 
     const result = await ctx.client.database.getRandomQuestion(
       type,
@@ -71,22 +78,20 @@ export default class ButtonHandler {
       ctx.guildId
     );
 
-    let label = ctx.client.functions.titleCase(ctx.data.custom_id);
-    if (ctx.data.custom_id === 'TOD') label = 'Random';
-
     const isMod = this.client.functions.hasPermission('ManageGuild', ctx.member);
     const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
 
     ctx.reply({
-      content: `${this.client.EMOTES.beta1}${
-        this.client.EMOTES.beta2
-      } Buttons are a beta feature. ${
-        isMod ? 'Toggle them with `/serversettings togglebuttons`.' : ''
-      }\n${ctx.client.EMOTES.trackball} **${ctx.user.username}#${
-        ctx.user.discriminator
-      }** clicked on **${label}**`,
+      content:
+        isMod && !hasSeenBetaMessage.has(ctx.user.id)
+          ? `${this.client.EMOTES.beta1}${this.client.EMOTES.beta2} Turn off buttons with \`/serversettings togglebuttons\``
+          : undefined,
       embeds: [
         {
+          author: {
+            name: `Requested by ${ctx.user.username}#${ctx.user.discriminator}`,
+            icon_url: `${avatarURL(ctx.user)}`,
+          },
           title: result.question,
           color: ctx.client.COLORS.BLUE,
           footer: result.id
@@ -96,15 +101,16 @@ export default class ButtonHandler {
             : undefined,
         },
       ],
-      components: settings?.disableButtons ? [] : ctx.client.server.buttonHandler.components('TOD'),
+      components: settings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components(buttonCommandType),
     });
+
+    if (isMod && !hasSeenBetaMessage.has(ctx.user.id)) hasSeenBetaMessage.add(ctx.user.id);
 
     ctx.client.functions.editMessage(
       {
         components: [],
-        content: ctx.interaction.message.content
-          ? ctx.interaction.message.content.split('\n').slice(-1)[0]
-          : undefined,
       },
       ctx.channelId,
       ctx.messageId,
@@ -134,6 +140,62 @@ export default class ButtonHandler {
               type: ComponentType.Button,
               custom_id: 'TOD',
               label: 'Random',
+              style: ButtonStyle.Primary,
+            },
+          ],
+        },
+      ];
+    } else if (type === 'NHIE') {
+      return [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              custom_id: 'NHIE',
+              label: 'Never Have I Ever',
+              style: ButtonStyle.Primary,
+            },
+          ],
+        },
+      ];
+    } else if (type === 'WYR') {
+      return [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              custom_id: 'WYR',
+              label: 'Would You Rather',
+              style: ButtonStyle.Primary,
+            },
+          ],
+        },
+      ];
+    } else if (type === 'PARANOIA') {
+      return [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              custom_id: 'PARANOIA',
+              label: 'Paranoia',
+              style: ButtonStyle.Primary,
+            },
+          ],
+        },
+      ];
+    } else if (type === 'RANDOM') {
+      return [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              custom_id: 'RANDOM',
+              label: 'Random Question',
               style: ButtonStyle.Primary,
             },
           ],
