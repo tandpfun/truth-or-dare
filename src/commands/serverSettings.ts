@@ -176,7 +176,6 @@ const serverSettings: Command = {
         } global questions in this server.`
       );
     } else if (ctx.args[0] === 'togglebuttons') {
-      if (ctx.guildId !== MAIN_GUILD) return ctx.reply(`👀 This feature hasn't been released yet`);
       const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
       await ctx.client.database.updateGuildSettings({
         id: ctx.guildId,
