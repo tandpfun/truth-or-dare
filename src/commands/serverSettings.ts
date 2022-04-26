@@ -4,8 +4,6 @@ import { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 
-const { MAIN_GUILD } = process.env;
-
 const options = [
   {
     type: ApplicationCommandOptionType.Subcommand,
