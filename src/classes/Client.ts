@@ -88,13 +88,6 @@ export default class Client {
       });
     }
 
-    this.commands = [];
-    this.console = new Logger('ToD');
-    this.metrics = new Metrics(this);
-    this.functions = functions;
-    this.server = new Server(this.port, this);
-    this.database = new Database(this);
-
     this.suggestCooldowns = {};
     this.stats = {
       minuteCommandCount: 0,
@@ -102,6 +95,13 @@ export default class Client {
       commands: {},
       minuteCommands: {},
     };
+
+    this.commands = [];
+    this.console = new Logger('ToD');
+    this.metrics = new Metrics(this);
+    this.functions = functions;
+    this.server = new Server(this.port, this);
+    this.database = new Database(this);
   }
 
   get devMode() {

@@ -19,6 +19,11 @@ export default class ButtonHandler {
     this.client = client;
     this.buttonIds = ['TRUTH', 'DARE', 'TOD', 'WYR', 'NHIE', 'PARANOIA', 'RANDOM'];
     this.buttonCooldown = new Set();
+
+    for (const buttonId of this.buttonIds) {
+      this.client.stats.commands[`${buttonId.toLowerCase()}-button`] = 0;
+      this.client.stats.minuteCommands[`${buttonId.toLowerCase()}-button`] = 0;
+    }
   }
 
   async handleButton(ctx: ButtonContext) {
@@ -29,15 +34,15 @@ export default class ButtonHandler {
 
     const channelSettings = await ctx.channelSettings;
 
+    // Cooldown
+    if (this.buttonCooldown.has(ctx.channelId)) return ctx.defer();
+
     // Statistics
     const buttonName = ctx.data.custom_id.toLowerCase();
     this.client.stats.minuteCommandCount++;
     this.client.stats.commands[`${buttonName}-button`]++;
     this.client.stats.minuteCommands[`${buttonName}-button`]++;
     this.client.metrics.trackButtonPress(buttonName);
-
-    // Cooldown
-    if (this.buttonCooldown.has(ctx.channelId)) return ctx.defer();
 
     this.buttonCooldown.add(ctx.channelId);
     setTimeout(() => {
