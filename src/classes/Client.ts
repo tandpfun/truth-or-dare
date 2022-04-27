@@ -1,9 +1,10 @@
 import { readdirSync } from 'fs';
 import os from 'os';
 
-import type {
+import {
   RESTPostAPIWebhookWithTokenJSONBody,
   APIApplicationCommand,
+  PermissionFlagsBits,
 } from 'discord-api-types/v9';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
@@ -179,6 +180,9 @@ export default class Client {
       .send(
         this.commands.map(c => ({
           ...c,
+          default_member_permissions: c.perms
+            .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
+            .reduce((a, c) => a | c, 0n),
           perms: undefined,
         }))
       );
