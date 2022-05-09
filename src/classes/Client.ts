@@ -160,14 +160,25 @@ export default class Client {
       .set('Authorization', 'Bot ' + this.token)
       .then(res => res.body);
 
-    return this.commands.some(
-      com =>
-        !this.functions.deepEquals(
-          com,
-          commandList.find(c => c.name === com.name),
-          ['category', 'perms', 'run']
-        )
-    );
+    return this.commands
+      .map(c => {
+        (c as Command & { default_member_permissions: string | null }).default_member_permissions =
+          c.perms.length
+            ? c.perms
+                .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
+                .reduce((a, c) => a | c, 0n)
+                .toString()
+            : null;
+        return c;
+      })
+      .some(
+        com =>
+          !this.functions.deepEquals(
+            com,
+            commandList.find(c => c.name === com.name),
+            ['category', 'perms', 'run']
+          )
+      );
   }
 
   async updateCommands() {
@@ -180,9 +191,12 @@ export default class Client {
       .send(
         this.commands.map(c => ({
           ...c,
-          default_member_permissions: c.perms
-            .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
-            .reduce((a, c) => a | c, 0n),
+          default_member_permissions: c.perms.length
+            ? c.perms
+                .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
+                .reduce((a, c) => a | c, 0n)
+                .toString()
+            : null,
           perms: undefined,
         }))
       );
