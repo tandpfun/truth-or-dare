@@ -144,7 +144,7 @@ export function premiumAd(): APIInteractionResponseCallbackData {
 export function promoMessage() {
   const promoMessages = [
     `${Client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
-    `${Client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (scroll down the page)`,
+    `${Client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
   ];
 
   return Math.random() < 0.08
