@@ -8,8 +8,6 @@ import { avatarURL } from './Functions';
 type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
 type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
 
-const hasSeenBetaMessage = new Set<string>();
-
 export default class ButtonHandler {
   client: Client;
   buttonIds: ButtonIds[];
@@ -66,14 +64,10 @@ export default class ButtonHandler {
       ctx.guildId
     );
 
-    const isMod = this.client.functions.hasPermission('ManageGuild', ctx.member);
     const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
 
     ctx.reply({
-      content:
-        isMod && !hasSeenBetaMessage.has(ctx.user.id)
-          ? `${this.client.EMOTES.beta1}${this.client.EMOTES.beta2} Turn off buttons with \`/serversettings togglebuttons\``
-          : undefined,
+      content: ctx.client.functions.promoMessage(),
       embeds: [
         {
           author: {
@@ -93,8 +87,6 @@ export default class ButtonHandler {
         ? []
         : ctx.client.server.buttonHandler.components(buttonCommandType),
     });
-
-    if (isMod && !hasSeenBetaMessage.has(ctx.user.id)) hasSeenBetaMessage.add(ctx.user.id);
 
     ctx.client.functions.editMessage(
       {

@@ -60,6 +60,7 @@ export default class Client {
     sparkles: ':sparkles:',
     info: ':information_source:',
     arrowUp: ':arrow_up:',
+    star: ':star:',
     delete: '<:delete:927979243844038657>',
     beta1: '<:beta1:955232478463930398>',
     beta2: '<:beta2:955232478434586645>',

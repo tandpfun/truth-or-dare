@@ -36,7 +36,7 @@ const truth: Command = {
       ctx.guildId
     );
     ctx.reply({
-      content: ctx.client.functions.upvoteAd(),
+      content: ctx.client.functions.promoMessage(),
       embeds: [
         {
           title: truth.question,

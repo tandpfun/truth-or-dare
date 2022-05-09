@@ -36,7 +36,7 @@ const tod: Command = {
       ctx.guildId
     );
     ctx.reply({
-      content: ctx.client.functions.upvoteAd(),
+      content: ctx.client.functions.promoMessage(),
       embeds: [
         {
           title: result.question,

@@ -36,7 +36,7 @@ const dare: Command = {
       ctx.guildId
     );
     ctx.reply({
-      content: ctx.client.functions.upvoteAd(),
+      content: ctx.client.functions.promoMessage(),
       embeds: [
         {
           title: dare.question,

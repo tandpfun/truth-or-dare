@@ -141,10 +141,14 @@ export function premiumAd(): APIInteractionResponseCallbackData {
   };
 }
 
-export function upvoteAd() {
+export function promoMessage() {
+  const promoMessages = [
+    `${Client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
+    `${Client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (scroll down the page)`,
+  ];
+
   return Math.random() < 0.08
-    ? Client.EMOTES.arrowUp +
-        ' Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!'
+    ? promoMessages[Math.floor(Math.random() * promoMessages.length)]
     : '';
 }
 
