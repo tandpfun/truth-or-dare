@@ -1,9 +1,10 @@
 import { readdirSync } from 'fs';
 import os from 'os';
 
-import type {
+import {
   RESTPostAPIWebhookWithTokenJSONBody,
   APIApplicationCommand,
+  PermissionFlagsBits,
 } from 'discord-api-types/v9';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
@@ -150,6 +151,13 @@ export default class Client {
     const commandFileNames = readdirSync(`${__dirname}/../commands`).filter(f => f.endsWith('.js'));
     for (const commandFileName of commandFileNames) {
       const commandFile: Command = (await import(`../commands/${commandFileName}`)).default;
+      if (typeof commandFile.default_member_permissions === 'undefined')
+        commandFile.default_member_permissions = commandFile.perms.length
+          ? commandFile.perms
+              .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
+              .reduce((a, c) => a | c, 0n)
+              .toString()
+          : null;
       this.commands.push(commandFile);
     }
   }
