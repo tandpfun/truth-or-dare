@@ -7,7 +7,7 @@ import {
   QuestionType,
   Question,
   Rating,
-  QuestionTranslation,
+  Translation,
 } from '@prisma/client';
 
 import type Client from './Client';
@@ -100,6 +100,7 @@ export default class Database {
       disableButtons: false,
       disabledQuestions: [],
       showParanoiaFrequency: 50,
+      language: null,
     };
   }
 
@@ -141,7 +142,7 @@ export default class Database {
     disabledRatings: Rating[] = [],
     rating?: Rating,
     guildId?: string,
-    language?: keyof QuestionTranslation
+    language?: Translation | null
   ): Promise<
     | Question
     | CustomQuestion
@@ -161,7 +162,10 @@ export default class Database {
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
 
-    const globalFilter = (q: Question) => (!type || q.type === type) && ratings.includes(q.rating);
+    const globalFilter = (q: Question) =>
+      (!type || q.type === type) &&
+      ratings.includes(q.rating) &&
+      (language ? language in q.translations : true);
     const customFilter = (q: CustomQuestion) =>
       q.guildId === guildId && (!type || q.type === type) && ratings.includes(q.rating);
 

@@ -66,6 +66,15 @@ export default class Client {
     beta1: '<:beta1:955232478463930398>',
     beta2: '<:beta2:955232478434586645>',
   } as const;
+  static LANGUAGES = {
+    en: 'English',
+    bn: 'বাংলা (Bengali)',
+    de: 'Deutsch (German)',
+    es: 'Español (Spanish)',
+    fr: 'Français (French)',
+    hi: 'हिन्दी	(Hindi)',
+    tl: 'Tagalog',
+  } as const;
 
   constructor({
     token,
@@ -119,6 +128,9 @@ export default class Client {
   }
   get EMOTES() {
     return Client.EMOTES;
+  }
+  get LANGUAGES() {
+    return Client.LANGUAGES;
   }
 
   async start() {

@@ -57,14 +57,15 @@ export default class ButtonHandler {
     else if (ctx.data.custom_id === 'RANDOM') type = undefined;
     else type = ctx.data.custom_id as QuestionType;
 
+    const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
+
     const result = await ctx.client.database.getRandomQuestion(
       type,
       channelSettings.disabledRatings,
       undefined,
-      ctx.guildId
+      ctx.guildId,
+      settings?.language
     );
-
-    const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
 
     ctx.reply({
       content: ctx.client.functions.promoMessage(),
