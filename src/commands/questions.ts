@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { QuestionType } from '.prisma/client';
+import { QuestionType, CustomQuestion } from '.prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -195,7 +195,7 @@ const questions: Command = {
                 ? Object.values(QuestionType)
                     .map(
                       type =>
-                        `${type}: ${questions.reduce(
+                        `${type}: ${(questions as CustomQuestion[]).reduce(
                           (total, q) => total + (q.type === type ? 1 : 0),
                           0
                         )}`
