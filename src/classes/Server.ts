@@ -5,7 +5,8 @@ import {
   APIInteraction,
   ComponentType,
 } from 'discord-api-types/v9';
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Request, RequestHandler, Response } from 'express';
+import cors, { CorsOptions } from 'cors';
 import { verifyKeyMiddleware } from 'discord-interactions';
 import { QuestionType, Rating } from '.prisma/client';
 import rateLimiter from 'express-rate-limit';
@@ -31,6 +32,10 @@ const APIRateLimit = rateLimiter({
   },
 });
 
+const corsOptions: CorsOptions = {
+  origin: '*',
+};
+
 export default class Server {
   port: number;
   client: Client;
@@ -55,7 +60,11 @@ export default class Server {
     );
 
     this.router.get('/api/:questionType', this.handleAPI.bind(this));
-    this.router.get('/v1/:questionType', this.handleAPI.bind(this));
+    this.router.get(
+      '/v1/:questionType',
+      (cors as (options: CorsOptions) => RequestHandler)(corsOptions),
+      this.handleAPI.bind(this)
+    );
 
     this.router.get('/metrics', async (req, res) => {
       if (req.headers.authorization?.replace('Bearer ', '') !== process.env.PROMETHEUS_AUTH)
