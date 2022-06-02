@@ -180,9 +180,11 @@ export default class Database {
         ).filter(q => !guildSettings?.disabledQuestions.includes(q.id));
 
     if (questions.length) {
-      const question = questions[Math.floor(Math.random() * questions.length)] as Question;
-      if (language && question.translations[language])
-        question.question = question.translations[language]!;
+      const question = questions[Math.floor(Math.random() * questions.length)];
+      if (language && 'translations' in question) {
+        const translation = question.translations[language];
+        if (translation !== null) question.question = translation;
+      }
       return question;
     }
 
