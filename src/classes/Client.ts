@@ -72,7 +72,7 @@ export default class Client {
     de: 'Deutsch (German)',
     es: 'Español (Spanish)',
     fr: 'Français (French)',
-    hi: 'हिन्दी	(Hindi)',
+    hi: 'हिंदी (Hindi)',
     tl: 'Tagalog',
   } as const;
 
