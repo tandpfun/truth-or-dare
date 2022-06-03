@@ -7,6 +7,7 @@ import {
   QuestionType,
   Question,
   Rating,
+  Translation,
 } from '@prisma/client';
 
 import type Client from './Client';
@@ -99,6 +100,7 @@ export default class Database {
       disableButtons: false,
       disabledQuestions: [],
       showParanoiaFrequency: 50,
+      language: null,
     };
   }
 
@@ -139,9 +141,11 @@ export default class Database {
     type?: QuestionType,
     disabledRatings: Rating[] = [],
     rating?: Rating,
-    guildId?: string
+    guildId?: string,
+    language?: Translation | null
   ): Promise<
     | Question
+    | CustomQuestion
     | { id: null; type: QuestionType | 'RANDOM'; rating: Rating | 'NONE'; question: string }
   > {
     const ratings = (rating ? [rating] : Object.values(Rating)).filter(
@@ -158,11 +162,14 @@ export default class Database {
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
 
-    const globalFilter = (q: Question) => (!type || q.type === type) && ratings.includes(q.rating);
+    const globalFilter = (q: Question) =>
+      (!type || q.type === type) &&
+      ratings.includes(q.rating) &&
+      (language ? language in q.translations : true);
     const customFilter = (q: CustomQuestion) =>
       q.guildId === guildId && (!type || q.type === type) && ratings.includes(q.rating);
 
-    const questions = guildSettings?.disableGlobals
+    const questions: (Question | CustomQuestion)[] = guildSettings?.disableGlobals
       ? this.customQuestions.filter(customFilter)
       : (isPremiumGuild
           ? [
@@ -171,22 +178,30 @@ export default class Database {
             ]
           : this.questionCache.filter(globalFilter)
         ).filter(q => !guildSettings?.disabledQuestions.includes(q.id));
-    return questions.length
-      ? questions[Math.floor(Math.random() * questions.length)]
-      : {
-          id: null,
-          type: type ?? 'RANDOM',
-          rating: 'NONE',
-          question: 'I dare you to tell the server admins to add questions',
-        };
+
+    if (questions.length) {
+      const question = questions[Math.floor(Math.random() * questions.length)];
+      if (language && 'translations' in question) {
+        const translation = question.translations[language];
+        if (translation !== null) question.question = translation;
+      }
+      return question;
+    }
+
+    return {
+      id: null,
+      type: type ?? 'RANDOM',
+      rating: 'NONE',
+      question: 'I dare you to tell the server admins to add questions',
+    };
   }
 
-  async updateQuestion(id: string, data: Optional<Question, 'id'>) {
+  async updateQuestion(id: string, data: Optional<Question, 'id' | 'translations'>) {
     const oldQuest = this.fetchSpecificQuestion(id);
     const quest = await this.db.question.upsert({
       where: { id },
       update: data,
-      create: { id: this.generateId(), ...data },
+      create: { id: this.generateId(), translations: {}, ...data },
     });
 
     const index = oldQuest ? this.questionCache.findIndex(q => q.id === quest.id) : -1;
@@ -221,6 +236,7 @@ export default class Database {
               type,
               rating,
               question: `${rating} ${type[0]}${type.slice(1).toLowerCase()} question ${i}`,
+              translations: {},
             },
           });
           this.client.console.log(`${type}-${rating}-${i}`);

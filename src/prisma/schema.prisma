@@ -25,6 +25,24 @@ enum Rating {
   R
 }
 
+enum Translation {
+  bn
+  de
+  es
+  fr
+  hi
+  tl
+}
+
+type QuestionTranslation {
+  bn String?
+  de String?
+  es String?
+  fr String?
+  hi String?
+  tl String?
+}
+
 model ChannelSettings {
   id              String   @id @map("_id")
   disabledRatings Rating[]
@@ -32,18 +50,20 @@ model ChannelSettings {
 }
 
 model GuildSettings {
-  id                    String   @id @map("_id")
+  id                    String       @id @map("_id")
   disableGlobals        Boolean
   disableButtons        Boolean
   disabledQuestions     String[]
   showParanoiaFrequency Int
+  language              Translation?
 }
 
 model Question {
-  id       String       @id @map("_id")
-  type     QuestionType
-  rating   Rating
-  question String
+  id           String              @id @map("_id")
+  type         QuestionType
+  rating       Rating
+  question     String
+  translations QuestionTranslation
 }
 
 model ParanoiaQuestion {

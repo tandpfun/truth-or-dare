@@ -40,7 +40,8 @@ const paranoia: Command = {
       'PARANOIA',
       channelSettings.disabledRatings,
       rating,
-      ctx.guildId
+      ctx.guildId,
+      serverSettings?.language
     );
 
     if (!ctx.guildId || !targetUserId || !paranoia.id) {

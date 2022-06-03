@@ -21,6 +21,7 @@ export default class Client {
   id: string;
   publicKey: string;
   port: number;
+  developers: string[];
   commands: Command[];
   console: Logger;
   metrics: Metrics;
@@ -62,9 +63,19 @@ export default class Client {
     info: ':information_source:',
     arrowUp: ':arrow_up:',
     star: ':star:',
+    shushing_face: ':shushing_face:',
     delete: '<:delete:927979243844038657>',
     beta1: '<:beta1:955232478463930398>',
     beta2: '<:beta2:955232478434586645>',
+  } as const;
+  static LANGUAGES = {
+    en: 'English',
+    bn: 'বাংলা (Bengali)',
+    de: 'Deutsch (German)',
+    es: 'Español (Spanish)',
+    fr: 'Français (French)',
+    hi: 'हिंदी (Hindi)',
+    tl: 'Tagalog',
   } as const;
 
   constructor({
@@ -82,6 +93,12 @@ export default class Client {
     this.id = applicationId;
     this.publicKey = publicKey;
     this.port = port;
+    this.developers = [
+      '393294718345412618',
+      '276544649148235776',
+      '358776042829119498',
+      '472176262291390464',
+    ];
 
     if (!this.devMode && process.env.SENTRY_DSN) {
       Sentry.init({ dsn: process.env.SENTRY_DSN });
@@ -119,6 +136,9 @@ export default class Client {
   }
   get EMOTES() {
     return Client.EMOTES;
+  }
+  get LANGUAGES() {
+    return Client.LANGUAGES;
   }
 
   async start() {

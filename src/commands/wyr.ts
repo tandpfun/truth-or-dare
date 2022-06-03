@@ -33,7 +33,8 @@ const wyr: Command = {
       'WYR',
       channelSettings.disabledRatings,
       rating,
-      ctx.guildId
+      ctx.guildId,
+      serverSettings?.language
     );
     ctx.reply({
       content: ctx.client.functions.promoMessage(),
