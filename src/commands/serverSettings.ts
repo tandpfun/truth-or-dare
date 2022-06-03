@@ -182,11 +182,6 @@ const serverSettings: Command = {
 
       return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again.');
     } else if (ctx.args[0] === 'setlanguage') {
-      if (!ctx.client.developers.includes(ctx.user.id))
-        return ctx.reply(
-          ctx.client.EMOTES.shushing_face + " This feature isn't released yet! Don't tell anyone."
-        );
-
       const lang = ctx.getOption<Mutable<typeof options[4]['options'][0]>>('language')!.value;
       const dbLang = lang === 'en' ? null : lang;
 
