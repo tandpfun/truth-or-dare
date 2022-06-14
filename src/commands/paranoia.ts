@@ -41,6 +41,7 @@ const paranoia: Command = {
       channelSettings.disabledRatings,
       rating,
       ctx.guildId,
+      ctx.channelId,
       serverSettings?.language
     );
 
