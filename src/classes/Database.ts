@@ -14,12 +14,12 @@ import type Client from './Client';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
-type SeenQuestion = { id: string; type: QuestionType; rating: Rating };
+type SeenQuestion = Pick<Question, 'id' | 'type' | 'rating'>;
 
 export default class Database {
   client: Client;
   db: PrismaClient;
-  questionsSeenCache: Map<string, SeenQuestion[]> = new Map();
+  questionsSeenCache: Record<string, SeenQuestion[]> = {};
   channelCache: Record<string, ChannelSettings | null> = {};
   guildCache: Record<string, GuildSettings | null> = {};
   questionCache: Question[] = [];
@@ -38,10 +38,13 @@ export default class Database {
     await this.fetchAllCustomQuestions();
     await this.fetchPremiumGuilds();
     setInterval(async () => {
-      const totalCachedSeenQuestions = [...this.questionsSeenCache.values()].flat().length;
+      const totalCachedSeenQuestions = Object.values(this.questionsSeenCache).reduce(
+        (a, c) => a + c.length,
+        0
+      );
       const channelCacheSize = Object.keys(this.channelCache).length;
       const guildCacheSize = Object.keys(this.guildCache).length;
-      this.questionsSeenCache = new Map();
+      this.questionsSeenCache = {};
       this.channelCache = {};
       this.guildCache = {};
       this.client.console.log(
@@ -167,7 +170,7 @@ export default class Database {
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
 
-    const questionFilter = (q: Question | CustomQuestion) =>
+    const questionFilter = (q: Omit<Question | CustomQuestion, 'question'>) =>
       (!type || q.type === type) && ratings.includes(q.rating);
     const globalFilter = (q: Question) =>
       questionFilter(q) && (language ? language in q.translations : true);
@@ -186,38 +189,40 @@ export default class Database {
     let allQuestionsSeen: SeenQuestion[] = [];
 
     if (isPremiumGuild && channelId) {
-      allQuestionsSeen = this.questionsSeenCache.get(channelId) || [];
-      let questionsSeen = allQuestionsSeen.filter(q => questionFilter(q as Question));
+      allQuestionsSeen = this.questionsSeenCache[channelId] ?? [];
+      let questionsSeen = allQuestionsSeen.filter(q => questionFilter(q));
 
       if (questionsSeen.length >= questions.length) {
         allQuestionsSeen = allQuestionsSeen.filter(q => !questionsSeen.some(sq => sq.id === q.id));
         questionsSeen = [];
-        this.questionsSeenCache.set(channelId, allQuestionsSeen);
       }
+      this.questionsSeenCache[channelId] = allQuestionsSeen;
 
       questions = questions.filter(q => !questionsSeen.some(sq => sq.id === q.id));
     }
 
-    if (questions.length) {
-      let question = questions[Math.floor(Math.random() * questions.length)];
-      if (language && 'translations' in question) {
-        const translation = question.translations[language];
-        if (translation !== null) question = { ...question, question: translation };
-      }
-      if (isPremiumGuild && channelId)
-        this.questionsSeenCache.set(
-          channelId,
-          allQuestionsSeen.concat({ id: question.id, type: question.type, rating: question.rating })
-        );
-      return question;
+    if (!questions.length) {
+      return {
+        id: null,
+        type: type ?? 'RANDOM',
+        rating: 'NONE',
+        question: 'I dare you to tell the server admins to add questions',
+      };
     }
 
-    return {
-      id: null,
-      type: type ?? 'RANDOM',
-      rating: 'NONE',
-      question: 'I dare you to tell the server admins to add questions',
-    };
+    let question = questions[Math.floor(Math.random() * questions.length)];
+    if (language && 'translations' in question) {
+      const translation = question.translations[language];
+      if (translation !== null) question = { ...question, question: translation };
+    }
+    if (isPremiumGuild && channelId) {
+      allQuestionsSeen.push({
+        id: question.id,
+        type: question.type,
+        rating: question.rating,
+      });
+    }
+    return question;
   }
 
   async updateQuestion(id: string, data: Optional<Question, 'id' | 'translations'>) {
