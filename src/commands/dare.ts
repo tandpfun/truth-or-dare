@@ -34,6 +34,7 @@ const dare: Command = {
       channelSettings.disabledRatings,
       rating,
       ctx.guildId,
+      ctx.channelId,
       serverSettings?.language
     );
     ctx.reply({

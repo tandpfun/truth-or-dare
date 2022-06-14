@@ -64,6 +64,7 @@ export default class ButtonHandler {
       channelSettings.disabledRatings,
       undefined,
       ctx.guildId,
+      ctx.channelId,
       settings?.language
     );
 

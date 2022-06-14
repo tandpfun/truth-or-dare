@@ -14,10 +14,12 @@ import type Client from './Client';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
+type SeenQuestion = Pick<Question, 'id' | 'type' | 'rating'>;
 
 export default class Database {
   client: Client;
   db: PrismaClient;
+  questionsSeenCache: Record<string, SeenQuestion[]> = {};
   channelCache: Record<string, ChannelSettings | null> = {};
   guildCache: Record<string, GuildSettings | null> = {};
   questionCache: Question[] = [];
@@ -36,12 +38,17 @@ export default class Database {
     await this.fetchAllCustomQuestions();
     await this.fetchPremiumGuilds();
     setInterval(async () => {
+      const totalCachedSeenQuestions = Object.values(this.questionsSeenCache).reduce(
+        (a, c) => a + c.length,
+        0
+      );
       const channelCacheSize = Object.keys(this.channelCache).length;
       const guildCacheSize = Object.keys(this.guildCache).length;
+      this.questionsSeenCache = {};
       this.channelCache = {};
       this.guildCache = {};
       this.client.console.log(
-        `Cleared ${channelCacheSize} channels and ${guildCacheSize} guilds from the settings cache`
+        `Cleared ${channelCacheSize} channels, ${guildCacheSize} guilds, and ${totalCachedSeenQuestions} seen questions from the settings cache`
       );
       await this.fetchAllQuestions();
       await this.sweepCustomQuestions();
@@ -142,6 +149,7 @@ export default class Database {
     disabledRatings: Rating[] = [],
     rating?: Rating,
     guildId?: string,
+    channelId?: string,
     language?: Translation | null
   ): Promise<
     | Question
@@ -162,14 +170,13 @@ export default class Database {
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
 
+    const questionFilter = (q: Omit<Question | CustomQuestion, 'question'>) =>
+      (!type || q.type === type) && ratings.includes(q.rating);
     const globalFilter = (q: Question) =>
-      (!type || q.type === type) &&
-      ratings.includes(q.rating) &&
-      (language ? language in q.translations : true);
-    const customFilter = (q: CustomQuestion) =>
-      q.guildId === guildId && (!type || q.type === type) && ratings.includes(q.rating);
+      questionFilter(q) && (language ? language in q.translations : true);
+    const customFilter = (q: CustomQuestion) => q.guildId === guildId && questionFilter(q);
 
-    const questions: (Question | CustomQuestion)[] = guildSettings?.disableGlobals
+    let questions: (Question | CustomQuestion)[] = guildSettings?.disableGlobals
       ? this.customQuestions.filter(customFilter)
       : (isPremiumGuild
           ? [
@@ -179,21 +186,43 @@ export default class Database {
           : this.questionCache.filter(globalFilter)
         ).filter(q => !guildSettings?.disabledQuestions.includes(q.id));
 
-    if (questions.length) {
-      let question = questions[Math.floor(Math.random() * questions.length)];
-      if (language && 'translations' in question) {
-        const translation = question.translations[language];
-        if (translation !== null) question = { ...question, question: translation };
+    let allQuestionsSeen: SeenQuestion[] = [];
+
+    if (isPremiumGuild && channelId) {
+      allQuestionsSeen = this.questionsSeenCache[channelId] ?? [];
+      let questionsSeen = allQuestionsSeen.filter(q => questionFilter(q));
+
+      if (questionsSeen.length >= questions.length) {
+        allQuestionsSeen = allQuestionsSeen.filter(q => !questionsSeen.some(sq => sq.id === q.id));
+        questionsSeen = [];
       }
-      return question;
+      this.questionsSeenCache[channelId] = allQuestionsSeen;
+
+      questions = questions.filter(q => !questionsSeen.some(sq => sq.id === q.id));
     }
 
-    return {
-      id: null,
-      type: type ?? 'RANDOM',
-      rating: 'NONE',
-      question: 'I dare you to tell the server admins to add questions',
-    };
+    if (!questions.length) {
+      return {
+        id: null,
+        type: type ?? 'RANDOM',
+        rating: 'NONE',
+        question: 'I dare you to tell the server admins to add questions',
+      };
+    }
+
+    let question = questions[Math.floor(Math.random() * questions.length)];
+    if (language && 'translations' in question) {
+      const translation = question.translations[language];
+      if (translation !== null) question = { ...question, question: translation };
+    }
+    if (isPremiumGuild && channelId) {
+      allQuestionsSeen.push({
+        id: question.id,
+        type: question.type,
+        rating: question.rating,
+      });
+    }
+    return question;
   }
 
   async updateQuestion(id: string, data: Optional<Question, 'id' | 'translations'>) {
