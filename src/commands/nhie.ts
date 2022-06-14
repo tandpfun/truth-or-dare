@@ -38,7 +38,7 @@ const nhie: Command = {
       serverSettings?.language
     );
     ctx.reply({
-      content: ctx.client.functions.promoMessage(),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [
         {
           title: nhie.question,

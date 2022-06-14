@@ -69,7 +69,7 @@ export default class ButtonHandler {
     );
 
     ctx.reply({
-      content: ctx.client.functions.promoMessage(),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [
         {
           author: {

@@ -141,10 +141,14 @@ export function premiumAd(): APIInteractionResponseCallbackData {
   };
 }
 
-export function promoMessage() {
+export function promoMessage(client: Client, guildId?: string) {
+  if (guildId && client.database.isPremiumGuild(guildId)) return '';
+
   const promoMessages = [
-    `${Client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
-    `${Client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
+    `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
+    `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
+    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a [premium feature](https://truthordarebot.xyz/premium).`,
+    `${client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
   ];
 
   return Math.random() < 0.08

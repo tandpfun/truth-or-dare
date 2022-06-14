@@ -47,6 +47,7 @@ const paranoia: Command = {
 
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
+        content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
         embeds: [
           {
             title: paranoia.question,
