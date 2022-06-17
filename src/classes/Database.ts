@@ -44,11 +44,10 @@ export default class Database {
       );
       const channelCacheSize = Object.keys(this.channelCache).length;
       const guildCacheSize = Object.keys(this.guildCache).length;
-      this.questionsSeenCache = {};
       this.channelCache = {};
       this.guildCache = {};
       this.client.console.log(
-        `Cleared ${channelCacheSize} channels, ${guildCacheSize} guilds, and ${totalCachedSeenQuestions} seen questions from the settings cache`
+        `Cleared ${channelCacheSize} channels, ${guildCacheSize} guilds, and there's ${totalCachedSeenQuestions} seen questions in the settings cache`
       );
       await this.fetchAllQuestions();
       await this.sweepCustomQuestions();
