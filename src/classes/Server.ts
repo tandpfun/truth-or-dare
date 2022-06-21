@@ -43,7 +43,7 @@ export default class Server {
 
     this.registerRoutes();
 
-    this.router.listen({ port: this.port }, (err, address) => {
+    this.router.listen({ port: this.port, host: '0.0.0.0' }, (err, address) => {
       if (err) throw err;
       this.client.console.success(`Listening for requests at ${address}!`);
     });
