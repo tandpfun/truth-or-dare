@@ -34,7 +34,7 @@ export default class Server {
   constructor(port: number, client: Client) {
     this.port = port;
     this.client = client;
-    this.router = fastify({ logger: false });
+    this.router = fastify({ logger: false, trustProxy: 1 });
     this.buttonHandler = new ButtonHandler(this.client);
   }
 
