@@ -1,22 +1,22 @@
 import {
   APIChatInputApplicationCommandInteraction,
+  InteractionResponseType,
   ApplicationCommandType,
   InteractionType,
   APIInteraction,
   ComponentType,
-  InteractionResponseType,
 } from 'discord-api-types/v9';
 import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { verifyKey } from 'discord-interactions';
+import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
 import { QuestionType, Rating } from '.prisma/client';
+import { verifyKey } from 'discord-interactions';
 import * as Sentry from '@sentry/node';
 import { register } from 'prom-client';
 
-import type Client from './Client';
 import CommandContext from './CommandContext';
 import ButtonContext from './ButtonContext';
 import ButtonHandler from './ButtonHandler';
-import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
+import type Client from './Client';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
 

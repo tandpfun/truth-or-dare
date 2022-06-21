@@ -12,9 +12,9 @@ import superagent from 'superagent';
 import * as functions from './Functions.js';
 import type Command from './Command.js';
 import Database from './Database.js';
+import Metrics from './Metrics.js';
 import Logger from './Logger.js';
 import Server from './Server.js';
-import Metrics from './Metrics.js';
 
 export default class Client {
   token: string;

@@ -2,18 +2,18 @@ import {
   APIInteractionResponseCallbackData,
   APIMessageButtonInteractionData,
   APIMessageComponentInteraction,
+  APIApplicationCommandOption,
   APIInteractionGuildMember,
   InteractionResponseType,
   ComponentType,
   APIUser,
-  APIApplicationCommandOption,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
+import { FastifyReply } from 'fastify';
 
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
-import { FastifyReply } from 'fastify';
 
 export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;

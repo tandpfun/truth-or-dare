@@ -2,8 +2,8 @@ import { APIActionRowComponent, ButtonStyle, ComponentType } from 'discord-api-t
 import { QuestionType } from '@prisma/client';
 
 import ButtonContext from './ButtonContext';
-import type Client from './Client';
 import { avatarURL } from './Functions';
+import type Client from './Client';
 
 type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
 type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';

@@ -15,11 +15,11 @@ import {
   APIUser,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
+import { FastifyReply } from 'fastify';
 
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
-import { FastifyReply } from 'fastify';
 
 export default class CommandContext implements Context {
   rawInteraction: APIApplicationCommandInteraction;
