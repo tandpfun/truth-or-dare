@@ -5,9 +5,9 @@ import {
   GuildSettings,
   PrismaClient,
   QuestionType,
+  Translation,
   Question,
   Rating,
-  Translation,
 } from '@prisma/client';
 
 import type Client from './Client';

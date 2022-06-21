@@ -1,74 +1,71 @@
 import {
   APIChatInputApplicationCommandInteraction,
+  InteractionResponseType,
   ApplicationCommandType,
   InteractionType,
   APIInteraction,
   ComponentType,
 } from 'discord-api-types/v9';
-import express, { Express, Request, RequestHandler, Response } from 'express';
-import cors, { CorsOptions } from 'cors';
-import { verifyKeyMiddleware } from 'discord-interactions';
+import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
 import { QuestionType, Rating } from '.prisma/client';
-import rateLimiter from 'express-rate-limit';
+import { verifyKey } from 'discord-interactions';
 import * as Sentry from '@sentry/node';
 import { register } from 'prom-client';
 
-import type Client from './Client';
 import CommandContext from './CommandContext';
 import ButtonContext from './ButtonContext';
 import ButtonHandler from './ButtonHandler';
+import type Client from './Client';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
 
-const APIRateLimit = rateLimiter({
-  windowMs: 5 * 1000,
+const rateLimitConfig: RateLimitOptions = {
   max: 5,
-  skipFailedRequests: true,
-  handler: (_: Request, res: Response) => {
-    res.status(429).send({
-      error: true,
-      message: 'Too many requests, please try again later.',
-    });
-  },
-});
-
-const corsOptions: CorsOptions = {
-  origin: '*',
+  timeWindow: 5 * 1000,
 };
 
 export default class Server {
   port: number;
   client: Client;
-  router: Express;
+  router: FastifyInstance;
   buttonHandler: ButtonHandler;
 
   constructor(port: number, client: Client) {
     this.port = port;
     this.client = client;
-    this.router = express();
+    this.router = fastify({ logger: false });
     this.buttonHandler = new ButtonHandler(this.client);
+  }
 
-    this.router.set('trust proxy', 1);
+  async start() {
+    await this.router.register(fastifyRateLimit, { global: false });
 
-    this.router.use('/api/', APIRateLimit);
-    this.router.use('/v1/', APIRateLimit);
+    this.registerRoutes();
 
-    this.router.post(
-      '/interactions',
-      verifyKeyMiddleware(this.client.publicKey),
-      this.handleRequest.bind(this)
+    this.router.listen({ port: this.port }, (err, address) => {
+      if (err) throw err;
+      this.client.console.success(`Listening for requests at ${address}!`);
+    });
+  }
+
+  registerRoutes() {
+    this.router.post('/interactions', this.handleRequest.bind(this));
+
+    this.router.get(
+      '/api/:questionType',
+      { config: { rateLimit: rateLimitConfig } },
+      this.handleAPI.bind(this)
     );
-
-    this.router.get('/api/:questionType', this.handleAPI.bind(this));
     this.router.get(
       '/v1/:questionType',
-      (cors as (options: CorsOptions) => RequestHandler)(corsOptions),
+      { config: { rateLimit: rateLimitConfig } },
       this.handleAPI.bind(this)
     );
 
     this.router.get('/metrics', async (req, res) => {
       if (req.headers.authorization?.replace('Bearer ', '') !== process.env.PROMETHEUS_AUTH)
-        return res.sendStatus(401);
+        return res.status(401).send('Invalid authorization');
       const metrics = await register.metrics();
       res.send(metrics);
     });
@@ -76,18 +73,37 @@ export default class Server {
     this.router.get('/', (_, res) => res.redirect('https://docs.truthordarebot.xyz/api-docs'));
   }
 
-  start() {
-    this.router.listen(this.port, () =>
-      this.client.console.success(`Listening for requests on port ${this.port}!`)
-    );
-  }
+  async handleRequest(
+    req: FastifyRequest<{
+      Body: APIInteraction;
+      Headers: {
+        'x-signature-ed25519': string;
+        'x-signature-timestamp': string;
+      };
+    }>,
+    res: FastifyReply
+  ) {
+    // Verify Request is from Discord
+    const signature = req.headers['x-signature-ed25519'];
+    const timestamp = req.headers['x-signature-timestamp'];
 
-  async handleRequest(req: Request, res: Response) {
-    const interaction = req.body as APIInteraction;
-    if (
+    if (!signature || !timestamp || !req.body) return res.status(401).send('Invalid signature');
+
+    const rawBody = JSON.stringify(req.body);
+    const isValidRequest = verifyKey(rawBody, signature, timestamp, this.client.publicKey);
+
+    if (!isValidRequest) return res.code(401).send('Invalid signature');
+
+    const interaction = req.body;
+
+    if (interaction.type === InteractionType.Ping)
+      // If interaction is a ping (url verification)
+      res.send({ type: InteractionResponseType.Pong });
+    else if (
       interaction.type === InteractionType.ApplicationCommand &&
       interaction.data.type === ApplicationCommandType.ChatInput
     ) {
+      // If interaction is a slash command
       if (interaction.data.type !== ApplicationCommandType.ChatInput) return;
       const ctx = new CommandContext(
         interaction as APIChatInputApplicationCommandInteraction,
@@ -106,6 +122,7 @@ export default class Server {
       interaction.type === InteractionType.MessageComponent &&
       interaction.data.component_type === ComponentType.Button
     ) {
+      // If interaction is a button
       const ctx = new ButtonContext(interaction, this.client, res);
       if ((await ctx.channelSettings).muted)
         return ctx.reply({
@@ -161,7 +178,15 @@ export default class Server {
     );*/
   }
 
-  async handleAPI(req: Request, res: Response) {
+  async handleAPI(
+    req: FastifyRequest<{
+      Params: { questionType: string }; // Not a question type as case insensitive
+      Querystring: { rating: string }; // Not a rating type as case insensitive
+    }>,
+    res: FastifyReply
+  ) {
+    res.header('Access-Control-Allow-Origin', '*'); // CORS support for TOD website
+
     const questionType = req.params.questionType.toUpperCase() as QuestionType;
     const rating = req.query.rating;
 
