@@ -13,14 +13,13 @@
     "generate": "prisma generate"
   },
   "dependencies": {
+    "@fastify/rate-limit": "^7.0.0",
     "@prisma/client": "^3.3.0",
     "@sentry/node": "^6.13.3",
     "chalk": "^4.1.2",
-    "cors": "^2.8.5",
     "discord-interactions": "^2.3.0",
     "dotenv": "^10.0.0",
-    "express": "^4.17.1",
-    "express-rate-limit": "^5.5.0",
+    "fastify": "^4.1.0",
     "prom-client": "^14.0.0",
     "superagent": "^6.1.0"
   },

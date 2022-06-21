@@ -9,16 +9,16 @@ import {
   APIApplicationCommandOption,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
-import type { Response } from 'express';
 
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
+import { FastifyReply } from 'fastify';
 
 export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;
   data: APIMessageButtonInteractionData;
-  response: Response;
+  response: FastifyReply;
   client: Client;
   applicationId: string;
   channelId: string;
@@ -28,7 +28,7 @@ export default class ButtonContext implements Context {
   messageId: string;
   args: (string | number | boolean)[] = [];
 
-  constructor(interaction: APIMessageComponentInteraction, client: Client, response: Response) {
+  constructor(interaction: APIMessageComponentInteraction, client: Client, response: FastifyReply) {
     if (interaction.data.component_type !== ComponentType.Button)
       throw new Error('The component type is not a button.');
 
@@ -59,8 +59,8 @@ export default class ButtonContext implements Context {
 
   defer() {
     this.response.send({
-      type: InteractionResponseType.DeferredMessageUpdate
-    })
+      type: InteractionResponseType.DeferredMessageUpdate,
+    });
   }
 
   get channelSettings(): Promise<ChannelSettings> {

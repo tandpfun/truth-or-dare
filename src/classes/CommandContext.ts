@@ -15,16 +15,16 @@ import {
   APIUser,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
-import type { Response } from 'express';
 
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
+import { FastifyReply } from 'fastify';
 
 export default class CommandContext implements Context {
   rawInteraction: APIApplicationCommandInteraction;
   rawData: APIChatInputApplicationCommandInteractionData;
-  response: Response;
+  response: FastifyReply;
   client: Client;
   command: { id: string; name: string; type: ApplicationCommandType };
   options: APIApplicationCommandInteractionDataOption[];
@@ -39,7 +39,7 @@ export default class CommandContext implements Context {
   constructor(
     interaction: APIChatInputApplicationCommandInteraction,
     client: Client,
-    response: Response
+    response: FastifyReply
   ) {
     this.rawInteraction = interaction;
     this.rawData = interaction.data;
