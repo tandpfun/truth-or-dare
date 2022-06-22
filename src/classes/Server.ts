@@ -8,6 +8,7 @@ import {
 } from 'discord-api-types/v9';
 import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
+import metricsPlugin from 'fastify-metrics';
 import { QuestionType, Rating } from '.prisma/client';
 import { verifyKey } from 'discord-interactions';
 import * as Sentry from '@sentry/node';
@@ -40,6 +41,7 @@ export default class Server {
 
   async start() {
     await this.router.register(fastifyRateLimit, { global: false });
+    this.router.register(metricsPlugin, { register: register, enableDefaultMetrics: false });
 
     this.registerRoutes();
 

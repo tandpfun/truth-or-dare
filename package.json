@@ -20,6 +20,7 @@
     "discord-interactions": "^2.3.0",
     "dotenv": "^10.0.0",
     "fastify": "^4.1.0",
+    "fastify-metrics": "^8.0.0",
     "prom-client": "^14.0.0",
     "superagent": "^6.1.0"
   },
