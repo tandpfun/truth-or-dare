@@ -40,11 +40,14 @@ const paranoia: Command = {
       'PARANOIA',
       channelSettings.disabledRatings,
       rating,
-      ctx.guildId
+      ctx.guildId,
+      ctx.channelId,
+      serverSettings?.language
     );
 
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
+        content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
         embeds: [
           {
             title: paranoia.question,

@@ -33,10 +33,12 @@ const wyr: Command = {
       'WYR',
       channelSettings.disabledRatings,
       rating,
-      ctx.guildId
+      ctx.guildId,
+      ctx.channelId,
+      serverSettings?.language
     );
     ctx.reply({
-      content: ctx.client.functions.upvoteAd(),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [
         {
           title: wyr.question,

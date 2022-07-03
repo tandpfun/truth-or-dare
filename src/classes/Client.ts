@@ -1,9 +1,10 @@
 import { readdirSync } from 'fs';
 import os from 'os';
 
-import type {
+import {
   RESTPostAPIWebhookWithTokenJSONBody,
   APIApplicationCommand,
+  PermissionFlagsBits,
 } from 'discord-api-types/v9';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
@@ -11,15 +12,16 @@ import superagent from 'superagent';
 import * as functions from './Functions.js';
 import type Command from './Command.js';
 import Database from './Database.js';
+import Metrics from './Metrics.js';
 import Logger from './Logger.js';
 import Server from './Server.js';
-import Metrics from './Metrics.js';
 
 export default class Client {
   token: string;
   id: string;
   publicKey: string;
   port: number;
+  developers: string[];
   commands: Command[];
   console: Logger;
   metrics: Metrics;
@@ -60,9 +62,21 @@ export default class Client {
     sparkles: ':sparkles:',
     info: ':information_source:',
     arrowUp: ':arrow_up:',
+    star: ':star:',
+    shushing_face: ':shushing_face:',
+    earth: ':earth_asia:',
     delete: '<:delete:927979243844038657>',
     beta1: '<:beta1:955232478463930398>',
     beta2: '<:beta2:955232478434586645>',
+  } as const;
+  static LANGUAGES = {
+    en: 'English',
+    bn: 'বাংলা (Bengali)',
+    de: 'Deutsch (German)',
+    es: 'Español (Spanish)',
+    fr: 'Français (French)',
+    hi: 'हिंदी (Hindi)',
+    tl: 'Tagalog',
   } as const;
 
   constructor({
@@ -80,6 +94,12 @@ export default class Client {
     this.id = applicationId;
     this.publicKey = publicKey;
     this.port = port;
+    this.developers = [
+      '393294718345412618',
+      '276544649148235776',
+      '358776042829119498',
+      '472176262291390464',
+    ];
 
     if (!this.devMode && process.env.SENTRY_DSN) {
       Sentry.init({ dsn: process.env.SENTRY_DSN });
@@ -118,6 +138,9 @@ export default class Client {
   get EMOTES() {
     return Client.EMOTES;
   }
+  get LANGUAGES() {
+    return Client.LANGUAGES;
+  }
 
   async start() {
     this.console.log(`Starting Truth or Dare...`);
@@ -148,6 +171,13 @@ export default class Client {
     const guildOnly: { [id: string]: Command[] } = {};
     for (const commandFileName of commandFileNames) {
       const commandFile: Command = (await import(`../commands/${commandFileName}`)).default;
+      if (typeof commandFile.default_member_permissions === 'undefined')
+        commandFile.default_member_permissions = commandFile.perms.length
+          ? commandFile.perms
+              .map(perm => (typeof perm === 'bigint' ? perm : PermissionFlagsBits[perm]))
+              .reduce((a, c) => a | c, 0n)
+              .toString()
+          : null;
       this.commands.push(commandFile);
       if (!commandFile.guildId) {
         globalCommands.push(commandFile);

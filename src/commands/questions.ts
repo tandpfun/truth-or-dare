@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { QuestionType } from '.prisma/client';
+import { QuestionType, Question } from '.prisma/client';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -168,7 +168,7 @@ const questions: Command = {
       const rating =
         ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value ?? 'ALL';
 
-      const questions =
+      const questions: Omit<Question, 'translations'>[] =
         ctx.guildId === MAIN_GUILD
           ? ctx.client.database.getQuestions({
               type: questionType === 'ALL' ? undefined : questionType,

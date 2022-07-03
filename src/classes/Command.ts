@@ -11,5 +11,6 @@ export default interface Command {
   options?: ReadOnly<APIApplicationCommandOption[]>;
   perms: Permission[];
   guildId?: string[];
+  default_member_permissions?: string | null;
   run: (ctx: Context) => Promise<void>;
 }

@@ -2,13 +2,11 @@ import { APIActionRowComponent, ButtonStyle, ComponentType } from 'discord-api-t
 import { QuestionType } from '@prisma/client';
 
 import ButtonContext from './ButtonContext';
-import type Client from './Client';
 import { avatarURL } from './Functions';
+import type Client from './Client';
 
 type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
 type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
-
-const hasSeenBetaMessage = new Set<string>();
 
 export default class ButtonHandler {
   client: Client;
@@ -59,21 +57,19 @@ export default class ButtonHandler {
     else if (ctx.data.custom_id === 'RANDOM') type = undefined;
     else type = ctx.data.custom_id as QuestionType;
 
+    const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
+
     const result = await ctx.client.database.getRandomQuestion(
       type,
       channelSettings.disabledRatings,
       undefined,
-      ctx.guildId
+      ctx.guildId,
+      ctx.channelId,
+      settings?.language
     );
 
-    const isMod = this.client.functions.hasPermission('ManageGuild', ctx.member);
-    const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
-
     ctx.reply({
-      content:
-        isMod && !hasSeenBetaMessage.has(ctx.user.id)
-          ? `${this.client.EMOTES.beta1}${this.client.EMOTES.beta2} Turn off buttons with \`/serversettings togglebuttons\``
-          : undefined,
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [
         {
           author: {
@@ -93,8 +89,6 @@ export default class ButtonHandler {
         ? []
         : ctx.client.server.buttonHandler.components(buttonCommandType),
     });
-
-    if (isMod && !hasSeenBetaMessage.has(ctx.user.id)) hasSeenBetaMessage.add(ctx.user.id);
 
     ctx.client.functions.editMessage(
       {

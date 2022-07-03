@@ -98,7 +98,7 @@ export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boo
   return (
     typeof obj1 === typeof obj2 &&
     Array.isArray(obj1) === Array.isArray(obj2) &&
-    (typeof obj1 === 'object'
+    (obj1 !== null && typeof obj1 === 'object'
       ? Array.isArray(obj1)
         ? obj1.length === obj2.length && obj1.every((a, i) => deepEquals(a, obj2[i], ignoreList))
         : Object.keys(obj1).every(key => {
@@ -141,10 +141,18 @@ export function premiumAd(): APIInteractionResponseCallbackData {
   };
 }
 
-export function upvoteAd() {
+export function promoMessage(client: Client, guildId?: string) {
+  if (guildId && client.database.isPremiumGuild(guildId)) return '';
+
+  const promoMessages = [
+    `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
+    `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
+    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a [premium feature](https://truthordarebot.xyz/premium).`,
+    `${client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
+  ];
+
   return Math.random() < 0.08
-    ? Client.EMOTES.arrowUp +
-        ' Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!'
+    ? promoMessages[Math.floor(Math.random() * promoMessages.length)]
     : '';
 }
 
