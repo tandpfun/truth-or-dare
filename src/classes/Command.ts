@@ -10,6 +10,7 @@ export default interface Command {
   category: 'question' | 'control';
   options?: ReadOnly<APIApplicationCommandOption[]>;
   perms: Permission[];
+  guildId?: string[];
   default_member_permissions?: string | null;
   run: (ctx: Context) => Promise<void>;
 }

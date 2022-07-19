@@ -149,9 +149,6 @@ export default class Client {
       this.stats.commands[name] = 0;
       this.stats.minuteCommands[name] = 0;
     }
-    if (this.devMode)
-      this.console.log((await this.compareCommands()) ? 'Changes detected' : 'No changes detected');
-    else await this.updateCommands();
     this.console.success(`Loaded ${this.commands.length} commands!`);
     await this.database.start();
     this.server.start();
@@ -170,6 +167,8 @@ export default class Client {
 
   async loadCommands() {
     const commandFileNames = readdirSync(`${__dirname}/../commands`).filter(f => f.endsWith('.js'));
+    const globalCommands: Command[] = [];
+    const guildOnly: { [id: string]: Command[] } = {};
     for (const commandFileName of commandFileNames) {
       const commandFile: Command = (await import(`../commands/${commandFileName}`)).default;
       if (typeof commandFile.default_member_permissions === 'undefined')
@@ -180,36 +179,72 @@ export default class Client {
               .toString()
           : null;
       this.commands.push(commandFile);
+      if (!commandFile.guildId) {
+        globalCommands.push(commandFile);
+      } else {
+        commandFile.guildId.forEach(guildId => {
+          if (!(guildId in guildOnly)) guildOnly[guildId] = [];
+          guildOnly[guildId].push(commandFile);
+        });
+      }
+    }
+    if (this.devMode)
+      this.console.log(
+        'Global Commands: ' +
+          ((await this.compareCommands(globalCommands))
+            ? 'Changes detected'
+            : 'No changes detected')
+      );
+    else await this.updateCommands(globalCommands);
+
+    for (const guildId in guildOnly) {
+      if (this.devMode)
+        this.console.log(
+          `GuildOnly Commands (${guildId}): ` +
+            ((await this.compareCommands(guildOnly[guildId], guildId))
+              ? 'Changes detected'
+              : 'No changes detected')
+        );
+      else await this.updateCommands(guildOnly[guildId], guildId);
     }
   }
 
-  async compareCommands(): Promise<boolean> {
+  async compareCommands(commands: Command[], guildId?: string): Promise<boolean> {
     const commandList: APIApplicationCommand[] = await superagent
-      .get(`https://discord.com/api/v9/applications/${this.id}/commands`)
+      .get(
+        `https://discord.com/api/v9/applications/${this.id}${
+          guildId ? `/guilds/${guildId}` : ''
+        }/commands`
+      )
       .set('Authorization', 'Bot ' + this.token)
       .then(res => res.body);
 
-    return this.commands.some(
+    return commands.some(
       com =>
         !this.functions.deepEquals(
           com,
           commandList.find(c => c.name === com.name),
-          ['category', 'perms', 'run']
+          ['category', 'perms', 'run', 'guildId']
         )
     );
   }
 
-  async updateCommands() {
-    if (!(await this.compareCommands())) return;
+  async updateCommands(commands: Command[], guildId?: string) {
+    if (!(await this.compareCommands(commands, guildId))) return;
     this.console.log('Updating commands...');
 
     await superagent
-      .put(`https://discord.com/api/v9/applications/${this.id}/commands`)
+      .put(
+        `https://discord.com/api/v9/applications/${this.id}${
+          guildId ? `/guilds/${guildId}` : ''
+        }/commands`
+      )
       .set('Authorization', 'Bot ' + this.token)
       .send(
-        this.commands.map(c => ({
+        commands.map(c => ({
           ...c,
           perms: undefined,
+          guild_id: guildId,
         }))
       );
     this.console.success(`Updated ${this.commands.length} slash commands`);
