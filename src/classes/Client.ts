@@ -9,12 +9,12 @@ import {
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
 
-import * as functions from './Functions.js';
-import type Command from './Command.js';
-import Database from './Database.js';
-import Metrics from './Metrics.js';
-import Logger from './Logger.js';
-import Server from './Server.js';
+import * as functions from './Functions';
+import type Command from './Command';
+import Database from './Database';
+import Metrics from './Metrics';
+import Logger from './Logger';
+import Server from './Server';
 
 export default class Client {
   token: string;
