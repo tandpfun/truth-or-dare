@@ -22,8 +22,6 @@ const options = [
   },
 ] as const;
 
-const currentlySending = new Set(); // Keep track of users sent questions synchronously
-
 const paranoia: Command = {
   name: 'paranoia',
   description: 'Gives a paranoia question or sends one to a user.',
@@ -72,35 +70,25 @@ const paranoia: Command = {
         `${ctx.client.EMOTES.xmark} Bots can't answer paranoia questions, no matter how hard they try.`
       );
 
-    if (currentlySending.has(ctx.user.id))
-      return ctx.reply(`${ctx.client.EMOTES.xmark} That user was just sent a question.`);
-
-    currentlySending.add(ctx.user.id);
-
     const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
 
-    if (!status.guildOpen) {
-      currentlySending.delete(ctx.user.id);
+    if (!status.guildOpen)
       return ctx.reply(
         `${ctx.client.EMOTES.xmark} That user already has an active question sent from this server.`
       );
-    }
 
     // create dm channel
     const dmChannel = await ctx.client.functions.createDMChannel(targetUserId, ctx.client.token);
-    if (!dmChannel) {
-      currentlySending.delete(ctx.user.id);
+    if (!dmChannel)
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed('Failed to create a DM with the user.', ctx.user, true),
         ],
       });
-    }
 
     // fetch guild name
     const guild = await ctx.client.functions.fetchGuild(ctx.guildId, ctx.client.token);
-    if (!guild) {
-      currentlySending.delete(ctx.user.id);
+    if (!guild)
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
@@ -110,7 +98,6 @@ const paranoia: Command = {
           ),
         ],
       });
-    }
 
     // send message
     const message = await ctx.client.functions.sendMessage(
@@ -134,9 +121,7 @@ const paranoia: Command = {
       dmChannel.id,
       ctx.client.token
     );
-
-    if (!message) {
-      currentlySending.delete(ctx.user.id);
+    if (!message)
       return ctx.reply({
         embeds: [
           ctx.client.functions.embed(
@@ -146,7 +131,6 @@ const paranoia: Command = {
           ),
         ],
       });
-    }
 
     // create db object
     const createQuestion = await ctx.client.database
@@ -161,8 +145,6 @@ const paranoia: Command = {
       })
       .then(_ => true)
       .catch(_ => null);
-
-    currentlySending.delete(ctx.user.id);
 
     if (!createQuestion) {
       ctx.client.console.error(
