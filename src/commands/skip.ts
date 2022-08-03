@@ -21,23 +21,25 @@ const skip: Command = {
     await ctx.client.database.removeParanoiaQuestion(currentParanoia.id);
 
     // edit message to let the user know the question has been skipped
-    const editedMessage = await ctx.client.functions.editMessage(
-      {
-        embeds: [
-          {
-            title: currentParanoia.questionText,
-            color: ctx.client.COLORS.YELLOW,
-            description: 'Question skipped',
-            footer: {
-              text: `Type: PARANOIA | Rating: ${currentParanoia.questionRating} | ID: ${currentParanoia.questionId}`,
+    const editedMessage = await ctx.client.functions
+      .editMessage(
+        {
+          embeds: [
+            {
+              title: currentParanoia.questionText,
+              color: ctx.client.COLORS.YELLOW,
+              description: 'Question skipped',
+              footer: {
+                text: `Type: PARANOIA | Rating: ${currentParanoia.questionRating} | ID: ${currentParanoia.questionId}`,
+              },
             },
-          },
-        ],
-      },
-      ctx.channelId,
-      currentParanoia.dmMessageId!,
-      ctx.client.token
-    );
+          ],
+        },
+        ctx.channelId,
+        currentParanoia.dmMessageId!,
+        ctx.client.token
+      )
+      .catch(_ => null);
     if (!editedMessage)
       ctx.client.console.warn(
         `Paranoia skip message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${currentParanoia.dmMessageId}`

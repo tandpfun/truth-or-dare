@@ -179,8 +179,7 @@ export async function editMessage(
     .patch(`https://discord.com/api/channels/${channelId}/messages/${messageId}`)
     .send(data)
     .set('Authorization', `Bot ${token}`)
-    .then(res => res.body)
-    .catch(_ => null);
+    .then(res => res.body);
 }
 
 export async function createDMChannel(

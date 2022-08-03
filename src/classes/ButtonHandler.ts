@@ -90,14 +90,18 @@ export default class ButtonHandler {
         : ctx.client.server.buttonHandler.components(buttonCommandType),
     });
 
-    ctx.client.functions.editMessage(
-      {
-        components: [],
-      },
-      ctx.channelId,
-      ctx.messageId,
-      ctx.client.token
-    );
+    ctx.client.functions
+      .editMessage(
+        {
+          components: [],
+        },
+        ctx.channelId,
+        ctx.messageId,
+        ctx.client.token
+      )
+      .catch(err =>
+        this.client.console.warn(`Button failed to edit with ${err.status}: ${err.message}}`)
+      );
   }
 
   components(type: CommandComponentTypes): APIActionRowComponent[] | undefined {

@@ -77,23 +77,25 @@ const answer: Command = {
         ],
       });
 
-    const editedMessage = await ctx.client.functions.editMessage(
-      {
-        embeds: [
-          {
-            title: paranoiaData.questionText,
-            color: ctx.client.COLORS.GREEN,
-            description: `Question answered: Check it out in <#${paranoiaData.channelId}>.`,
-            footer: {
-              text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
+    const editedMessage = await ctx.client.functions
+      .editMessage(
+        {
+          embeds: [
+            {
+              title: paranoiaData.questionText,
+              color: ctx.client.COLORS.GREEN,
+              description: `Question answered: Check it out in <#${paranoiaData.channelId}>.`,
+              footer: {
+                text: `Type: PARANOIA | Rating: ${paranoiaData.questionRating} | ID: ${paranoiaData.questionId}`,
+              },
             },
-          },
-        ],
-      },
-      ctx.channelId,
-      paranoiaData.dmMessageId!,
-      ctx.client.token
-    );
+          ],
+        },
+        ctx.channelId,
+        paranoiaData.dmMessageId!,
+        ctx.client.token
+      )
+      .catch(_ => null);
     if (!editedMessage)
       ctx.client.console.warn(
         `Paranoia message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${paranoiaData.dmMessageId}`
