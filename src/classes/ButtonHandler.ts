@@ -99,9 +99,10 @@ export default class ButtonHandler {
         ctx.messageId,
         ctx.client.token
       )
-      .catch(err =>
-        this.client.console.warn(`Button failed to edit with ${err.status}: ${err.message}}`)
-      );
+      .catch(err => {
+        if (err.status !== 403)
+          this.client.console.warn(`Button failed to edit with ${err.status}: ${err.message}`);
+      });
   }
 
   components(type: CommandComponentTypes): APIActionRowComponent[] | undefined {
