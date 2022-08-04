@@ -101,7 +101,9 @@ export default class ButtonHandler {
       )
       .catch(err => {
         if (err.status !== 403)
-          this.client.console.warn(`Button failed to edit with ${err.status}: ${err.message}`);
+          this.client.console.warn(
+            `Button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`
+          );
       });
   }
 
