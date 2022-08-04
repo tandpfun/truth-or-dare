@@ -162,7 +162,9 @@ export async function sendMessage(
   token: string
 ): Promise<RESTPostAPIChannelMessageResult | null> {
   return await superagent
-    .post(`https://discord.com/api/channels/${channelId}/messages`)
+    .post(
+      `${process.env.DISCORD_API_URL || 'https://discord.com'}/api/channels/${channelId}/messages`
+    )
     .send(data)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
@@ -176,7 +178,11 @@ export async function editMessage(
   token: string
 ): Promise<RESTPatchAPIChannelMessageResult | null> {
   return await superagent
-    .patch(`https://discord.com/api/channels/${channelId}/messages/${messageId}`)
+    .patch(
+      `${
+        process.env.DISCORD_API_URL || 'https://discord.com'
+      }/api/channels/${channelId}/messages/${messageId}`
+    )
     .send(data)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body);
@@ -187,7 +193,7 @@ export async function createDMChannel(
   token: string
 ): Promise<RESTPostAPICurrentUserCreateDMChannelResult | null> {
   return await superagent
-    .post('https://discord.com/api/users/@me/channels')
+    .post(`${process.env.DISCORD_API_URL || 'https://discord.com'}/api/users/@me/channels`)
     .send({ recipient_id: userId })
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
@@ -199,7 +205,7 @@ export async function fetchGuild(
   token: string
 ): Promise<RESTGetAPIGuildResult | null> {
   return await superagent
-    .get(`https://discord.com/api/guilds/${guildId}`)
+    .get(`${process.env.DISCORD_API_URL || 'https://discord.com'}/api/guilds/${guildId}`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(_ => null);
@@ -210,7 +216,7 @@ export async function fetchChannel(
   token: string
 ): Promise<RESTGetAPIChannelResult | null> {
   return await superagent
-    .get(`https://discord.com/api/channels/${channelId}`)
+    .get(`${process.env.DISCORD_API_URL || 'https://discord.com'}/api/channels/${channelId}`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(_ => null);
@@ -221,7 +227,7 @@ export async function fetchGuildChannels(
   token: string
 ): Promise<RESTGetAPIGuildChannelsResult | null> {
   return await superagent
-    .get(`https://discord.com/api/guilds/${guildId}/channels`)
+    .get(`${process.env.DISCORD_API_URL || 'https://discord.com'}/api/guilds/${guildId}/channels`)
     .set('Authorization', `Bot ${token}`)
     .then(res => res.body)
     .catch(console.log);

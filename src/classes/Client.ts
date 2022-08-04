@@ -21,6 +21,7 @@ export default class Client {
   id: string;
   publicKey: string;
   port: number;
+  discordAPIUrl: string;
   developers: string[];
   commands: Command[];
   console: Logger;
@@ -94,6 +95,7 @@ export default class Client {
     this.id = applicationId;
     this.publicKey = publicKey;
     this.port = port;
+    this.discordAPIUrl = process.env.DISCORD_API_URL || 'https://discord.com';
     this.developers = [
       '393294718345412618',
       '276544649148235776',
@@ -144,6 +146,7 @@ export default class Client {
 
   async start() {
     this.console.log(`Starting Truth or Dare...`);
+    this.console.log(`Using API URL: ${this.discordAPIUrl}`);
     await this.loadCommands();
     for (const { name } of this.commands) {
       this.stats.commands[name] = 0;
@@ -212,7 +215,7 @@ export default class Client {
   async compareCommands(commands: Command[], guildId?: string): Promise<boolean> {
     const commandList: APIApplicationCommand[] = await superagent
       .get(
-        `https://discord.com/api/v9/applications/${this.id}${
+        `${this.discordAPIUrl}/api/v9/applications/${this.id}${
           guildId ? `/guilds/${guildId}` : ''
         }/commands`
       )
@@ -235,7 +238,7 @@ export default class Client {
 
     await superagent
       .put(
-        `https://discord.com/api/v9/applications/${this.id}${
+        `${this.discordAPIUrl}/api/v9/applications/${this.id}${
           guildId ? `/guilds/${guildId}` : ''
         }/commands`
       )
