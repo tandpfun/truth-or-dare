@@ -37,6 +37,7 @@ const dare: Command = {
       ctx.channelId,
       serverSettings?.language
     );
+    if (dare.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE', ctx.user.id);
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [
