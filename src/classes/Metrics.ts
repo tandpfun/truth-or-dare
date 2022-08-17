@@ -1,3 +1,4 @@
+import { Rating } from '@prisma/client';
 import { collectDefaultMetrics, Gauge } from 'prom-client';
 
 import Client from './Client';
@@ -15,6 +16,12 @@ export default class Metrics {
     name: 'buttons_pressed',
     help: 'The number of buttons pressed',
     labelNames: ['type'],
+  });
+
+  readonly ratingSelections = new Gauge({
+    name: 'rating_selections',
+    help: 'Number of times a rating has been selected by rating',
+    labelNames: ['rating'],
   });
 
   readonly apiRequests = new Gauge({
@@ -45,6 +52,10 @@ export default class Metrics {
 
   trackButtonPress(type: string) {
     this.buttonsPressed.labels(type).inc();
+  }
+
+  trackRatingSelection(rating: Rating) {
+    this.ratingSelections.labels(rating).inc();
   }
 
   trackAPIRequest(endpoint: string, rating: string) {

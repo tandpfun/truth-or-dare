@@ -166,6 +166,9 @@ export default class Database {
         question:
           'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
       };
+
+    if (rating) this.client.metrics.trackRatingSelection(rating);
+
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
 
