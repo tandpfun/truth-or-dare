@@ -10,7 +10,7 @@ import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
 import metricsPlugin from 'fastify-metrics';
 import { QuestionType, Rating } from '.prisma/client';
-import { PlatformAlgorithm, verify } from 'discord-verify/node';
+import { verify } from 'discord-verify/node';
 import crypto from 'node:crypto';
 import * as Sentry from '@sentry/node';
 import { register } from 'prom-client';
@@ -96,8 +96,7 @@ export default class Server {
       signature,
       timestamp,
       this.client.publicKey,
-      crypto.webcrypto.subtle,
-      PlatformAlgorithm.OldNode
+      crypto.webcrypto.subtle
     );
 
     if (!isValidRequest) return res.code(401).send('Invalid signature');
