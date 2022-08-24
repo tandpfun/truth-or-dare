@@ -17,7 +17,7 @@
     "@prisma/client": "^3.3.0",
     "@sentry/node": "^6.13.3",
     "chalk": "^4.1.2",
-    "discord-verify": "^0.0.2-beta.28",
+    "discord-verify": "0.0.2-beta.31",
     "dotenv": "^10.0.0",
     "fastify": "^4.1.0",
     "fastify-metrics": "^8.0.0",

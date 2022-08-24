@@ -347,10 +347,10 @@ discord-api-types@^0.24.0:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.24.0.tgz#9e429b8a1ddb4147134dfb3109093422de7ec549"
   integrity sha512-X0uA2a92cRjowUEXpLZIHWl4jiX1NsUpDhcEOpa1/hpO1vkaokgZ8kkPtPih9hHth5UVQ3mHBu/PpB4qjyfJ4A==
 
-discord-verify@^0.0.2-beta.28:
-  version "0.0.2-beta.28"
-  resolved "https://registry.yarnpkg.com/discord-verify/-/discord-verify-0.0.2-beta.28.tgz#decfe4ba71666cc97e9594253f6718b3ba82a2d3"
-  integrity sha512-e75FoGSd+9g8XoM+q0Pbwb0JuwRmroKlCVKqqHCira9O6kt/n3J84svXd46AMiLRaU5yFe/BZZDSU+AUseAqyA==
+discord-verify@0.0.2-beta.31:
+  version "0.0.2-beta.31"
+  resolved "https://registry.yarnpkg.com/discord-verify/-/discord-verify-0.0.2-beta.31.tgz#5152dbffee117ab974b5c6c928e52b74cc273e3a"
+  integrity sha512-epr8xQftwjNfWHPh7nt+6RyCntesAVLxpmEji0ddZdGy0KZRg808zKrHsAJckOZXMGVYFAj42FT3DHVgbxRR+w==
 
 dotenv@^10.0.0:
   version "10.0.0"
