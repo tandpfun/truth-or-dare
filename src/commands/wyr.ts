@@ -53,7 +53,7 @@ const wyr: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.server.buttonHandler.components('WYR'),
+        : ctx.client.server.buttonHandler.components('WYR', rating),
     });
   },
 };
