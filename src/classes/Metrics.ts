@@ -21,7 +21,7 @@ export default class Metrics {
   readonly ratingSelections = new Gauge({
     name: 'rating_selections',
     help: 'Number of times a rating has been selected by rating and user',
-    labelNames: ['rating', 'userId'],
+    labelNames: ['rating'],
   });
 
   readonly apiRequests = new Gauge({
@@ -54,8 +54,8 @@ export default class Metrics {
     this.buttonsPressed.labels(type).inc();
   }
 
-  trackRatingSelection(rating: Rating | 'NONE', userId: string) {
-    this.ratingSelections.labels(rating, userId).inc();
+  trackRatingSelection(rating: Rating | 'NONE') {
+    this.ratingSelections.labels(rating).inc();
   }
 
   trackAPIRequest(endpoint: string, rating: string) {

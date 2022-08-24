@@ -44,7 +44,7 @@ const paranoia: Command = {
       ctx.channelId,
       serverSettings?.language
     );
-    if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE', ctx.user.id);
+    if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
         content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),

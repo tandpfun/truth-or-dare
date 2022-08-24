@@ -37,7 +37,7 @@ const nhie: Command = {
       ctx.channelId,
       serverSettings?.language
     );
-    if (nhie.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE', ctx.user.id);
+    if (nhie.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [

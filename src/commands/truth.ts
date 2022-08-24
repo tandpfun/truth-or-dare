@@ -37,7 +37,7 @@ const truth: Command = {
       ctx.channelId,
       serverSettings?.language
     );
-    if (truth.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE', ctx.user.id);
+    if (truth.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [

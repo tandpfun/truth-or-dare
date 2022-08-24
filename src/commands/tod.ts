@@ -38,7 +38,7 @@ const tod: Command = {
       ctx.channelId,
       serverSettings?.language
     );
-    if (result.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE', ctx.user.id);
+    if (result.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
       embeds: [
