@@ -53,7 +53,7 @@ const nhie: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.server.buttonHandler.components('NHIE'),
+        : ctx.client.server.buttonHandler.components('NHIE', rating),
     });
   },
 };
