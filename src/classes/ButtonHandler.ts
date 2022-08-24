@@ -29,7 +29,7 @@ export default class ButtonHandler {
     const customId = ctx.data.custom_id as ButtonIdsWithState;
     const [id, rating] = customId.split(':') as [QuestionTypeButtonIds, Rating | undefined];
 
-    if (!this.buttonIds.includes(id as QuestionTypeButtonIds))
+    if (!this.buttonIds.includes(id))
       return this.client.console.error(
         `Button ${customId} was pressed with no corresponding question type.`
       );
