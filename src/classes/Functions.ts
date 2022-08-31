@@ -145,6 +145,9 @@ export function promoMessage(client: Client, guildId?: string) {
   if (guildId && client.database.isPremiumGuild(guildId)) return '';
 
   const promoMessages = [
+    `📝 We are trying to gain feedback from our community on the possibility of splitting the R rating into a different bot to allow us to reach a 
+    broader audience. This would also allow us to have more flexibility on the R rating, including what we can add to it, how we can limit it, etc. 
+    If you have a moment, please vote on [this survey](https://strawpoll.com/polls/w4nWDKeB3gA). Thank you for using Truth or Dare!`,
     `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
     `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
     `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a [premium feature](https://truthordarebot.xyz/premium).`,
