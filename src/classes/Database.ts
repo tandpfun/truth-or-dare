@@ -211,6 +211,10 @@ export default class Database {
     }
 
     let question = questions[Math.floor(Math.random() * questions.length)];
+
+    // Track questions sent by rating
+    if (guildId) this.client.metrics.trackQuestionRating(question.rating);
+
     if (language && 'translations' in question) {
       const translation = question.translations[language];
       if (translation !== null) question = { ...question, question: translation };

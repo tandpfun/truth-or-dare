@@ -24,6 +24,12 @@ export default class Metrics {
     labelNames: ['rating'],
   });
 
+  readonly questionsSentRating = new Gauge({
+    name: 'questions_sent_rating',
+    help: 'The number of questions sent by rating',
+    labelNames: ['rating'],
+  });
+
   readonly apiRequests = new Gauge({
     name: 'api_requests',
     help: 'API request usage statistics',
@@ -56,6 +62,10 @@ export default class Metrics {
 
   trackRatingSelection(rating: Rating | 'NONE') {
     this.ratingSelections.labels(rating).inc();
+  }
+
+  trackQuestionRating(rating: Rating) {
+    this.questionsSentRating.labels(rating).inc();
   }
 
   trackAPIRequest(endpoint: string, rating: string) {
