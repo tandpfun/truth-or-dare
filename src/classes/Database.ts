@@ -10,14 +10,16 @@ import {
   Rating,
 } from '@prisma/client';
 
-import type Client from './Client';
+import type Metrics from './Metrics';
+import Logger from './Logger';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
 type SeenQuestion = Pick<Question, 'id' | 'type' | 'rating'>;
 
 export default class Database {
-  client: Client;
+  metrics: Metrics;
+  console: Logger;
   db: PrismaClient;
   questionsSeenCache: Record<string, SeenQuestion[]> = {};
   channelCache: Record<string, ChannelSettings | null> = {};
@@ -26,14 +28,15 @@ export default class Database {
   customQuestions: CustomQuestion[] = [];
   premiumGuilds: Set<string> = new Set();
 
-  constructor(client: Client) {
-    this.client = client;
+  constructor(metrics: Metrics) {
+    this.metrics = metrics;
+    this.console = new Logger('DB');
     this.db = new PrismaClient();
   }
 
   async start() {
     await this.db.$connect();
-    this.client.console.success('Connected to database!');
+    this.console.success('Connected to database!');
     await this.fetchAllQuestions();
     await this.fetchAllCustomQuestions();
     await this.fetchPremiumGuilds();
@@ -46,7 +49,7 @@ export default class Database {
       const guildCacheSize = Object.keys(this.guildCache).length;
       this.channelCache = {};
       this.guildCache = {};
-      this.client.console.log(
+      this.console.log(
         `Cleared ${channelCacheSize} channels, ${guildCacheSize} guilds, and there's ${totalCachedSeenQuestions} seen questions in the settings cache`
       );
       await this.fetchAllQuestions();
@@ -56,9 +59,11 @@ export default class Database {
   }
 
   async migrate() {
-    if (!this.client.devMode) throw new Error('Migrations in production');
-    //const result = await this.db.something.updateMany({ data: {} });
-    //this.client.console.log(`Migration complete. ${result.count} affected`);
+    // NEVER commit changes to this line.
+    throw new Error('Unintended Migrations!');
+
+    // const result = await this.db.something.updateMany({ data: {} });
+    // this.console.log(`Migration complete. ${result.count} affected`);
   }
 
   generateId(): string {
@@ -129,7 +134,7 @@ export default class Database {
     this.questionCache = await this.db.question.findMany();
 
     // Track question count for metrics
-    this.client.metrics.updateQuestionCount(this.questionCache.length);
+    this.metrics.updateQuestionCount(this.questionCache.length);
     return this.questionCache;
   }
 
@@ -213,7 +218,7 @@ export default class Database {
     let question = questions[Math.floor(Math.random() * questions.length)];
 
     // Track questions sent by rating
-    if (guildId) this.client.metrics.trackQuestionRating(question.rating);
+    if (guildId) this.metrics.trackQuestionRating(question.rating);
 
     if (language && 'translations' in question) {
       const translation = question.translations[language];
@@ -239,7 +244,7 @@ export default class Database {
 
     const index = oldQuest ? this.questionCache.findIndex(q => q.id === quest.id) : -1;
     if (index !== -1) this.questionCache.splice(index, 1);
-    else this.client.metrics.questionCount.inc();
+    else this.metrics.questionCount.inc();
     this.questionCache.push(quest);
     return quest;
   }
@@ -253,12 +258,14 @@ export default class Database {
         1
       );
 
-    this.client.metrics.questionCount.dec();
+    this.metrics.questionCount.dec();
     return question;
   }
 
-  async makeExampleQuestions() {
-    if (!this.client.devMode || (await this.db.question.count()) > 0)
+  /* async makeExampleQuestions() {
+    // NEVER commit changes to this line.
+    throw new Error('Unintended example questions.');
+    if ((await this.db.question.count()) > 0)
       throw new Error('Example questions in production database');
     for (let i = 0; i < 100; i++) {
       for (const type of Object.values(QuestionType)) {
@@ -272,16 +279,16 @@ export default class Database {
               translations: {},
             },
           });
-          this.client.console.log(`${type}-${rating}-${i}`);
+          this.console.log(`${type}-${rating}-${i}`);
         }
       }
     }
-  }
+  } */
 
   async fetchAllCustomQuestions() {
     this.customQuestions = await this.db.customQuestion.findMany();
 
-    this.client.metrics.updateCustomQuestionCount(this.customQuestions.length); // Track custom question count for metrics
+    this.metrics.updateCustomQuestionCount(this.customQuestions.length); // Track custom question count for metrics
     return this.customQuestions;
   }
 
@@ -304,7 +311,7 @@ export default class Database {
     });
     this.customQuestions.push(question);
 
-    this.client.metrics.customQuestionCount.inc();
+    this.metrics.customQuestionCount.inc();
     return question;
   }
 
@@ -329,7 +336,7 @@ export default class Database {
         1
       );
 
-    this.client.metrics.customQuestionCount.dec();
+    this.metrics.customQuestionCount.dec();
     return question;
   }
 
