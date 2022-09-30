@@ -61,7 +61,7 @@ const paranoia: Command = {
         ],
         components: serverSettings?.disableButtons
           ? []
-          : ctx.client.server.buttonHandler.components('PARANOIA'),
+          : ctx.client.buttonHandler.components('PARANOIA'),
       });
     }
 

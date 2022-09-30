@@ -1,4 +1,3 @@
-import { ButtonStyle, ComponentType } from 'discord-api-types/v9';
 import { QuestionType, Rating } from '@prisma/client';
 
 import type Command from '../classes/Command';
@@ -43,19 +42,6 @@ const stats: Command = {
                   .join(' | ')}`
             )
             .join('\n')}`,
-        },
-      ],
-      components: [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              label: 'More Stats',
-              url: 'https://statcord.com/bot/692045914436796436',
-              style: ButtonStyle.Link,
-            },
-          ],
         },
       ],
     });

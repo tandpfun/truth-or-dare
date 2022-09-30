@@ -185,7 +185,7 @@ const questions: Command = {
       );
 
       const titleCase = ctx.client.functions.titleCase;
-      // TODO: Buttons
+      // TODO: Buttons for pages
       return ctx.reply({
         embeds: [
           {

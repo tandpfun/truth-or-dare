@@ -1,7 +1,7 @@
 import { ButtonStyle, ComponentType } from 'discord-api-types/v9';
 
 import type Command from '../classes/Command';
-import type Context from '../classes/Context';
+import type Context from '../classes/CommandContext';
 
 const invite: Command = {
   name: 'invite',
