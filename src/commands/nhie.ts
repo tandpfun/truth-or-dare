@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type Context from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
