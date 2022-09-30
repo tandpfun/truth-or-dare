@@ -1,7 +1,11 @@
-import { collectDefaultMetrics, Gauge } from 'prom-client';
 import { Rating } from '@prisma/client';
+import { collectDefaultMetrics, Gauge } from 'prom-client';
+
+import Client from './Client';
 
 export default class Metrics {
+  client: Client;
+
   readonly commandsUsed = new Gauge({
     name: 'commands_used',
     help: 'The usage of each command',
@@ -42,10 +46,9 @@ export default class Metrics {
     help: 'The number of custom questions in the database',
   });
 
-  // TODO: add metric types for R bot
+  constructor(client: Client) {
+    this.client = client;
 
-  constructor() {
-    // TODO: determine if prefixed or separate metrics per bot are wanted?
     collectDefaultMetrics();
   }
 

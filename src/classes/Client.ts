@@ -1,4 +1,5 @@
 import { readdirSync } from 'fs';
+import os from 'os';
 
 import {
   RESTPostAPIWebhookWithTokenJSONBody,
@@ -8,30 +9,26 @@ import {
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
 
-import type CommandContext from './CommandContext';
-import type ButtonContext from './ButtonContext';
-import ButtonHandler from './ButtonHandler';
 import * as functions from './Functions';
-import type Database from './Database';
-import type Metrics from './Metrics';
 import type Command from './Command';
+import Database from './Database';
+import Metrics from './Metrics';
 import Logger from './Logger';
-
-const PASSTHROUGH_COMMANDS = ['settings'];
+import Server from './Server';
 
 export default class Client {
-  id: string;
   token: string;
+  id: string;
   publicKey: string;
+  port: number;
   discordAPIUrl: string;
-  enableR: boolean;
-  owners: string[];
+  developers: string[];
   commands: Command[];
   console: Logger;
   metrics: Metrics;
-  database: Database;
-  buttonHandler: ButtonHandler;
   functions: typeof functions;
+  server: Server;
+  database: Database;
 
   suggestCooldowns: Record<string, number>;
   stats: {
@@ -84,28 +81,34 @@ export default class Client {
   } as const;
 
   constructor({
-    applicationId,
     token,
+    applicationId,
     publicKey,
-    owners,
-    metrics,
-    database,
-    enableR,
+    port,
   }: {
     token: string;
     applicationId: string;
     publicKey: string;
-    owners: string[];
-    metrics: Metrics;
-    database: Database;
-    enableR: boolean;
+    port: number;
   }) {
-    this.id = applicationId;
     this.token = token;
+    this.id = applicationId;
     this.publicKey = publicKey;
-    this.enableR = enableR;
-    this.owners = owners;
-    this.discordAPIUrl = process.env.DISCORD_API_URL ?? 'https://discord.com';
+    this.port = port;
+    this.discordAPIUrl = process.env.DISCORD_API_URL || 'https://discord.com';
+    this.developers = [
+      '393294718345412618',
+      '276544649148235776',
+      '358776042829119498',
+      '472176262291390464',
+    ];
+
+    if (!this.devMode && process.env.SENTRY_DSN) {
+      Sentry.init({ dsn: process.env.SENTRY_DSN });
+      process.on('unhandledRejection', err => {
+        Sentry.captureException(err);
+      });
+    }
 
     this.suggestCooldowns = {};
     this.stats = {
@@ -116,11 +119,15 @@ export default class Client {
     };
 
     this.commands = [];
-    this.console = new Logger('ToD' + (enableR ? ' R' : ''));
-    this.metrics = metrics;
+    this.console = new Logger('ToD');
+    this.metrics = new Metrics(this);
     this.functions = functions;
-    this.database = database;
-    this.buttonHandler = new ButtonHandler(this);
+    this.server = new Server(this.port, this);
+    this.database = new Database(this);
+  }
+
+  get devMode() {
+    return process.argv.includes('dev');
   }
 
   get inviteUrl() {
@@ -138,6 +145,7 @@ export default class Client {
   }
 
   async start() {
+    this.console.log(`Starting Truth or Dare...`);
     this.console.log(`Using API URL: ${this.discordAPIUrl}`);
     await this.loadCommands();
     for (const { name } of this.commands) {
@@ -145,70 +153,19 @@ export default class Client {
       this.stats.minuteCommands[name] = 0;
     }
     this.console.success(`Loaded ${this.commands.length} commands!`);
+    await this.database.start();
+    this.server.start();
 
     setInterval(() => {
       this.stats.pastCommandCounts.unshift(this.stats.minuteCommandCount);
       if (this.stats.pastCommandCounts.length > 30) this.stats.pastCommandCounts.pop();
+      if (!this.devMode && process.env.STATCORD_KEY)
+        this.postToStatcord(this.stats.minuteCommandCount, this.stats.minuteCommands);
       for (const command in this.stats.minuteCommands) {
         this.stats.minuteCommands[command] = 0;
       }
       this.stats.minuteCommandCount = 0;
     }, 60 * 1000);
-  }
-
-  async handleCommand(ctx: CommandContext) {
-    if ((await ctx.channelSettings).muted && !PASSTHROUGH_COMMANDS.includes(ctx.command.name))
-      return ctx.reply({
-        content:
-          this.EMOTES.xmark + ' I am muted in this channel. Use `/settings unmute` to unmute me.',
-        flags: 1 << 6,
-      });
-    const command = this.commands.find(c => c.name === ctx.command.name);
-    if (!command)
-      return this.console.error(
-        `Command ${ctx.command.name} was run with no corresponding command file.`
-      );
-    if (!this.functions.checkPerms(command, ctx)) return;
-
-    // Statistics
-    this.stats.minuteCommandCount++;
-    this.stats.commands[command.name]++;
-    this.stats.minuteCommands[command.name]++;
-
-    let commandErrored;
-    try {
-      await command.run(ctx);
-    } catch (err) {
-      commandErrored = true;
-      this.console.error(err);
-
-      // Track error with Sentry
-      Sentry.withScope(scope => {
-        scope.setExtras({
-          user: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
-          command: command.name,
-          args: JSON.stringify(ctx.options),
-          channelId: ctx.channelId,
-        });
-        Sentry.captureException(err);
-      });
-      ctx.reply({
-        content: `${this.EMOTES.xmark} Something went wrong while running that command.`,
-        flags: 1 << 6,
-      });
-    }
-
-    this.metrics.trackCommandUse(command.name, !commandErrored);
-  }
-
-  async handleButton(ctx: ButtonContext) {
-    if ((await ctx.channelSettings).muted)
-      return ctx.reply({
-        content:
-          this.EMOTES.xmark + ' I am muted in this channel. Use `/settings unmute` to unmute me.',
-        flags: 1 << 6,
-      });
-    await this.buttonHandler.handleButton(ctx);
   }
 
   async loadCommands() {
@@ -234,8 +191,7 @@ export default class Client {
         });
       }
     }
-    const devMode = process.argv.includes('dev');
-    if (devMode)
+    if (this.devMode)
       this.console.log(
         'Global Commands: ' +
           ((await this.compareCommands(globalCommands))
@@ -245,7 +201,7 @@ export default class Client {
     else await this.updateCommands(globalCommands);
 
     for (const guildId in guildOnly) {
-      if (devMode)
+      if (this.devMode)
         this.console.log(
           `GuildOnly Commands (${guildId}): ` +
             ((await this.compareCommands(guildOnly[guildId], guildId))
@@ -295,6 +251,28 @@ export default class Client {
         }))
       );
     this.console.success(`Updated ${this.commands.length} slash commands`);
+  }
+
+  async postToStatcord(minuteCommandCount: number, minuteCommands: { [command: string]: number }) {
+    const activeMem = os.totalmem() - os.freemem();
+
+    await superagent
+      .post(`https://api.statcord.com/v3/stats`)
+      .send({
+        id: this.id,
+        key: process.env.STATCORD_KEY,
+        servers: 200000,
+        users: 0,
+        active: [],
+        commands: minuteCommandCount,
+        popular: Object.entries(minuteCommands).map(([name, count]) => ({ name, count })),
+        memactive: activeMem,
+        memload: (activeMem / os.totalmem()) * 100,
+        cpuload: 0,
+        bandwidth: 0,
+      })
+      .then(res => res.body)
+      .catch(_ => null);
   }
 
   async webhookLog(type: string, data: RESTPostAPIWebhookWithTokenJSONBody) {

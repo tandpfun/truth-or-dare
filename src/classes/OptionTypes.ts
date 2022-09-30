@@ -1,8 +1,8 @@
 import type {
-  APIApplicationCommandInteractionDataSubcommandOption,
-  APIApplicationCommandInteractionDataBasicOption,
-  APIApplicationCommandSubcommandGroupOption,
-  APIApplicationCommandSubcommandOption,
+  APIApplicationCommandInteractionDataOptionWithValues,
+  ApplicationCommandInteractionDataOptionSubCommand,
+  APIApplicationCommandSubCommandOptions,
+  APIApplicationCommandArgumentOptions,
   ApplicationCommandOptionType,
   APIApplicationCommandOption,
   Snowflake,
@@ -16,60 +16,49 @@ export type ReadOnly<D> = {
 };
 
 export type OptionType<O extends APIApplicationCommandOption> =
-  O extends APIApplicationCommandSubcommandOption
+  O extends APIApplicationCommandSubCommandOptions
     ? SubOptionType<O>
-    : O extends Exclude<
-        APIApplicationCommandOption,
-        APIApplicationCommandSubcommandOption | APIApplicationCommandSubcommandGroupOption
-      >
+    : O extends Exclude<APIApplicationCommandOption, APIApplicationCommandSubCommandOptions>
     ? DataOption<O>
     : never;
 
-type SubOptionType<O extends APIApplicationCommandSubcommandOption> = {
+type SubOptionType<O extends APIApplicationCommandSubCommandOptions> = {
   name: O['name'];
   type: O['type'];
   options: O['options'] extends any[]
     ? O['type'] extends ApplicationCommandOptionType.SubcommandGroup
-      ? APIApplicationCommandInteractionDataSubcommandOption[]
-      : APIApplicationCommandInteractionDataBasicOption[]
+      ? ApplicationCommandInteractionDataOptionSubCommand[]
+      : APIApplicationCommandInteractionDataOptionWithValues[]
     : [];
 };
 
 type DataOption<
-  O extends Exclude<
-    APIApplicationCommandOption,
-    APIApplicationCommandSubcommandOption | APIApplicationCommandSubcommandGroupOption
-  >
+  O extends Exclude<APIApplicationCommandOption, APIApplicationCommandSubCommandOptions>
 > = {
   name: O['name'];
   type: O['type'];
-  value: O extends { choices: { value: any }[] } ? O['choices'][number]['value'] : ValueType<O>;
+  value: O extends APIApplicationCommandArgumentOptions
+    ? O['choices'] extends any[]
+      ? O['choices'][number]['value']
+      : ValueType<O>
+    : ValueType<O>;
 };
 
 type MentionableTypes =
-  | ApplicationCommandOptionType.User
   | ApplicationCommandOptionType.Channel
+  | ApplicationCommandOptionType.Mentionable
   | ApplicationCommandOptionType.Role
-  | ApplicationCommandOptionType.Mentionable;
-type NumberTypes = ApplicationCommandOptionType.Number | ApplicationCommandOptionType.Integer;
+  | ApplicationCommandOptionType.User;
+type NumberTypes = ApplicationCommandOptionType.Integer | ApplicationCommandOptionType.Number;
 
 type ValueType<
-  O extends Exclude<
-    APIApplicationCommandOption,
-    APIApplicationCommandSubcommandOption | APIApplicationCommandSubcommandGroupOption
-  >
-> = O['type'] extends ApplicationCommandOptionType.Boolean
-  ? boolean
+  O extends Exclude<APIApplicationCommandOption, APIApplicationCommandSubCommandOptions>
+> = O['type'] extends MentionableTypes
+  ? Snowflake
   : O['type'] extends NumberTypes
   ? number
   : O['type'] extends ApplicationCommandOptionType.String
-  ? // @ts-ignore
-    O['choices'] extends any[]
-    ? // @ts-ignore
-      O['choices'][number]['value']
-    : string
-  : O['type'] extends MentionableTypes
-  ? Snowflake
-  : O['type'] extends ApplicationCommandOptionType.Attachment
-  ? Snowflake
+  ? string
+  : O['type'] extends ApplicationCommandOptionType.Boolean
+  ? boolean
   : never;

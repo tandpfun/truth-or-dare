@@ -9,7 +9,7 @@ import {
   APIUser,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
-import type { FastifyReply } from 'fastify';
+import { FastifyReply } from 'fastify';
 
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';

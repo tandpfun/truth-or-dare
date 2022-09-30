@@ -1,12 +1,7 @@
-import {
-  APIActionRowComponent,
-  APIButtonComponent,
-  ComponentType,
-  ButtonStyle,
-} from 'discord-api-types/v9';
+import { APIActionRowComponent, ButtonStyle, ComponentType } from 'discord-api-types/v9';
 import { QuestionType } from '@prisma/client';
 
-import type ButtonContext from './ButtonContext';
+import ButtonContext from './ButtonContext';
 import { avatarURL } from './Functions';
 import type Client from './Client';
 
@@ -90,7 +85,9 @@ export default class ButtonHandler {
             : undefined,
         },
       ],
-      components: settings?.disableButtons ? [] : this.components(buttonCommandType),
+      components: settings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components(buttonCommandType),
     });
 
     ctx.client.functions
@@ -110,7 +107,7 @@ export default class ButtonHandler {
       });
   }
 
-  components(type: CommandComponentTypes): APIActionRowComponent<APIButtonComponent>[] | undefined {
+  components(type: CommandComponentTypes): APIActionRowComponent[] | undefined {
     if (type === 'TOD') {
       return [
         {

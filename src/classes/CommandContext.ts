@@ -1,7 +1,7 @@
 import {
-  APIApplicationCommandInteractionDataSubcommandGroupOption,
+  ApplicationCommandInteractionDataOptionSubCommandGroup,
   APIChatInputApplicationCommandInteractionDataResolved,
-  APIApplicationCommandInteractionDataSubcommandOption,
+  ApplicationCommandInteractionDataOptionSubCommand,
   APIChatInputApplicationCommandInteractionData,
   APIApplicationCommandInteractionDataOption,
   APIChatInputApplicationCommandInteraction,
@@ -15,7 +15,7 @@ import {
   APIUser,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
-import type { FastifyReply } from 'fastify';
+import { FastifyReply } from 'fastify';
 
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
@@ -82,25 +82,25 @@ export default class CommandContext implements Context {
     const firstRes = (
       (
         this.options[0] as
-          | APIApplicationCommandInteractionDataSubcommandGroupOption
-          | APIApplicationCommandInteractionDataSubcommandOption
+          | ApplicationCommandInteractionDataOptionSubCommandGroup
+          | ApplicationCommandInteractionDataOptionSubCommand
       ).options as (
-        | APIApplicationCommandInteractionDataSubcommandGroupOption
-        | APIApplicationCommandInteractionDataSubcommandOption
+        | ApplicationCommandInteractionDataOptionSubCommandGroup
+        | ApplicationCommandInteractionDataOptionSubCommand
       )[]
     )?.find(o => o.name === name);
     if (firstRes) return firstRes as OptionType<O>;
     if (
       (
         this.options[0] as
-          | APIApplicationCommandInteractionDataSubcommandGroupOption
-          | APIApplicationCommandInteractionDataSubcommandOption
+          | ApplicationCommandInteractionDataOptionSubCommandGroup
+          | ApplicationCommandInteractionDataOptionSubCommand
       ).options?.[0]?.type !== ApplicationCommandOptionType.Subcommand
     )
       return;
     const secondRes = (
-      (this.options[0] as APIApplicationCommandInteractionDataSubcommandGroupOption)
-        .options[0] as APIApplicationCommandInteractionDataSubcommandOption
+      (this.options[0] as ApplicationCommandInteractionDataOptionSubCommandGroup)
+        .options[0] as ApplicationCommandInteractionDataOptionSubCommand
     ).options?.find(o => o.name === name);
     if (secondRes) return secondRes as OptionType<O>;
     return;

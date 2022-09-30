@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
-import type Context from '../classes/CommandContext';
+import type Context from '../classes/Context';
 
 const options = [
   {
@@ -51,7 +51,9 @@ const nhie: Command = {
             : undefined,
         },
       ],
-      components: serverSettings?.disableButtons ? [] : ctx.client.buttonHandler.components('NHIE'),
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.server.buttonHandler.components('NHIE'),
     });
   },
 };
