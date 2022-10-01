@@ -171,7 +171,7 @@ export default class Database {
       };
 
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
-    const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
+    const guildSettings = guildId ? await this.fetchGuildSettings(guildId) : null;
     const language = guildSettings?.language;
 
     const questionFilter = (q: Omit<Question | CustomQuestion, 'question'>) =>
@@ -180,15 +180,16 @@ export default class Database {
       questionFilter(q) && (language ? language in q.translations : true);
     const customFilter = (q: CustomQuestion) => q.guildId === guildId && questionFilter(q);
 
-    let questions: (Question | CustomQuestion)[] = guildSettings?.disableGlobals
-      ? this.customQuestions.filter(customFilter)
-      : (isPremiumGuild
-          ? [
-              ...this.questionCache.filter(globalFilter),
-              ...this.customQuestions.filter(customFilter),
-            ]
-          : this.questionCache.filter(globalFilter)
-        ).filter(q => !guildSettings?.disabledQuestions.includes(q.id));
+    let questions: (Question | CustomQuestion)[] =
+      isPremiumGuild && guildSettings?.disableGlobals
+        ? this.customQuestions.filter(customFilter)
+        : (isPremiumGuild
+            ? [
+                ...this.questionCache.filter(globalFilter),
+                ...this.customQuestions.filter(customFilter),
+              ]
+            : this.questionCache.filter(globalFilter)
+          ).filter(q => !isPremiumGuild || !guildSettings?.disabledQuestions.includes(q.id));
 
     let allQuestionsSeen: SeenQuestion[] = [];
 
