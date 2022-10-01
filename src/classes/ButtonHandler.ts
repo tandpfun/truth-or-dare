@@ -35,8 +35,6 @@ export default class ButtonHandler {
         `Button ${ctx.data.custom_id} was pressed with no corresponding question type.`
       );
 
-    const channelSettings = await ctx.channelSettings;
-
     // Cooldown + Perm checks
     if (this.buttonCooldown.has(ctx.channelId)) return ctx.defer();
     if (!this.client.functions.hasPermission('SendMessages', ctx.member)) return ctx.defer();
@@ -64,15 +62,7 @@ export default class ButtonHandler {
 
     const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
 
-    const result = await ctx.client.database.getRandomQuestion(
-      type,
-      channelSettings.disabledRatings,
-      undefined,
-      ctx.guildId,
-      ctx.channelId,
-      settings?.language,
-      this.client.enableR
-    );
+    const result = await ctx.client.getQuestion(ctx, type, undefined);
 
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, result.rating),

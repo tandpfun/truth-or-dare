@@ -5,7 +5,6 @@ import {
   GuildSettings,
   PrismaClient,
   QuestionType,
-  Translation,
   Question,
   Rating,
 } from '@prisma/client';
@@ -153,16 +152,14 @@ export default class Database {
     disabledRatings: Rating[] = [],
     rating?: Rating,
     guildId?: string,
-    channelId?: string,
-    language?: Translation | null,
-    enableR: boolean = true
+    channelId?: string
   ): Promise<
     | Question
     | CustomQuestion
     | { id: null; type: QuestionType | 'RANDOM'; rating: Rating | 'NONE'; question: string }
   > {
     const ratings = (rating ? [rating] : Object.values(Rating)).filter(
-      r => !disabledRatings.includes(r) && (enableR || r !== 'R' || true) // TODO: remove or true
+      r => !disabledRatings.includes(r)
     );
     if (!ratings.length)
       return {
@@ -175,6 +172,7 @@ export default class Database {
 
     const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = isPremiumGuild ? await this.fetchGuildSettings(guildId) : null;
+    const language = guildSettings?.language;
 
     const questionFilter = (q: Omit<Question | CustomQuestion, 'question'>) =>
       (!type || q.type === type) && ratings.includes(q.rating);
