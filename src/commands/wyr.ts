@@ -35,11 +35,12 @@ const wyr: Command = {
       rating,
       ctx.guildId,
       ctx.channelId,
-      serverSettings?.language
+      serverSettings?.language,
+      ctx.client.enableR
     );
     if (wyr.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, wyr.rating),
       embeds: [
         {
           title: wyr.question,

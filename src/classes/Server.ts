@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 
 import {
+  APIChatInputApplicationCommandInteraction,
   InteractionResponseType,
   ApplicationCommandType,
   InteractionType,

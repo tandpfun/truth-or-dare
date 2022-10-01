@@ -35,11 +35,12 @@ const nhie: Command = {
       rating,
       ctx.guildId,
       ctx.channelId,
-      serverSettings?.language
+      serverSettings?.language,
+      ctx.client.enableR
     );
     if (nhie.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, nhie.rating),
       embeds: [
         {
           title: nhie.question,

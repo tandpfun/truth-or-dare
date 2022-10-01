@@ -53,7 +53,7 @@ export default class Database {
         `Cleared ${channelCacheSize} channels, ${guildCacheSize} guilds, and there's ${totalCachedSeenQuestions} seen questions in the settings cache`
       );
       await this.fetchAllQuestions();
-      await this.sweepCustomQuestions();
+      await this.fetchAllCustomQuestions();
       await this.fetchPremiumGuilds();
     }, 24 * 60 * 60 * 1000);
   }
@@ -154,14 +154,15 @@ export default class Database {
     rating?: Rating,
     guildId?: string,
     channelId?: string,
-    language?: Translation | null
+    language?: Translation | null,
+    enableR: boolean = true
   ): Promise<
     | Question
     | CustomQuestion
     | { id: null; type: QuestionType | 'RANDOM'; rating: Rating | 'NONE'; question: string }
   > {
     const ratings = (rating ? [rating] : Object.values(Rating)).filter(
-      r => !disabledRatings.includes(r)
+      r => !disabledRatings.includes(r) && (enableR || r !== 'R' || true) // TODO: remove or true
     );
     if (!ratings.length)
       return {
@@ -338,13 +339,6 @@ export default class Database {
 
     this.metrics.customQuestionCount.dec();
     return question;
-  }
-
-  async sweepCustomQuestions() {
-    await this.db.customQuestion.deleteMany({
-      where: { guildId: { notIn: [...this.premiumGuilds] } },
-    });
-    await this.fetchAllCustomQuestions();
   }
 
   async addParanoiaQuestion(questionData: Optional<ParanoiaQuestion, 'id' | 'time'>) {

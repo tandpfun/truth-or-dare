@@ -42,12 +42,13 @@ const paranoia: Command = {
       rating,
       ctx.guildId,
       ctx.channelId,
-      serverSettings?.language
+      serverSettings?.language,
+      ctx.client.enableR
     );
     if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
-        content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+        content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, paranoia.rating),
         embeds: [
           {
             title: paranoia.question,

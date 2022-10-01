@@ -35,11 +35,12 @@ const dare: Command = {
       rating,
       ctx.guildId,
       ctx.channelId,
-      serverSettings?.language
+      serverSettings?.language,
+      ctx.client.enableR
     );
     if (dare.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, dare.rating),
       embeds: [
         {
           title: dare.question,

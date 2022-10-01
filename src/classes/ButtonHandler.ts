@@ -70,11 +70,12 @@ export default class ButtonHandler {
       undefined,
       ctx.guildId,
       ctx.channelId,
-      settings?.language
+      settings?.language,
+      this.client.enableR
     );
 
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, result.rating),
       embeds: [
         {
           author: {

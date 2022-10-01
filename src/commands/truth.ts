@@ -35,11 +35,12 @@ const truth: Command = {
       rating,
       ctx.guildId,
       ctx.channelId,
-      serverSettings?.language
+      serverSettings?.language,
+      ctx.client.enableR
     );
     if (truth.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, truth.rating),
       embeds: [
         {
           title: truth.question,
