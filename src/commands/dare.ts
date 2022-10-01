@@ -24,20 +24,11 @@ const dare: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const channelSettings = await ctx.channelSettings;
     const serverSettings = ctx.guildId
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const dare = await ctx.client.database.getRandomQuestion(
-      'DARE',
-      channelSettings.disabledRatings,
-      rating,
-      ctx.guildId,
-      ctx.channelId,
-      serverSettings?.language,
-      ctx.client.enableR
-    );
+    const dare = await ctx.client.getQuestion(ctx, 'DARE', rating);
     if (dare.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, dare.rating),

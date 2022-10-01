@@ -29,22 +29,13 @@ const paranoia: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const channelSettings = await ctx.channelSettings;
     const serverSettings = ctx.guildId
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const targetUserId = ctx.getOption<Mutable<typeof options[0]>>('target')?.value;
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')?.value;
 
-    const paranoia = await ctx.client.database.getRandomQuestion(
-      'PARANOIA',
-      channelSettings.disabledRatings,
-      rating,
-      ctx.guildId,
-      ctx.channelId,
-      serverSettings?.language,
-      ctx.client.enableR
-    );
+    const paranoia = await ctx.client.getQuestion(ctx, 'PARANOIA', rating);
     if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({

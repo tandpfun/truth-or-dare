@@ -5,6 +5,7 @@ import {
   APIApplicationCommand,
   PermissionFlagsBits,
 } from 'discord-api-types/v9';
+import { QuestionType, Rating } from '@prisma/client';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
 
@@ -15,6 +16,7 @@ import * as functions from './Functions';
 import type Database from './Database';
 import type Metrics from './Metrics';
 import type Command from './Command';
+import type Context from './Context';
 import Logger from './Logger';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
@@ -211,6 +213,18 @@ export default class Client {
     await this.buttonHandler.handleButton(ctx);
   }
 
+  async getQuestion(ctx: Context, type?: QuestionType, rating?: Rating) {
+    const disabledRatings = (await ctx.channelSettings).disabledRatings;
+    if (this.enableR) disabledRatings.push('R');
+    return this.database.getRandomQuestion(
+      type,
+      disabledRatings,
+      rating,
+      ctx.guildId,
+      ctx.channelId
+    );
+  }
+
   async loadCommands() {
     const commandFileNames = readdirSync(`${__dirname}/../commands`).filter(f => f.endsWith('.js'));
     const globalCommands: Command[] = [];
@@ -277,6 +291,7 @@ export default class Client {
   }
 
   async updateCommands(commands: Command[], guildId?: string) {
+    // TODO: don't post R option to commands for regular bot
     if (!(await this.compareCommands(commands, guildId))) return;
     this.console.log('Updating commands...');
 

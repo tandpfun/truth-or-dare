@@ -13,7 +13,6 @@ const devMode = process.argv.includes('dev');
 
 const metrics = new Metrics();
 const database = new Database(metrics);
-// TODO: make server, server delegates to 2 clients
 
 const clients = [];
 if (TOKEN && APPLICATION_ID && PUBLIC_KEY)
@@ -29,15 +28,17 @@ if (TOKEN && APPLICATION_ID && PUBLIC_KEY)
     })
   );
 if (R_TOKEN && R_APPLICATION_ID && R_PUBLIC_KEY)
-  new Client({
-    token: R_TOKEN,
-    applicationId: R_APPLICATION_ID,
-    publicKey: R_PUBLIC_KEY,
-    owners: (OWNERS ?? '').split(','),
-    metrics,
-    database,
-    enableR: true,
-  });
+  clients.push(
+    new Client({
+      token: R_TOKEN,
+      applicationId: R_APPLICATION_ID,
+      publicKey: R_PUBLIC_KEY,
+      owners: (OWNERS ?? '').split(','),
+      metrics,
+      database,
+      enableR: true,
+    })
+  );
 
 const server = new Server(Number(PORT), database, metrics, clients);
 
