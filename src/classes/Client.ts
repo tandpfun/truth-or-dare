@@ -215,7 +215,7 @@ export default class Client {
 
   async getQuestion(ctx: Context, type?: QuestionType, rating?: Rating) {
     const disabledRatings = (await ctx.channelSettings).disabledRatings;
-    if (this.enableR) disabledRatings.push('R');
+    // if (this.enableR) disabledRatings.push('R'); // TODO: disable R rating again
     return this.database.getRandomQuestion(
       type,
       disabledRatings,
