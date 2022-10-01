@@ -52,7 +52,9 @@ const nhie: Command = {
             : undefined,
         },
       ],
-      components: serverSettings?.disableButtons ? [] : ctx.client.buttonHandler.components('NHIE'),
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.buttonHandler.components('NHIE', nhie.rating),
     });
   },
 };

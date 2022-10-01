@@ -52,7 +52,9 @@ const dare: Command = {
             : undefined,
         },
       ],
-      components: serverSettings?.disableButtons ? [] : ctx.client.buttonHandler.components('TOD'),
+      components: serverSettings?.disableButtons
+        ? []
+        : ctx.client.buttonHandler.components('TOD', dare.rating),
     });
   },
 };

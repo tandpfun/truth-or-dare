@@ -4,7 +4,7 @@ import {
   ComponentType,
   ButtonStyle,
 } from 'discord-api-types/v9';
-import { QuestionType } from '@prisma/client';
+import { QuestionType, Rating } from '@prisma/client';
 
 import type ButtonContext from './ButtonContext';
 import { avatarURL } from './Functions';
@@ -91,7 +91,7 @@ export default class ButtonHandler {
             : undefined,
         },
       ],
-      components: settings?.disableButtons ? [] : this.components(buttonCommandType),
+      components: settings?.disableButtons ? [] : this.components(buttonCommandType, result.rating),
     });
 
     ctx.client.functions
@@ -111,89 +111,69 @@ export default class ButtonHandler {
       });
   }
 
-  components(type: CommandComponentTypes): APIActionRowComponent<APIButtonComponent>[] | undefined {
+  components(
+    type: CommandComponentTypes,
+    rating: Rating | 'NONE'
+  ): APIActionRowComponent<APIButtonComponent>[] | undefined {
+    const arr: APIButtonComponent[] = [];
     if (type === 'TOD') {
-      return [
+      arr.push(
         {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              custom_id: 'TRUTH',
-              label: 'Truth',
-              style: ButtonStyle.Success,
-            },
-            {
-              type: ComponentType.Button,
-              custom_id: 'DARE',
-              label: 'Dare',
-              style: ButtonStyle.Danger,
-            },
-            {
-              type: ComponentType.Button,
-              custom_id: 'TOD',
-              label: 'Random',
-              style: ButtonStyle.Primary,
-            },
-          ],
+          type: ComponentType.Button,
+          custom_id: 'TRUTH',
+          label: 'Truth',
+          style: ButtonStyle.Success,
         },
-      ];
+        {
+          type: ComponentType.Button,
+          custom_id: 'DARE',
+          label: 'Dare',
+          style: ButtonStyle.Danger,
+        },
+        {
+          type: ComponentType.Button,
+          custom_id: 'TOD',
+          label: 'Random',
+          style: ButtonStyle.Primary,
+        }
+      );
     } else if (type === 'NHIE') {
-      return [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              custom_id: 'NHIE',
-              label: 'Never Have I Ever',
-              style: ButtonStyle.Primary,
-            },
-          ],
-        },
-      ];
+      arr.push({
+        type: ComponentType.Button,
+        custom_id: 'NHIE',
+        label: 'Never Have I Ever',
+        style: ButtonStyle.Primary,
+      });
     } else if (type === 'WYR') {
-      return [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              custom_id: 'WYR',
-              label: 'Would You Rather',
-              style: ButtonStyle.Primary,
-            },
-          ],
-        },
-      ];
+      arr.push({
+        type: ComponentType.Button,
+        custom_id: 'WYR',
+        label: 'Would You Rather',
+        style: ButtonStyle.Primary,
+      });
     } else if (type === 'PARANOIA') {
-      return [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              custom_id: 'PARANOIA',
-              label: 'Paranoia',
-              style: ButtonStyle.Primary,
-            },
-          ],
-        },
-      ];
+      arr.push({
+        type: ComponentType.Button,
+        custom_id: 'PARANOIA',
+        label: 'Paranoia',
+        style: ButtonStyle.Primary,
+      });
     } else if (type === 'RANDOM') {
-      return [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.Button,
-              custom_id: 'RANDOM',
-              label: 'Random Question',
-              style: ButtonStyle.Primary,
-            },
-          ],
-        },
-      ];
+      arr.push({
+        type: ComponentType.Button,
+        custom_id: 'RANDOM',
+        label: 'Random Question',
+        style: ButtonStyle.Primary,
+      });
     }
+    if (rating === 'R') {
+      arr.push({
+        type: ComponentType.Button,
+        label: 'Invite R bot',
+        url: 'https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands',
+        style: ButtonStyle.Link,
+      });
+    }
+    return [{ type: ComponentType.ActionRow, components: arr }];
   }
 }
