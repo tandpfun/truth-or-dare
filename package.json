@@ -7,8 +7,8 @@
     "schema": "./src/prisma/schema.prisma"
   },
   "scripts": {
-    "start": "tsc && node .",
-    "dev": "tsc && node . dev",
+    "start": "tsc && node . ",
+    "dev": "tsc && node --trace-warnings . dev ",
     "format": "prettier . --write",
     "generate": "prisma generate"
   },
@@ -16,10 +16,10 @@
     "@fastify/rate-limit": "^7.4.0",
     "@prisma/client": "^4.4.0",
     "@sentry/node": "^7.13.0",
-    "chalk": "^5.0.1",
+    "chalk": "4",
     "discord-verify": "^1.0.0",
     "dotenv": "^16.0.2",
-    "fastify": "^4.6.0",
+    "fastify": "^4.7.0",
     "fastify-metrics": "^9.2.2",
     "prom-client": "^14.1.0",
     "superagent": "^8.0.0"

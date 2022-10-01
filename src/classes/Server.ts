@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 
 import {
-  APIChatInputApplicationCommandInteraction,
   InteractionResponseType,
   ApplicationCommandType,
   InteractionType,
@@ -10,9 +9,9 @@ import {
 } from 'discord-api-types/v9';
 import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
+import metricsPlugin from 'fastify-metrics';
 import { QuestionType, Rating } from '.prisma/client';
 import { verify } from 'discord-verify/node';
-import metricsPlugin from 'fastify-metrics';
 import { register } from 'prom-client';
 
 import CommandContext from './CommandContext';
@@ -52,7 +51,10 @@ export default class Server {
     }
 
     await this.router.register(fastifyRateLimit, { global: false });
-    this.router.register(metricsPlugin, { register: register, enableDefaultMetrics: false });
+    await this.router.register(metricsPlugin, {
+      defaultMetrics: { enabled: false, register: register },
+      endpoint: null,
+    });
 
     this.registerRoutes();
 
@@ -67,11 +69,13 @@ export default class Server {
 
     this.router.get(
       '/api/:questionType',
+      // @ts-expect-error Bug with metrics plugin extending types
       { config: { rateLimit: rateLimitConfig } },
       this.handleAPI.bind(this)
     );
     this.router.get(
       '/v1/:questionType',
+      // @ts-expect-error Bug with metrics plugin extending types
       { config: { rateLimit: rateLimitConfig } },
       this.handleAPI.bind(this)
     );
@@ -130,14 +134,14 @@ export default class Server {
         client,
         res
       );
-      client.handleCommand(ctx);
+      await client.handleCommand(ctx);
     } else if (
       interaction.type === InteractionType.MessageComponent &&
       interaction.data.component_type === ComponentType.Button
     ) {
       // If interaction is a button
       const ctx = new ButtonContext(interaction, client, res);
-      client.handleButton(ctx);
+      await client.handleButton(ctx);
     }
   }
 
