@@ -144,8 +144,8 @@ export function premiumAd(): APIInteractionResponseCallbackData {
 
 export function promoMessage(client: Client, guildId?: string, rating?: Rating | 'NONE') {
   if (rating === 'R')
-  if (guildId && client.database.isPremiumGuild(guildId)) return '';
     return `${client.EMOTES.warning} R rated questions will be removed <t:1665287999:R> to adhere to Discord's new Developer Terms of Service. R rated questions will only be available on the [new bot](https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands). For any questions, feel free to ask in our [Support Server](https://discord.gg/vBERMvVaRt).`;
+  if (guildId && client.database.isPremiumGuild(guildId)) return '';
 
   const promoMessages = [
     `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
