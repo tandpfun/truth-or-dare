@@ -63,11 +63,7 @@ type ValueType<
   : O['type'] extends NumberTypes
   ? number
   : O['type'] extends ApplicationCommandOptionType.String
-  ? // @ts-ignore
-    O['choices'] extends any[]
-    ? // @ts-ignore
-      O['choices'][number]['value']
-    : string
+  ? string
   : O['type'] extends MentionableTypes
   ? Snowflake
   : O['type'] extends ApplicationCommandOptionType.Attachment

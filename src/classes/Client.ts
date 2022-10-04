@@ -2,6 +2,8 @@ import { readdirSync } from 'fs';
 
 import {
   RESTPostAPIWebhookWithTokenJSONBody,
+  ApplicationCommandOptionType,
+  APIApplicationCommandOption,
   APIApplicationCommand,
   PermissionFlagsBits,
 } from 'discord-api-types/v9';
@@ -213,9 +215,17 @@ export default class Client {
     await this.buttonHandler.handleButton(ctx);
   }
 
-  async getQuestion(ctx: Context, type?: QuestionType, rating?: Rating) {
+  async getQuestion(ctx: Context, type?: QuestionType, rating?: Rating | 'NONE') {
     const disabledRatings = (await ctx.channelSettings).disabledRatings;
-    // if (this.enableR) disabledRatings.push('R'); // TODO: disable R rating again
+    if (this.enableR) {
+      // R bot
+      if (rating === 'NONE') rating = undefined;
+      else rating = 'R';
+    } else {
+      // main bot
+      // disabledRatings.push('R'); // TODO: disable R from main bot
+      if (rating === 'NONE') rating = undefined;
+    }
     return this.database.getRandomQuestion(
       type,
       disabledRatings,
@@ -231,6 +241,9 @@ export default class Client {
     const guildOnly: { [id: string]: Command[] } = {};
     for (const commandFileName of commandFileNames) {
       const commandFile: Command = (await import(`../commands/${commandFileName}`)).default;
+      if ((commandFile.mainBotOnly && this.enableR) || (commandFile.rBotOnly && !this.enableR)) {
+        continue; // ignore main bot commands on r bot & vice versa
+      }
       if (typeof commandFile.default_member_permissions === 'undefined')
         commandFile.default_member_permissions = commandFile.perms.length
           ? commandFile.perms
@@ -238,6 +251,8 @@ export default class Client {
               .reduce((a, c) => a | c, 0n)
               .toString()
           : null;
+      if (commandFile.options)
+        this.removeRatings(commandFile.options as APIApplicationCommandOption[]);
       this.commands.push(commandFile);
       if (!commandFile.guildId) {
         globalCommands.push(commandFile);
@@ -267,6 +282,20 @@ export default class Client {
               : 'No changes detected')
         );
       else await this.updateCommands(guildOnly[guildId], guildId);
+    }
+  }
+
+  removeRatings(options: APIApplicationCommandOption[]) {
+    for (const option of options) {
+      if ('choices' in option && option.type === ApplicationCommandOptionType.String) {
+        option.choices = option.choices?.filter(
+          c =>
+            // R bot does not have pg or pg13 ratings
+            (this.enableR && c.value !== 'PG' && c.value !== 'PG13') ||
+            // main bot does not have R rating // TODO: disable R option from main bot
+            (!this.enableR /* && c.value !== 'R' */ && c.value !== 'NONE')
+        );
+      }
     }
   }
 

@@ -18,6 +18,7 @@ const options = [
       { name: 'PG', value: 'PG' },
       { name: 'PG13', value: 'PG13' },
       { name: 'R', value: 'R' },
+      { name: 'random', value: 'NONE' },
     ],
   },
 ] as const;

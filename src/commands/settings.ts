@@ -15,7 +15,7 @@ const options = [
         type: ApplicationCommandOptionType.Channel,
         name: 'channel',
         description: 'The channel to view the settings for.',
-        channel_types: [ChannelType.GuildText, ChannelType.GuildNews],
+        channel_types: [ChannelType.GuildText, ChannelType.GuildAnnouncement],
       },
     ],
   },
