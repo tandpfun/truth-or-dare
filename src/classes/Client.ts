@@ -288,13 +288,15 @@ export default class Client {
   removeRatings(options: APIApplicationCommandOption[]) {
     for (const option of options) {
       if ('choices' in option && option.type === ApplicationCommandOptionType.String) {
-        option.choices = option.choices?.filter(
-          c =>
-            // R bot does not have pg or pg13 ratings
-            (this.enableR && c.value !== 'PG' && c.value !== 'PG13') ||
-            // main bot does not have R rating // TODO: disable R option from main bot
-            (!this.enableR /* && c.value !== 'R' */ && c.value !== 'NONE')
-        );
+        if (this.enableR) {
+          // R bot no pg or pg13
+          option.choices = option.choices?.filter(c => c.value !== 'PG' && c.value !== 'PG13');
+        } else {
+          // main bot no R or random // TODO: disable R option from main bot
+          option.choices = option.choices?.filter(c => /*c.value !== 'R' && */ c.value !== 'NONE');
+        }
+      } else if ('options' in option && option.options) {
+        this.removeRatings(option.options);
       }
     }
   }
