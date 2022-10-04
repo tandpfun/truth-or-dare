@@ -107,7 +107,7 @@ export default class Client {
     this.publicKey = publicKey;
     this.enableR = enableR;
     this.owners = owners;
-    this.discordAPIUrl = process.env.DISCORD_API_URL ?? 'https://discord.com';
+    this.discordAPIUrl = process.env.DISCORD_API_URL || 'https://discord.com';
 
     this.suggestCooldowns = {};
     this.stats = {
