@@ -156,7 +156,7 @@ export default class ButtonHandler {
         style: ButtonStyle.Primary,
       });
     }
-    if (rating === 'R') {
+    if (rating === 'R' && !this.client.enableR) {
       arr.push({
         type: ComponentType.Button,
         label: 'Invite R bot',
