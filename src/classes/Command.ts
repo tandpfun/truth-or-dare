@@ -11,6 +11,8 @@ export default interface Command {
   options?: ReadOnly<APIApplicationCommandOption[]>;
   perms: Permission[];
   guildId?: string[];
+  mainBotOnly?: boolean;
+  rBotOnly?: boolean;
   default_member_permissions?: string | null;
   run: (ctx: Context) => Promise<void>;
 }
