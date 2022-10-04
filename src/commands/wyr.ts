@@ -24,22 +24,14 @@ const wyr: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const channelSettings = await ctx.channelSettings;
     const serverSettings = ctx.guildId
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const wyr = await ctx.client.database.getRandomQuestion(
-      'WYR',
-      channelSettings.disabledRatings,
-      rating,
-      ctx.guildId,
-      ctx.channelId,
-      serverSettings?.language
-    );
+    const wyr = await ctx.client.getQuestion(ctx, 'WYR', rating);
     if (wyr.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, wyr.rating),
       embeds: [
         {
           title: wyr.question,
@@ -53,7 +45,7 @@ const wyr: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.server.buttonHandler.components('WYR'),
+        : ctx.client.buttonHandler.components('WYR', wyr.rating),
     });
   },
 };

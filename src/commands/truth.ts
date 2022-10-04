@@ -24,22 +24,14 @@ const truth: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const channelSettings = await ctx.channelSettings;
     const serverSettings = ctx.guildId
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const truth = await ctx.client.database.getRandomQuestion(
-      'TRUTH',
-      channelSettings.disabledRatings,
-      rating,
-      ctx.guildId,
-      ctx.channelId,
-      serverSettings?.language
-    );
+    const truth = await ctx.client.getQuestion(ctx, 'TRUTH', rating);
     if (truth.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, truth.rating),
       embeds: [
         {
           title: truth.question,
@@ -53,7 +45,7 @@ const truth: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.server.buttonHandler.components('TOD'),
+        : ctx.client.buttonHandler.components('TOD', truth.rating),
     });
   },
 };
