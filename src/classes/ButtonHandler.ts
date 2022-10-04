@@ -12,6 +12,7 @@ import type Client from './Client';
 
 type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
 type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
+type ButtonIdWithState = ButtonIds | `${ButtonIds}:${Rating | 'NONE'}`;
 
 export default class ButtonHandler {
   client: Client;
@@ -30,9 +31,16 @@ export default class ButtonHandler {
   }
 
   async handleButton(ctx: ButtonContext) {
-    if (!this.buttonIds.includes(ctx.data.custom_id as ButtonIds))
+    const customId = ctx.data.custom_id as ButtonIdWithState;
+    const [id, rating] = customId.split(':') as [ButtonIds, Rating | 'NONE' | undefined];
+    if (!this.buttonIds.includes(id))
       return this.client.console.error(
         `Button ${ctx.data.custom_id} was pressed with no corresponding question type.`
+      );
+
+    if (rating && !(rating in Rating || rating === 'NONE'))
+      return this.client.console.error(
+        `Button ${customId} was pressed, but rating ${rating} is unknown`
       );
 
     // Cooldown + Perm checks
@@ -40,7 +48,7 @@ export default class ButtonHandler {
     if (!this.client.functions.hasPermission('SendMessages', ctx.member)) return ctx.defer();
 
     // Statistics
-    const buttonName = ctx.data.custom_id.toLowerCase();
+    const buttonName = id.toLowerCase();
     this.client.stats.minuteCommandCount++;
     this.client.stats.commands[`${buttonName}-button`]++;
     this.client.stats.minuteCommands[`${buttonName}-button`]++;
@@ -52,17 +60,17 @@ export default class ButtonHandler {
     }, 2000);
 
     let buttonCommandType: CommandComponentTypes;
-    if (ctx.data.custom_id === 'TRUTH' || ctx.data.custom_id === 'DARE') buttonCommandType = 'TOD';
-    else buttonCommandType = ctx.data.custom_id as CommandComponentTypes;
+    if (id === 'TRUTH' || id === 'DARE') buttonCommandType = 'TOD';
+    else buttonCommandType = id;
 
     let type: QuestionType | undefined;
-    if (ctx.data.custom_id === 'TOD') type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
-    else if (ctx.data.custom_id === 'RANDOM') type = undefined;
-    else type = ctx.data.custom_id as QuestionType;
+    if (id === 'TOD') type = Math.random() < 0.5 ? 'TRUTH' : 'DARE';
+    else if (id === 'RANDOM') type = undefined;
+    else type = id;
 
     const settings = ctx.guildId ? await ctx.client.database.fetchGuildSettings(ctx.guildId) : null;
 
-    const result = await ctx.client.getQuestion(ctx, type, undefined);
+    const result = await ctx.client.getQuestion(ctx, type, rating);
 
     ctx.reply({
       content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, result.rating),
@@ -81,7 +89,9 @@ export default class ButtonHandler {
             : undefined,
         },
       ],
-      components: settings?.disableButtons ? [] : this.components(buttonCommandType, result.rating),
+      components: settings?.disableButtons
+        ? []
+        : this.components(buttonCommandType, rating, result.rating),
     });
 
     ctx.client.functions
@@ -103,26 +113,28 @@ export default class ButtonHandler {
 
   components(
     type: CommandComponentTypes,
-    rating: Rating | 'NONE'
+    rating: Rating | 'NONE' | undefined,
+    rRating: Rating | 'NONE'
   ): APIActionRowComponent<APIButtonComponent>[] | undefined {
+    const makeId = (t: ButtonIds) => `${t}${rating ? ':' + rating : ''}`;
     const arr: APIButtonComponent[] = [];
     if (type === 'TOD') {
       arr.push(
         {
           type: ComponentType.Button,
-          custom_id: 'TRUTH',
+          custom_id: makeId('TRUTH'),
           label: 'Truth',
           style: ButtonStyle.Success,
         },
         {
           type: ComponentType.Button,
-          custom_id: 'DARE',
+          custom_id: makeId('DARE'),
           label: 'Dare',
           style: ButtonStyle.Danger,
         },
         {
           type: ComponentType.Button,
-          custom_id: 'TOD',
+          custom_id: makeId('TOD'),
           label: 'Random',
           style: ButtonStyle.Primary,
         }
@@ -130,33 +142,33 @@ export default class ButtonHandler {
     } else if (type === 'NHIE') {
       arr.push({
         type: ComponentType.Button,
-        custom_id: 'NHIE',
+        custom_id: makeId('NHIE'),
         label: 'Never Have I Ever',
         style: ButtonStyle.Primary,
       });
     } else if (type === 'WYR') {
       arr.push({
         type: ComponentType.Button,
-        custom_id: 'WYR',
+        custom_id: makeId('WYR'),
         label: 'Would You Rather',
         style: ButtonStyle.Primary,
       });
     } else if (type === 'PARANOIA') {
       arr.push({
         type: ComponentType.Button,
-        custom_id: 'PARANOIA',
+        custom_id: makeId('PARANOIA'),
         label: 'Paranoia',
         style: ButtonStyle.Primary,
       });
     } else if (type === 'RANDOM') {
       arr.push({
         type: ComponentType.Button,
-        custom_id: 'RANDOM',
+        custom_id: makeId('RANDOM'),
         label: 'Random Question',
         style: ButtonStyle.Primary,
       });
     }
-    if (rating === 'R' && !this.client.enableR) {
+    if (rRating === 'R' && !this.client.enableR) {
       arr.push({
         type: ComponentType.Button,
         label: 'Invite R bot',
