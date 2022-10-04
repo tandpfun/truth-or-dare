@@ -4,7 +4,6 @@ import {
   APIApplicationCommandInteractionDataSubcommandOption,
   APIChatInputApplicationCommandInteractionData,
   APIApplicationCommandInteractionDataOption,
-  APIChatInputApplicationCommandInteraction,
   APIInteractionResponseCallbackData,
   APIApplicationCommandInteraction,
   ApplicationCommandOptionType,
@@ -20,6 +19,7 @@ import type { FastifyReply } from 'fastify';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
+import { APIChatInputApplicationCommandInteractionWithEntitlements } from './PremiumTypes';
 
 export default class CommandContext implements Context {
   rawInteraction: APIApplicationCommandInteraction;
@@ -35,9 +35,11 @@ export default class CommandContext implements Context {
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
+  entitlements: string[];
+  premium: boolean;
 
   constructor(
-    interaction: APIChatInputApplicationCommandInteraction,
+    interaction: APIChatInputApplicationCommandInteractionWithEntitlements,
     client: Client,
     response: FastifyReply
   ) {
@@ -67,6 +69,11 @@ export default class CommandContext implements Context {
 
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
+
+    this.entitlements = interaction.entitlement_sku_ids || [];
+    this.premium =
+      !!this.guildId &&
+      (!!this.entitlements.length || this.client.database.isChargebeePremiumGuild(this.guildId));
   }
 
   getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined {
@@ -111,6 +118,12 @@ export default class CommandContext implements Context {
     this.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data,
+    });
+  }
+
+  replyUpsell() {
+    this.response.send({
+      type: 10,
     });
   }
 

@@ -31,6 +31,9 @@ export default class ButtonHandler {
   }
 
   async handleButton(ctx: ButtonContext) {
+    // Premium upsell button
+    if (ctx.data.custom_id === 'upsell') return ctx.replyUpsell();
+
     const customId = ctx.data.custom_id as ButtonIdWithState;
     const [id, rating] = customId.split(':') as [ButtonIds, Rating | 'NONE' | undefined];
     if (!this.buttonIds.includes(id))
@@ -73,7 +76,7 @@ export default class ButtonHandler {
     const result = await ctx.client.getQuestion(ctx, type, rating);
 
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, result.rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, result.rating),
       embeds: [
         {
           author: {

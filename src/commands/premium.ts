@@ -47,10 +47,13 @@ const premium: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    const premiumGuild = ctx.guildId && ctx.client.database.isPremiumGuild(ctx.guildId);
+    const premiumGuild = ctx.premium;
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
 
-    if (!premiumUser && ctx.args[0] !== 'check') return ctx.reply(ctx.client.functions.premiumAd());
+    if (!premiumUser && ctx.args[0] !== 'check')
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} These features are only available to legacy premium subscribers.`
+      );
 
     if (ctx.args[0] === 'check') {
       if (!ctx.guildId)
@@ -67,7 +70,7 @@ const premium: Command = {
             : {
                 title: `${ctx.client.EMOTES.xmark} Basic Server`,
                 description:
-                  'Help support the development of Truth or Dare with premium and gain some awesome perks like custom questions!\n\nTo activate a server, run `/premium activate`.',
+                  "This server doesn't have premium. Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!",
                 color: ctx.client.COLORS.RED,
               },
         ],
@@ -78,10 +81,11 @@ const premium: Command = {
                 type: ComponentType.ActionRow,
                 components: [
                   {
+                    custom_id: 'upsell',
+                    label: 'Upgrade',
+                    emoji: { name: 'premium', id: '1025833542082646026' },
                     type: ComponentType.Button,
-                    label: 'Get Premium Slots',
-                    url: 'https://truthordarebot.xyz/premium',
-                    style: ButtonStyle.Link,
+                    style: ButtonStyle.Success,
                   },
                 ],
               },
@@ -140,19 +144,22 @@ const premium: Command = {
       if (premiumUser!.premiumServers.length >= premiumUser!.premiumSlots)
         return ctx.reply({
           content: `All of your premium slots have been filled, click the button below to get more!`,
-          components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [
+          components: premiumGuild
+            ? undefined
+            : [
                 {
-                  type: ComponentType.Button,
-                  label: 'Get Premium Slots',
-                  url: 'https://truthordarebot.xyz/premium',
-                  style: ButtonStyle.Link,
+                  type: ComponentType.ActionRow,
+                  components: [
+                    {
+                      custom_id: 'upsell',
+                      label: 'Upgrade to Premium',
+                      emoji: { name: '✨' },
+                      type: ComponentType.Button,
+                      style: ButtonStyle.Success,
+                    },
+                  ],
                 },
               ],
-            },
-          ],
         });
 
       await ctx.client.database.activatePremium(ctx.user.id, ctx.guildId);

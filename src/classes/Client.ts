@@ -230,6 +230,7 @@ export default class Client {
       type,
       disabledRatings,
       rating,
+      ctx.premium,
       ctx.guildId,
       ctx.channelId
     );

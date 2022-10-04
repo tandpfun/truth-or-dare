@@ -32,7 +32,7 @@ const truth: Command = {
     const truth = await ctx.client.getQuestion(ctx, 'TRUTH', rating);
     if (truth.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, truth.rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
       embeds: [
         {
           title: truth.question,
