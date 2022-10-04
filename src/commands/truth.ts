@@ -46,7 +46,7 @@ const truth: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.buttonHandler.components('TOD', truth.rating),
+        : ctx.client.buttonHandler.components('TOD', rating, truth.rating),
     });
   },
 };

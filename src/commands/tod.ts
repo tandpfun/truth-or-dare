@@ -47,7 +47,7 @@ const tod: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.buttonHandler.components('TOD', result.rating),
+        : ctx.client.buttonHandler.components('TOD', rating, result.rating),
     });
   },
 };

@@ -46,7 +46,7 @@ const dare: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.buttonHandler.components('TOD', dare.rating),
+        : ctx.client.buttonHandler.components('TOD', rating, dare.rating),
     });
   },
 };
