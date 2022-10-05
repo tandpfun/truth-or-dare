@@ -116,14 +116,14 @@ export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function premiumAd(): APIInteractionResponseCallbackData {
+export function legacyPremiumAd(): APIInteractionResponseCallbackData {
   return {
     embeds: [
       {
         color: Client.COLORS.YELLOW,
         title: `${Client.EMOTES.sparkles} Truth or Dare Premium`,
         description:
-          'Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!',
+          'This command requires premium. Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!',
       },
     ],
     components: [
@@ -131,11 +131,10 @@ export function premiumAd(): APIInteractionResponseCallbackData {
         type: ComponentType.ActionRow,
         components: [
           {
-            custom_id: 'upsell',
             label: 'Upgrade',
-            emoji: { name: 'premium', id: '1025833542082646026' },
             type: ComponentType.Button,
-            style: ButtonStyle.Success,
+            url: 'https://truthordarebot.xyz/premium',
+            style: ButtonStyle.Link,
           },
         ],
       },
@@ -151,7 +150,7 @@ export function promoMessage(client: Client, isPremium?: boolean, rating?: Ratin
   const promoMessages = [
     `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
     `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
-    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature. Press "Upgrade" on the bot's profile!`,
+    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature.`,
     `${client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
   ];
 

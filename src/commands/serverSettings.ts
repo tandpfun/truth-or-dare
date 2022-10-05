@@ -96,7 +96,9 @@ const serverSettings: Command = {
       ctx.args[0] !== 'togglebuttons' &&
       ctx.args[0] !== 'setlanguage'
     )
-      return ctx.replyUpsell();
+      return ctx.entitlements
+        ? ctx.replyUpsell()
+        : ctx.reply(ctx.client.functions.legacyPremiumAd());
 
     const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
 

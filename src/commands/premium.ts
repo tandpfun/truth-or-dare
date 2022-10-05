@@ -58,39 +58,44 @@ const premium: Command = {
     if (ctx.args[0] === 'check') {
       if (!ctx.guildId)
         return ctx.reply(`${ctx.client.EMOTES.xmark} This command cannot be run in a DM.`);
-      return ctx.reply({
-        embeds: [
-          premiumGuild
-            ? {
-                title: `${ctx.client.EMOTES.checkmark} Premium Server`,
-                description:
-                  'This server has premium activated! Thank you so much for supporting the bot.',
-                color: ctx.client.COLORS.GREEN,
-              }
-            : {
+
+      if (premiumGuild)
+        return ctx.reply({
+          embeds: [
+            {
+              title: `${ctx.client.EMOTES.checkmark} Premium Server`,
+              description:
+                'This server has premium activated! Thank you so much for supporting the bot.',
+              color: ctx.client.COLORS.GREEN,
+            },
+          ],
+        });
+
+      return ctx.entitlements
+        ? ctx.replyUpsell()
+        : ctx.reply({
+            embeds: [
+              {
                 title: `${ctx.client.EMOTES.xmark} Basic Server`,
                 description:
                   "This server doesn't have premium. Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!",
                 color: ctx.client.COLORS.RED,
               },
-        ],
-        components: premiumGuild
-          ? undefined
-          : [
+            ],
+            components: [
               {
                 type: ComponentType.ActionRow,
                 components: [
                   {
-                    custom_id: 'upsell',
                     label: 'Upgrade',
-                    emoji: { name: 'premium', id: '1025833542082646026' },
                     type: ComponentType.Button,
-                    style: ButtonStyle.Success,
+                    url: 'https://truthordarebot.xyz/premium',
+                    style: ButtonStyle.Link,
                   },
                 ],
               },
             ],
-      });
+          });
     } else if (ctx.args[0] === 'list') {
       const premiumServerData = await Promise.all(
         premiumUser!.premiumServers.map(

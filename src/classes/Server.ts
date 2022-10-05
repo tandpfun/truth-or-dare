@@ -92,8 +92,6 @@ export default class Server {
     });
 
     this.router.get('/', (_, res) => res.redirect('https://docs.truthordarebot.xyz/api-docs'));
-
-    this.router.get('/owo', (_, res) => res.send({ code: 10 }));
   }
 
   async handleRequest(

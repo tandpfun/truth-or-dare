@@ -35,7 +35,7 @@ export default class CommandContext implements Context {
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
-  entitlements: string[];
+  entitlements?: string[];
   premium: boolean;
 
   constructor(
@@ -70,10 +70,10 @@ export default class CommandContext implements Context {
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
 
-    this.entitlements = interaction.entitlement_sku_ids || [];
+    this.entitlements = interaction.entitlement_sku_ids;
     this.premium =
       !!this.guildId &&
-      (!!this.entitlements.length || this.client.database.isChargebeePremiumGuild(this.guildId));
+      (!!this.entitlements?.length || this.client.database.isChargebeePremiumGuild(this.guildId));
   }
 
   getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined {
