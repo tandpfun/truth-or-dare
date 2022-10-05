@@ -18,8 +18,11 @@ export default interface Context {
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
+  entitlements?: string[];
+  premium: boolean;
 
   getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined;
   reply(data: string | APIInteractionResponseCallbackData, ephemeral?: boolean): void;
+  replyUpsell(): void;
   get channelSettings(): Promise<ChannelSettings>;
 }

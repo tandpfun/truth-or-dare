@@ -159,8 +159,10 @@ const questions: Command = {
     if (!ctx.guildId)
       return ctx.reply(`${ctx.client.EMOTES.xmark} Custom questions cannot be edited in DMs.`);
 
-    if (!ctx.client.database.isPremiumGuild(ctx.guildId))
-      return ctx.reply(ctx.client.functions.premiumAd());
+    if (!ctx.premium)
+      return ctx.entitlements
+        ? ctx.replyUpsell()
+        : ctx.reply(ctx.client.functions.legacyPremiumAd());
 
     if (ctx.args[0] === 'list') {
       const questionType =

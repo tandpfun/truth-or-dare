@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 
 import {
-  APIChatInputApplicationCommandInteraction,
   InteractionResponseType,
   ApplicationCommandType,
   InteractionType,
@@ -18,6 +17,10 @@ import { register } from 'prom-client';
 import CommandContext from './CommandContext';
 import ButtonContext from './ButtonContext';
 import type Client from './Client';
+import {
+  APIChatInputApplicationCommandInteractionWithEntitlements,
+  APIMessageComponentInteractionWithEntitlements,
+} from './PremiumTypes';
 import Database from './Database';
 import Metrics from './Metrics';
 import Logger from './Logger';
@@ -131,7 +134,7 @@ export default class Server {
       // If interaction is a slash command
       if (interaction.data.type !== ApplicationCommandType.ChatInput) return;
       const ctx = new CommandContext(
-        interaction as APIChatInputApplicationCommandInteraction,
+        interaction as APIChatInputApplicationCommandInteractionWithEntitlements,
         client,
         res
       );
@@ -141,7 +144,11 @@ export default class Server {
       interaction.data.component_type === ComponentType.Button
     ) {
       // If interaction is a button
-      const ctx = new ButtonContext(interaction, client, res);
+      const ctx = new ButtonContext(
+        interaction as APIMessageComponentInteractionWithEntitlements,
+        client,
+        res
+      );
       await client.handleButton(ctx);
     }
   }

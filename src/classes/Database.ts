@@ -25,7 +25,7 @@ export default class Database {
   guildCache: Record<string, GuildSettings | null> = {};
   questionCache: Question[] = [];
   customQuestions: CustomQuestion[] = [];
-  premiumGuilds: Set<string> = new Set();
+  chargebeePremiumGuilds: Set<string> = new Set();
 
   constructor(metrics: Metrics) {
     this.metrics = metrics;
@@ -38,7 +38,7 @@ export default class Database {
     this.console.success('Connected to database!');
     await this.fetchAllQuestions();
     await this.fetchAllCustomQuestions();
-    await this.fetchPremiumGuilds();
+    await this.fetchChargebeePremiumGuilds();
     setInterval(async () => {
       const totalCachedSeenQuestions = Object.values(this.questionsSeenCache).reduce(
         (a, c) => a + c.length,
@@ -53,7 +53,7 @@ export default class Database {
       );
       await this.fetchAllQuestions();
       await this.fetchAllCustomQuestions();
-      await this.fetchPremiumGuilds();
+      await this.fetchChargebeePremiumGuilds();
     }, 24 * 60 * 60 * 1000);
   }
 
@@ -151,6 +151,7 @@ export default class Database {
     type?: QuestionType,
     disabledRatings: Rating[] = [],
     rating?: Rating,
+    premium?: boolean,
     guildId?: string,
     channelId?: string
   ): Promise<
@@ -170,7 +171,6 @@ export default class Database {
           'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
       };
 
-    const isPremiumGuild = guildId && this.isPremiumGuild(guildId);
     const guildSettings = guildId ? await this.fetchGuildSettings(guildId) : null;
     const language = guildSettings?.language;
 
@@ -181,19 +181,19 @@ export default class Database {
     const customFilter = (q: CustomQuestion) => q.guildId === guildId && questionFilter(q);
 
     let questions: (Question | CustomQuestion)[] =
-      isPremiumGuild && guildSettings?.disableGlobals
+      premium && guildSettings?.disableGlobals
         ? this.customQuestions.filter(customFilter)
-        : (isPremiumGuild
+        : (premium
             ? [
                 ...this.questionCache.filter(globalFilter),
                 ...this.customQuestions.filter(customFilter),
               ]
             : this.questionCache.filter(globalFilter)
-          ).filter(q => !isPremiumGuild || !guildSettings?.disabledQuestions.includes(q.id));
+          ).filter(q => !premium || !guildSettings?.disabledQuestions.includes(q.id));
 
     let allQuestionsSeen: SeenQuestion[] = [];
 
-    if (isPremiumGuild && channelId) {
+    if (premium && channelId) {
       allQuestionsSeen = this.questionsSeenCache[channelId] ?? [];
       let questionsSeen = allQuestionsSeen.filter(q => questionFilter(q));
 
@@ -224,7 +224,7 @@ export default class Database {
       const translation = question.translations[language];
       if (translation !== null) question = { ...question, question: translation };
     }
-    if (isPremiumGuild && channelId) {
+    if (premium && channelId) {
       allQuestionsSeen.push({
         id: question.id,
         type: question.type,
@@ -376,17 +376,17 @@ export default class Database {
     await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
   }
 
-  async fetchPremiumGuilds() {
+  async fetchChargebeePremiumGuilds() {
     const users = await this.db.premiumUser.findMany();
-    this.premiumGuilds = new Set(users.flatMap(user => user.premiumServers));
+    this.chargebeePremiumGuilds = new Set(users.flatMap(user => user.premiumServers));
   }
 
   async getPremiumUser(id: string) {
     return await this.db.premiumUser.findUnique({ where: { id } });
   }
 
-  isPremiumGuild(guildId: string): boolean {
-    return this.premiumGuilds.has(guildId);
+  isChargebeePremiumGuild(guildId: string): boolean {
+    return this.chargebeePremiumGuilds.has(guildId);
   }
 
   async getPremiumActivated(guildId: string) {
@@ -398,7 +398,7 @@ export default class Database {
       where: { id: userId },
       data: { premiumServers: { push: guildId } },
     });
-    this.premiumGuilds.add(guildId);
+    this.chargebeePremiumGuilds.add(guildId);
     return user;
   }
 
@@ -410,7 +410,7 @@ export default class Database {
       data: { premiumServers: oldUser.premiumServers.filter(id => id !== guildId) },
     });
     if (!(await this.db.premiumUser.findFirst({ where: { premiumServers: { has: guildId } } })))
-      this.premiumGuilds.delete(guildId);
+      this.chargebeePremiumGuilds.delete(guildId);
     return user;
   }
 

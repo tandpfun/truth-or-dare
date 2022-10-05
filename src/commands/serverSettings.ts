@@ -91,12 +91,14 @@ const serverSettings: Command = {
     if (!ctx.guildId)
       return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');
     if (
-      !ctx.client.database.isPremiumGuild(ctx.guildId) &&
+      !ctx.premium &&
       ctx.args[0] !== 'view' &&
       ctx.args[0] !== 'togglebuttons' &&
       ctx.args[0] !== 'setlanguage'
     )
-      return ctx.reply(ctx.client.functions.premiumAd());
+      return ctx.entitlements
+        ? ctx.replyUpsell()
+        : ctx.reply(ctx.client.functions.legacyPremiumAd());
 
     const settings = await ctx.client.database.fetchGuildSettings(ctx.guildId);
 

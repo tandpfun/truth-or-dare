@@ -14,6 +14,7 @@ import type { FastifyReply } from 'fastify';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
+import { APIMessageComponentInteractionWithEntitlements } from './PremiumTypes';
 
 export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;
@@ -27,8 +28,14 @@ export default class ButtonContext implements Context {
   user: APIUser;
   messageId: string;
   args: (string | number | boolean)[] = [];
+  entitlements?: string[];
+  premium: boolean;
 
-  constructor(interaction: APIMessageComponentInteraction, client: Client, response: FastifyReply) {
+  constructor(
+    interaction: APIMessageComponentInteractionWithEntitlements,
+    client: Client,
+    response: FastifyReply
+  ) {
     if (interaction.data.component_type !== ComponentType.Button)
       throw new Error('The component type is not a button.');
 
@@ -44,6 +51,11 @@ export default class ButtonContext implements Context {
 
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
+
+    this.entitlements = interaction.entitlement_sku_ids;
+    this.premium =
+      !!this.guildId &&
+      (!!this.entitlements?.length || this.client.database.isChargebeePremiumGuild(this.guildId));
   }
   getOption<O extends APIApplicationCommandOption>(_name: string): OptionType<O> | undefined {
     return;
@@ -54,6 +66,12 @@ export default class ButtonContext implements Context {
     this.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data,
+    });
+  }
+
+  replyUpsell() {
+    this.response.send({
+      type: 10,
     });
   }
 

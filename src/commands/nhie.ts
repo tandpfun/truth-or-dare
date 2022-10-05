@@ -32,7 +32,7 @@ const nhie: Command = {
     const nhie = await ctx.client.getQuestion(ctx, 'NHIE', rating);
     if (nhie.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.guildId, nhie.rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, nhie.rating),
       embeds: [
         {
           title: nhie.question,

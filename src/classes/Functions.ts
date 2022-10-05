@@ -116,14 +116,14 @@ export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function premiumAd(): APIInteractionResponseCallbackData {
+export function legacyPremiumAd(): APIInteractionResponseCallbackData {
   return {
     embeds: [
       {
         color: Client.COLORS.YELLOW,
         title: `${Client.EMOTES.sparkles} Truth or Dare Premium`,
         description:
-          'Help support the development and hosting of Truth or Dare with premium! Get some awesome perks like custom questions. Click the button below for more information.',
+          'This command requires premium. Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!',
       },
     ],
     components: [
@@ -131,8 +131,8 @@ export function premiumAd(): APIInteractionResponseCallbackData {
         type: ComponentType.ActionRow,
         components: [
           {
+            label: 'Upgrade',
             type: ComponentType.Button,
-            label: 'Get Premium',
             url: 'https://truthordarebot.xyz/premium',
             style: ButtonStyle.Link,
           },
@@ -142,15 +142,15 @@ export function premiumAd(): APIInteractionResponseCallbackData {
   };
 }
 
-export function promoMessage(client: Client, guildId?: string, rating?: Rating | 'NONE') {
+export function promoMessage(client: Client, isPremium?: boolean, rating?: Rating | 'NONE') {
   if (rating === 'R' && !client.enableR)
     return `${client.EMOTES.warning} R-rated questions will be removed <t:1665288000:R> to adhere to Discord's new Developer Terms of Service. R-rated questions will only be available on the [new bot](https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands). For any questions, feel free to ask in our [Support Server](https://discord.gg/vBERMvVaRt).`;
-  if (guildId && client.database.isPremiumGuild(guildId)) return '';
+  if (isPremium) return '';
 
   const promoMessages = [
     `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
     `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
-    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a [premium feature](https://truthordarebot.xyz/premium).`,
+    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature.`,
     `${client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
   ];
 
