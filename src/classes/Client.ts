@@ -241,7 +241,9 @@ export default class Client {
     const globalCommands: Command[] = [];
     const guildOnly: { [id: string]: Command[] } = {};
     for (const commandFileName of commandFileNames) {
-      const commandFile: Command = (await import(`../commands/${commandFileName}`)).default;
+      const commandFile: Command = this.functions.deepCopy(
+        (await import(`../commands/${commandFileName}`)).default
+      );
       if ((commandFile.mainBotOnly && this.enableR) || (commandFile.rBotOnly && !this.enableR)) {
         continue; // ignore main bot commands on r bot & vice versa
       }

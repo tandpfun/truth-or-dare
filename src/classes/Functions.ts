@@ -112,6 +112,16 @@ export function deepEquals(obj1: any, obj2: any, ignoreList: string[] = []): boo
   );
 }
 
+export function deepCopy<T>(obj: T): T {
+  return (
+    Array.isArray(obj)
+      ? obj.map(a => deepCopy(a))
+      : typeof obj === 'object' && obj !== null
+      ? Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, deepCopy(v)]))
+      : obj
+  ) as T;
+}
+
 export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
