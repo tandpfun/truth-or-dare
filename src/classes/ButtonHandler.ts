@@ -92,9 +92,7 @@ export default class ButtonHandler {
             : undefined,
         },
       ],
-      components: settings?.disableButtons
-        ? []
-        : this.components(buttonCommandType, rating, result.rating),
+      components: settings?.disableButtons ? [] : this.components(buttonCommandType, rating),
     });
 
     ctx.client.functions
@@ -116,8 +114,7 @@ export default class ButtonHandler {
 
   components(
     type: CommandComponentTypes,
-    rating: Rating | 'NONE' | undefined,
-    rRating: Rating | 'NONE'
+    rating: Rating | 'NONE' | undefined
   ): APIActionRowComponent<APIButtonComponent>[] | undefined {
     const makeId = (t: ButtonIds) => `${t}${rating ? ':' + rating : ''}`;
     const arr: APIButtonComponent[] = [];
@@ -171,7 +168,8 @@ export default class ButtonHandler {
         style: ButtonStyle.Primary,
       });
     }
-    if (rRating === 'R' && !this.client.enableR) {
+    if (rating === 'R' && !this.client.enableR) {
+      // TODO: remove deprecation
       arr.push({
         type: ComponentType.Button,
         label: 'Invite R bot',

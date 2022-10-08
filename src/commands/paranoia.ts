@@ -40,7 +40,7 @@ const paranoia: Command = {
     if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
-        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, paranoia.rating),
+        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
         embeds: [
           {
             title: paranoia.question,
@@ -54,7 +54,7 @@ const paranoia: Command = {
         ],
         components: serverSettings?.disableButtons
           ? []
-          : ctx.client.buttonHandler.components('PARANOIA', rating, paranoia.rating),
+          : ctx.client.buttonHandler.components('PARANOIA', rating),
       });
     }
 

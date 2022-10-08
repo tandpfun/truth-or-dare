@@ -223,10 +223,10 @@ export default class Client {
       else rating = 'R';
     } else {
       // main bot
-      // disabledRatings.push('R'); // TODO: disable R from main bot
+      disabledRatings.push('R');
       if (rating === 'NONE') rating = undefined;
     }
-    return this.database.getRandomQuestion(
+    const res = await this.database.getRandomQuestion(
       type,
       disabledRatings,
       rating,
@@ -234,6 +234,11 @@ export default class Client {
       ctx.guildId,
       ctx.channelId
     );
+    if (!this.enableR && rating === 'R') {
+      // TODO: remove deprecation when options are gone
+      res.question = `The R rating has been moved to out 18+ bot which you can invite from the button below. For more information read our [blog post](https://docs.truthordarebot.xyz/blog/removal-of-the-r-rating).`;
+    }
+    return res;
   }
 
   async loadCommands() {
@@ -325,7 +330,6 @@ export default class Client {
   }
 
   async updateCommands(commands: Command[], guildId?: string) {
-    // TODO: don't post R option to commands for regular bot
     if (!(await this.compareCommands(commands, guildId))) return;
     this.console.log('Updating commands...');
 

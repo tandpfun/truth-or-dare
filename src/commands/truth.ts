@@ -32,7 +32,7 @@ const truth: Command = {
     const truth = await ctx.client.getQuestion(ctx, 'TRUTH', rating);
     if (truth.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, truth.rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
       embeds: [
         {
           title: truth.question,
@@ -46,7 +46,7 @@ const truth: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.buttonHandler.components('TOD', rating, truth.rating),
+        : ctx.client.buttonHandler.components('TOD', rating),
     });
   },
 };

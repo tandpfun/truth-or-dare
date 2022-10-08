@@ -32,7 +32,7 @@ const wyr: Command = {
     const wyr = await ctx.client.getQuestion(ctx, 'WYR', rating);
     if (wyr.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, wyr.rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
       embeds: [
         {
           title: wyr.question,
@@ -46,7 +46,7 @@ const wyr: Command = {
       ],
       components: serverSettings?.disableButtons
         ? []
-        : ctx.client.buttonHandler.components('WYR', rating, wyr.rating),
+        : ctx.client.buttonHandler.components('WYR', rating),
     });
   },
 };
