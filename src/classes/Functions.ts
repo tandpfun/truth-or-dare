@@ -155,7 +155,7 @@ export function legacyPremiumAd(): APIInteractionResponseCallbackData {
 export function promoMessage(client: Client, isPremium?: boolean, rating?: Rating | 'NONE') {
   // TODO: remove deprecation message
   if (rating === 'R' && !client.enableR)
-    return `${client.EMOTES.warning} R-rated questions were removed <t:1665288000:R> to adhere to Discord's new Developer Terms of Service. R-rated questions are only available on the [new bot](https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands). For any questions, feel free to ask in our [Support Server](https://discord.gg/vBERMvVaRt).`;
+    return `${client.EMOTES.warning} R-rated questions were removed <t:1665288000:R> to adhere to Discord's new Developer Terms of Service. R-rated questions are only available on the [new bot](https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands). For more information read our [blog post](https://docs.truthordarebot.xyz/blog/removal-of-the-r-rating) and if you have any questions, feel free to ask in our [Support Server](https://discord.gg/vBERMvVaRt).`;
   if (isPremium) return '';
 
   const promoMessages = [
