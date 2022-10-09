@@ -236,7 +236,7 @@ export default class Client {
     );
     if (!this.enableR && rating === 'R') {
       // TODO: remove deprecation when options are gone
-      res.question = `The R rating has been moved to our 18+ bot, which you can invite from the button below.`;
+      res.question = `The R rating has been moved to our 18+ bot, which you can invite using the button below.`;
     }
     return res;
   }

@@ -172,7 +172,7 @@ export default class ButtonHandler {
       // TODO: remove deprecation
       arr.push({
         type: ComponentType.Button,
-        label: 'Invite R bot',
+        label: 'Invite 18+ bot',
         url: 'https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands',
         style: ButtonStyle.Link,
       });
