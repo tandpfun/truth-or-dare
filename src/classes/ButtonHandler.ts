@@ -76,7 +76,7 @@ export default class ButtonHandler {
     const result = await ctx.client.getQuestion(ctx, type, rating);
 
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, result.rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
       embeds: [
         {
           author: {
@@ -170,6 +170,7 @@ export default class ButtonHandler {
     }
     if (rating === 'R' && !this.client.enableR) {
       // TODO: remove deprecation
+      arr.length = 0;
       arr.push({
         type: ComponentType.Button,
         label: 'Invite 18+ bot',
