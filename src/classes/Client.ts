@@ -216,7 +216,7 @@ export default class Client {
   }
 
   async getQuestion(ctx: Context, type?: QuestionType, rating?: Rating | 'NONE') {
-    const disabledRatings = (await ctx.channelSettings).disabledRatings;
+    const disabledRatings = [...(await ctx.channelSettings).disabledRatings];
     if (this.enableR) {
       // R bot
       if (rating === 'NONE') rating = undefined;
