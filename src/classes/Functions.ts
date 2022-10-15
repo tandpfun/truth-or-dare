@@ -19,6 +19,7 @@ import type Command from './Command';
 import type Context from './Context';
 import Client from './Client';
 import { Rating } from '@prisma/client';
+import { RESTGetAPIApplicationEntitlementsResult } from './PremiumTypes';
 
 export type Permission =
   | keyof typeof PermissionFlagsBits
@@ -243,6 +244,21 @@ export async function fetchGuildChannels(
   return await superagent
     .get(`${process.env.DISCORD_API_URL || 'https://discord.com'}/api/guilds/${guildId}/channels`)
     .set('Authorization', `Bot ${token}`)
+    .then(res => res.body)
+    .catch(console.log);
+}
+
+export async function fetchApplicationEntitlementsForGuild(
+  guildId: string,
+  excludeEnded = true
+): Promise<RESTGetAPIApplicationEntitlementsResult> {
+  return await superagent
+    .get(
+      `${process.env.DISCORD_API_URL || 'https://discord.com'}/api/applications/${
+        process.env.APPLICATION_ID
+      }/entitlements?guild_id=${guildId}&exclude_ended=${excludeEnded}`
+    )
+    .set('Authorization', `Bot ${process.env.TOKEN}`)
     .then(res => res.body)
     .catch(console.log);
 }
