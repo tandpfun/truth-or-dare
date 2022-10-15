@@ -391,7 +391,7 @@ export default class Database {
   }
 
   async isPremiumGuild(guildId: string): Promise<boolean> {
-    return (this.isChargebeePremiumGuild(guildId) || !!(await fetchApplicationEntitlementsForGuild(guildId)).length)
+    return (this.isChargebeePremiumGuild(guildId) || !!(await fetchApplicationEntitlementsForGuild(guildId))?.length)
   }
 
   async getPremiumActivated(guildId: string) {
