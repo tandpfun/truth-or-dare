@@ -32,7 +32,7 @@ const answer: Command = {
     if (!paranoiaData)
       return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
-    const showFreq = ctx.premium
+    const showFreq = await ctx.client.database.isPremiumGuild(paranoiaData.guildId)
       ? (await ctx.client.database.fetchGuildSettings(paranoiaData.guildId)).showParanoiaFrequency
       : ctx.client.database.defaultGuildSettings(ctx.guildId!).showParanoiaFrequency;
 
