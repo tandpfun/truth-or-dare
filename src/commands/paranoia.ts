@@ -40,7 +40,7 @@ const paranoia: Command = {
     if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
-        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
+        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
         embeds: [
           {
             title: paranoia.question,

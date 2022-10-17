@@ -234,10 +234,6 @@ export default class Client {
       ctx.guildId,
       ctx.channelId
     );
-    if (!this.enableR && rating === 'R') {
-      // TODO: remove deprecation when options are gone
-      res.question = `The R rating has been moved to our 18+ bot, which you can invite using the button below.`;
-    }
     return res;
   }
 
@@ -300,8 +296,8 @@ export default class Client {
           // R bot no pg or pg13
           option.choices = option.choices?.filter(c => c.value !== 'PG' && c.value !== 'PG13');
         } else {
-          // main bot no R or random // TODO: disable R option from main bot
-          option.choices = option.choices?.filter(c => /*c.value !== 'R' && */ c.value !== 'NONE');
+          // main bot no R or random
+          option.choices = option.choices?.filter(c => c.value !== 'R' && c.value !== 'NONE');
         }
       } else if ('options' in option && option.options) {
         this.removeRatings(option.options);

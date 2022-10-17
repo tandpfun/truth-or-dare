@@ -32,7 +32,7 @@ const wyr: Command = {
     const wyr = await ctx.client.getQuestion(ctx, 'WYR', rating);
     if (wyr.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
       embeds: [
         {
           title: wyr.question,

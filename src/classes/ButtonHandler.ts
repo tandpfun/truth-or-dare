@@ -76,7 +76,7 @@ export default class ButtonHandler {
     const result = await ctx.client.getQuestion(ctx, type, rating);
 
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium, rating),
+      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
       embeds: [
         {
           author: {
@@ -166,16 +166,6 @@ export default class ButtonHandler {
         custom_id: makeId('RANDOM'),
         label: 'Random Question',
         style: ButtonStyle.Primary,
-      });
-    }
-    if (rating === 'R' && !this.client.enableR) {
-      // TODO: remove deprecation
-      arr.length = 0;
-      arr.push({
-        type: ComponentType.Button,
-        label: 'Invite 18+ bot',
-        url: 'https://discord.com/oauth2/authorize?client_id=1017989345292058656&permissions=19456&scope=bot%20applications.commands',
-        style: ButtonStyle.Link,
       });
     }
     return [{ type: ComponentType.ActionRow, components: arr }];
