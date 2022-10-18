@@ -9,18 +9,18 @@ import {
 } from 'discord-api-types/v9';
 import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
-import metricsPlugin from 'fastify-metrics';
 import { QuestionType, Rating } from '.prisma/client';
 import { verify } from 'discord-verify/node';
+import metricsPlugin from 'fastify-metrics';
 import { register } from 'prom-client';
 
-import CommandContext from './CommandContext';
-import ButtonContext from './ButtonContext';
-import type Client from './Client';
 import {
   APIChatInputApplicationCommandInteractionWithEntitlements,
   APIMessageComponentInteractionWithEntitlements,
 } from './PremiumTypes';
+import CommandContext from './CommandContext';
+import ButtonContext from './ButtonContext';
+import type Client from './Client';
 import Database from './Database';
 import Metrics from './Metrics';
 import Logger from './Logger';

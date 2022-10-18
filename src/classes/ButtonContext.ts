@@ -11,10 +11,10 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
+import { APIMessageComponentInteractionWithEntitlements } from './PremiumTypes';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
-import { APIMessageComponentInteractionWithEntitlements } from './PremiumTypes';
 
 export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;

@@ -9,9 +9,9 @@ import {
   Rating,
 } from '@prisma/client';
 
+import { fetchApplicationEntitlementsForGuild } from './Functions';
 import type Metrics from './Metrics';
 import Logger from './Logger';
-import { fetchApplicationEntitlementsForGuild } from './Functions';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
@@ -391,7 +391,10 @@ export default class Database {
   }
 
   async isPremiumGuild(guildId: string): Promise<boolean> {
-    return (this.isChargebeePremiumGuild(guildId) || !!(await fetchApplicationEntitlementsForGuild(guildId))?.length)
+    return (
+      this.isChargebeePremiumGuild(guildId) ||
+      !!(await fetchApplicationEntitlementsForGuild(guildId))?.length
+    );
   }
 
   async getPremiumActivated(guildId: string) {

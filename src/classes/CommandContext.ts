@@ -16,10 +16,10 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
+import { APIChatInputApplicationCommandInteractionWithEntitlements } from './PremiumTypes';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
-import { APIChatInputApplicationCommandInteractionWithEntitlements } from './PremiumTypes';
 
 export default class CommandContext implements Context {
   rawInteraction: APIApplicationCommandInteraction;

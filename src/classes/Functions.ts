@@ -15,11 +15,10 @@ import {
 } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
+import { RESTGetAPIApplicationEntitlementsResult } from './PremiumTypes';
 import type Command from './Command';
 import type Context from './Context';
 import Client from './Client';
-import { Rating } from '@prisma/client';
-import { RESTGetAPIApplicationEntitlementsResult } from './PremiumTypes';
 
 export type Permission =
   | keyof typeof PermissionFlagsBits
