@@ -158,7 +158,7 @@ export function promoMessage(client: Client, isPremium?: boolean) {
   const promoMessages = [
     `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
     `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
-    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature.`,
+    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature. Tap the Upgrade button on my profile for more.`,
     `${client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
   ];
 
