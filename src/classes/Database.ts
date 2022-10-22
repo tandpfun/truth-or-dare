@@ -7,6 +7,7 @@ import {
   QuestionType,
   Question,
   Rating,
+  ScheduledQuestionChannel,
 } from '@prisma/client';
 
 import { fetchApplicationEntitlementsForGuild } from './Functions';
@@ -375,6 +376,22 @@ export default class Database {
 
   async setParanoiaMessageId(id: string, dmMessageId: string) {
     await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
+  }
+
+  async fetchAllScheduledQuestionChannels() {
+    return await this.db.scheduledQuestionChannel.findMany();
+  }
+
+  async getScheduledQuestionChannel(id: string) {
+    return await this.db.scheduledQuestionChannel.findUnique({ where: { id } });
+  }
+
+  async createScheduledQuestionChannel(data: ScheduledQuestionChannel) {
+    await this.db.scheduledQuestionChannel.create({ data });
+  }
+
+  async deleteScheduledQuestionChannel(id: string) {
+    return await this.db.scheduledQuestionChannel.delete({ where: { id } }).catch(_ => null);
   }
 
   async fetchChargebeePremiumGuilds() {

@@ -21,12 +21,14 @@
     "dotenv": "^16.0.2",
     "fastify": "^4.7.0",
     "fastify-metrics": "^9.2.2",
+    "node-schedule": "^2.1.0",
     "prom-client": "^14.1.0",
     "superagent": "^8.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",
     "@types/node": "^18.7.23",
+    "@types/node-schedule": "^2.1.0",
     "@types/superagent": "^4.1.15",
     "discord-api-types": "^0.37.11",
     "prettier": "^2.7.1",

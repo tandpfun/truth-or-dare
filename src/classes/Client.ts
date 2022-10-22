@@ -20,6 +20,7 @@ import type Metrics from './Metrics';
 import type Command from './Command';
 import type Context from './Context';
 import Logger from './Logger';
+import ScheduledQuestionHandler from './ScheduledQuestionHandler';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
 
@@ -35,6 +36,7 @@ export default class Client {
   metrics: Metrics;
   database: Database;
   buttonHandler: ButtonHandler;
+  scheduledQuestionHandler: ScheduledQuestionHandler;
   functions: typeof functions;
 
   suggestCooldowns: Record<string, number>;
@@ -125,6 +127,7 @@ export default class Client {
     this.functions = functions;
     this.database = database;
     this.buttonHandler = new ButtonHandler(this);
+    this.scheduledQuestionHandler = new ScheduledQuestionHandler(this);
   }
 
   get inviteUrl() {
@@ -143,6 +146,7 @@ export default class Client {
 
   async start() {
     this.console.log(`Using API URL: ${this.discordAPIUrl}`);
+    this.scheduledQuestionHandler.start();
     await this.loadCommands();
     for (const { name } of this.commands) {
       this.stats.commands[name] = 0;
