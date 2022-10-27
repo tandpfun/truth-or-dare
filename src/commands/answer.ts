@@ -28,11 +28,11 @@ const answer: Command = {
         flags: 1 << 6,
       });
 
-    const paranoiaData = await ctx.client.database.getNextParanoia(ctx.user.id);
+    const paranoiaData = await ctx.client.database.getNextParanoia(ctx.user.id, ctx.client.id);
     if (!paranoiaData)
       return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
 
-    const showFreq = await ctx.client.database.isPremiumGuild(paranoiaData.guildId)
+    const showFreq = (await ctx.client.database.isPremiumGuild(paranoiaData.guildId))
       ? (await ctx.client.database.fetchGuildSettings(paranoiaData.guildId)).showParanoiaFrequency
       : ctx.client.database.defaultGuildSettings(ctx.guildId!).showParanoiaFrequency;
 
@@ -106,7 +106,7 @@ const answer: Command = {
     ctx.reply(`${ctx.client.EMOTES.checkmark} Answer sent!`);
 
     // fetch the next queued question, if there is one
-    const nextQuestion = await ctx.client.database.getNextParanoia(ctx.user.id);
+    const nextQuestion = await ctx.client.database.getNextParanoia(ctx.user.id, ctx.client.id);
     if (!nextQuestion) return;
 
     const guild = await ctx.client.functions.fetchGuild(nextQuestion.guildId, ctx.client.token);

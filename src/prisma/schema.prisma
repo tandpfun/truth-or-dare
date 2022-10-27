@@ -75,6 +75,7 @@ model ParanoiaQuestion {
   channelId      String
   dmMessageId    String?
   time           Int
+  clientId       String
 }
 
 model CustomQuestion {

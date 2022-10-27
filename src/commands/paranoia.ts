@@ -63,7 +63,11 @@ const paranoia: Command = {
         `${ctx.client.EMOTES.xmark} Bots can't answer paranoia questions, no matter how hard they try.`
       );
 
-    const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
+    const status = await ctx.client.database.checkParanoiaStatus(
+      targetUserId,
+      ctx.guildId,
+      ctx.client.id
+    );
 
     if (!status.guildOpen)
       return ctx.reply(
@@ -135,6 +139,7 @@ const paranoia: Command = {
         guildId: ctx.guildId,
         channelId: ctx.channelId,
         dmMessageId: status.queueEmpty ? message.id : null,
+        clientId: ctx.client.id,
       })
       .then(_ => true)
       .catch(_ => null);

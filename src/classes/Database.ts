@@ -344,20 +344,20 @@ export default class Database {
   async addParanoiaQuestion(questionData: Optional<ParanoiaQuestion, 'id' | 'time'>) {
     await this.db.paranoiaQuestion.create({
       data: {
-        id: `${questionData.userId}-${questionData.guildId}`,
+        id: `${questionData.clientId}-${questionData.userId}-${questionData.guildId}`,
         time: Date.now(),
         ...questionData,
       },
     });
   }
 
-  async getParanoiaData(userId: string) {
-    const results = await this.db.paranoiaQuestion.findMany({ where: { userId } });
+  async getParanoiaData(userId: string, clientId: string) {
+    const results = await this.db.paranoiaQuestion.findMany({ where: { userId, clientId } });
     return results.sort((a, b) => a.time - b.time);
   }
 
-  async checkParanoiaStatus(userId: string, guildId: string) {
-    const questions = await this.db.paranoiaQuestion.findMany({ where: { userId } });
+  async checkParanoiaStatus(userId: string, guildId: string, clientId: string) {
+    const questions = await this.db.paranoiaQuestion.findMany({ where: { userId, clientId } });
     return {
       guildOpen: !questions.some(data => data.guildId === guildId),
       queueEmpty: !questions.length,
@@ -368,8 +368,8 @@ export default class Database {
     return await this.db.paranoiaQuestion.delete({ where: { id } }).catch(_ => null);
   }
 
-  async getNextParanoia(userId: string) {
-    const questions = await this.db.paranoiaQuestion.findMany({ where: { userId } });
+  async getNextParanoia(userId: string, clientId: string) {
+    const questions = await this.db.paranoiaQuestion.findMany({ where: { userId, clientId } });
     return questions.length ? questions.reduce((a, data) => (a.time < data.time ? a : data)) : null;
   }
 

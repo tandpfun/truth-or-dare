@@ -13,7 +13,7 @@ const skip: Command = {
         flags: 1 << 6,
       });
 
-    const currentParanoia = await ctx.client.database.getNextParanoia(ctx.user.id);
+    const currentParanoia = await ctx.client.database.getNextParanoia(ctx.user.id, ctx.client.id);
 
     if (!currentParanoia)
       return ctx.reply(`${ctx.client.EMOTES.xmark} You don't have any active paranoia questions.`);
@@ -46,7 +46,7 @@ const skip: Command = {
       );
 
     // get next queued question, if there is one
-    const nextParanoia = await ctx.client.database.getNextParanoia(ctx.user.id);
+    const nextParanoia = await ctx.client.database.getNextParanoia(ctx.user.id, ctx.client.id);
     if (!nextParanoia) return ctx.reply(`${ctx.client.EMOTES.checkmark} Your queue is now empty.`);
 
     // fetch server name
