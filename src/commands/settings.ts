@@ -135,6 +135,7 @@ const settings: Command = {
           {
             title: `${ctx.client.EMOTES.gear} Channel Settings`,
             description: `__Ratings:__\n${Object.values(Rating)
+              .filter(r => r !== 'R' || ctx.client.enableR)
               .map(r => `${ratingEmoji(r)} ${r} Questions`)
               .join('\n')}`,
             color: ctx.client.COLORS.BLUE,
