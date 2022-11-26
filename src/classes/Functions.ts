@@ -156,10 +156,15 @@ export function promoMessage(client: Client, isPremium?: boolean) {
   if (isPremium) return '';
 
   const promoMessages = [
-    `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
-    `${client.EMOTES.star} Having fun? Share your experience [with a review](https://top.gg/bot/692045914436796436)! (at the bottom of the page)`,
-    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature. Tap the Upgrade button on my profile for more.`,
     `${client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
+    `${client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
+    `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature. Tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.shushing_face} psst.. hide these messages with premium. tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.running} Help us keep the bot up and running with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.technologist} Having fun? Support the development new features with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.heart} Love the bot? You'll love it even more with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.bank} We run off donations, not your data. Get some awesome perks when you donate! Tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.earth} You can play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
   ];
 
   return Math.random() < 0.08

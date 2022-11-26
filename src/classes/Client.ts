@@ -76,6 +76,10 @@ export default class Client {
     delete: '<:delete:927979243844038657>',
     beta1: '<:beta1:955232478463930398>',
     beta2: '<:beta2:955232478434586645>',
+    running: ':person_running:',
+    technologist: ':technologist:',
+    heart: ':heart:',
+    bank: ':bank:',
   } as const;
   static LANGUAGES = {
     en: 'English',
