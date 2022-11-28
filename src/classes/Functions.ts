@@ -161,7 +161,7 @@ export function promoMessage(client: Client, isPremium?: boolean) {
     `${client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature. Tap the "Upgrade" button on our profile on the desktop app for more.`,
     `${client.EMOTES.shushing_face} psst.. hide these messages with premium. tap the "Upgrade" button on our profile on the desktop app for more.`,
     `${client.EMOTES.running} Help us keep the bot up and running with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
-    `${client.EMOTES.technologist} Having fun? Support the development new features with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
+    `${client.EMOTES.technologist} Having fun? Support the development of new features with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
     `${client.EMOTES.heart} Love the bot? You'll love it even more with premium! Tap the "Upgrade" button on our profile on the desktop app for more.`,
     `${client.EMOTES.bank} We run off donations, not your data. Get some awesome perks when you donate! Tap the "Upgrade" button on our profile on the desktop app for more.`,
     `${client.EMOTES.earth} You can play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
