@@ -244,15 +244,15 @@ export async function fetchGuildChannels(
     .catch(console.log);
 }
 
-export async function fetchApplicationEntitlementsForGuild(
-  guildId: string,
+export async function fetchApplicationEntitlements(
+  guildId?: string,
   excludeEnded = true
 ): Promise<RESTGetAPIApplicationEntitlementsResult> {
   return await superagent
     .get(
       `${process.env.DISCORD_API_URL || 'https://discord.com'}/api/applications/${
         process.env.APPLICATION_ID
-      }/entitlements?guild_id=${guildId}&exclude_ended=${excludeEnded}`
+      }/entitlements?${guildId ? `guild_id=${guildId}&` : ''}exclude_ended=${excludeEnded}`
     )
     .set('Authorization', `Bot ${process.env.TOKEN}`)
     .then(res => res.body)

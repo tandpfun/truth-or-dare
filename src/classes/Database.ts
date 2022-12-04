@@ -10,7 +10,7 @@ import {
   ScheduledQuestionChannel,
 } from '@prisma/client';
 
-import { fetchApplicationEntitlementsForGuild } from './Functions';
+import { fetchApplicationEntitlements } from './Functions';
 import type Metrics from './Metrics';
 import Logger from './Logger';
 
@@ -399,6 +399,11 @@ export default class Database {
     this.chargebeePremiumGuilds = new Set(users.flatMap(user => user.premiumServers));
   }
 
+  async fetchDiscordPremiumGuilds() {
+    const guilds = await fetchApplicationEntitlements();
+    return guilds.map(g => g.guild_id);
+  }
+
   async getPremiumUser(id: string) {
     return await this.db.premiumUser.findUnique({ where: { id } });
   }
@@ -410,7 +415,7 @@ export default class Database {
   async isPremiumGuild(guildId: string): Promise<boolean> {
     return (
       this.isChargebeePremiumGuild(guildId) ||
-      !!(await fetchApplicationEntitlementsForGuild(guildId))?.length
+      !!(await fetchApplicationEntitlements(guildId))?.length
     );
   }
 

@@ -17,13 +17,18 @@ export default class ScheduledQuestionHandler {
   }
 
   async handleSchedule(scheduleType: ScheduleType) {
+    const premiumGuilds = new Set([
+      ...(await this.client.database.fetchDiscordPremiumGuilds()),
+      ...this.client.database.chargebeePremiumGuilds,
+    ]);
+
     const scheduledQuestions = await this.client.database.fetchAllScheduledQuestionChannels();
-    console.log(scheduledQuestions);
-    const hourlyQuestions = scheduledQuestions.filter(
+    const scheduledQuestionsByType = scheduledQuestions.filter(
       q => q.schedule === scheduleType && q.botId === this.client.id
     );
 
-    for (const scheduledQuestionChannel of hourlyQuestions) {
+    for (const scheduledQuestionChannel of scheduledQuestionsByType) {
+      if (!premiumGuilds.has(scheduledQuestionChannel.guildId)) continue;
       this.client.functions.sendMessage(
         await this.questionMessage(scheduledQuestionChannel),
         scheduledQuestionChannel.id,
@@ -35,9 +40,19 @@ export default class ScheduledQuestionHandler {
   async questionMessage(
     scheduledQuestionChannel: ScheduledQuestionChannel
   ): Promise<RESTPostAPIChannelMessageJSONBody> {
-    const question = await this.client.database.getRandomQuestion(
+    const channelSettings = this.client.database.fetchChannelSettings(
+      scheduledQuestionChannel.id,
+      false
+    );
+
+    const question = await this.client.getQuestion(
+      {
+        channelSettings,
+        premium: true,
+        channelId: scheduledQuestionChannel.id,
+        guildId: scheduledQuestionChannel.guildId,
+      },
       scheduledQuestionChannel.type || undefined,
-      this.client.enableR ? [] : ['R'],
       scheduledQuestionChannel.rating || undefined
     );
 

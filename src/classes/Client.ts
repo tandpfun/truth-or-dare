@@ -7,7 +7,7 @@ import {
   APIApplicationCommand,
   PermissionFlagsBits,
 } from 'discord-api-types/v9';
-import { QuestionType, Rating } from '@prisma/client';
+import { ChannelSettings, QuestionType, Rating } from '@prisma/client';
 import * as Sentry from '@sentry/node';
 import superagent from 'superagent';
 
@@ -18,7 +18,6 @@ import * as functions from './Functions';
 import type Database from './Database';
 import type Metrics from './Metrics';
 import type Command from './Command';
-import type Context from './Context';
 import Logger from './Logger';
 import ScheduledQuestionHandler from './ScheduledQuestionHandler';
 
@@ -219,7 +218,16 @@ export default class Client {
     await this.buttonHandler.handleButton(ctx);
   }
 
-  async getQuestion(ctx: Context, type?: QuestionType, rating?: Rating | 'NONE') {
+  async getQuestion(
+    ctx: {
+      channelSettings: Promise<ChannelSettings>;
+      premium: boolean;
+      guildId?: string;
+      channelId: string;
+    },
+    type?: QuestionType,
+    rating?: Rating | 'NONE'
+  ) {
     const disabledRatings = [...(await ctx.channelSettings).disabledRatings];
     if (this.enableR) {
       // R bot
