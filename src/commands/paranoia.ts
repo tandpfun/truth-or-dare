@@ -93,27 +93,29 @@ const paranoia: Command = {
       });
 
     // send message
-    const message = await ctx.client.functions.sendMessage(
-      {
-        embeds: [
-          status.queueEmpty
-            ? {
-                title: paranoia.question,
-                color: ctx.client.COLORS.BLUE,
-                description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guild.name}** <#${ctx.channelId}>.`,
-                footer: {
-                  text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
+    const message = await ctx.client.functions
+      .sendMessage(
+        {
+          embeds: [
+            status.queueEmpty
+              ? {
+                  title: paranoia.question,
+                  color: ctx.client.COLORS.BLUE,
+                  description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guild.name}** <#${ctx.channelId}>.`,
+                  footer: {
+                    text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
+                  },
+                }
+              : {
+                  description: `${ctx.client.EMOTES.warning} You received a question from ${guild.name}, but you need to answer the current question to see it.`,
+                  color: ctx.client.COLORS.BLUE,
                 },
-              }
-            : {
-                description: `${ctx.client.EMOTES.warning} You received a question from ${guild.name}, but you need to answer the current question to see it.`,
-                color: ctx.client.COLORS.BLUE,
-              },
-        ],
-      },
-      dmChannel.id,
-      ctx.client.token
-    );
+          ],
+        },
+        dmChannel.id,
+        ctx.client.token
+      )
+      .catch(_ => null);
     if (!message)
       return ctx.reply({
         embeds: [

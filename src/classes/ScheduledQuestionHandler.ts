@@ -13,12 +13,12 @@ export default class ScheduledQuestionHandler {
 
   start() {
     schedule.scheduleJob('0 8 * * *', this.handleSchedule.bind(this, 'DAILY'));
-    schedule.scheduleJob('* * * * *', this.handleSchedule.bind(this, 'HOURLY'));
+    schedule.scheduleJob('0 * * * *', this.handleSchedule.bind(this, 'HOURLY'));
   }
 
   async handleSchedule(scheduleType: ScheduleType) {
     const premiumGuilds = new Set([
-      ...(await this.client.database.fetchDiscordPremiumGuilds()),
+      ...((await this.client.database.fetchDiscordPremiumGuilds()) || []),
       ...this.client.database.chargebeePremiumGuilds,
     ]);
 
@@ -29,11 +29,20 @@ export default class ScheduledQuestionHandler {
 
     for (const scheduledQuestionChannel of scheduledQuestionsByType) {
       if (!premiumGuilds.has(scheduledQuestionChannel.guildId)) continue;
-      this.client.functions.sendMessage(
-        await this.questionMessage(scheduledQuestionChannel),
-        scheduledQuestionChannel.id,
-        this.client.token
-      );
+      this.client.functions
+        .sendMessage(
+          await this.questionMessage(scheduledQuestionChannel),
+          scheduledQuestionChannel.id,
+          this.client.token
+        )
+        .catch(err => {
+          if (err.response.body.code === 10003)
+            this.client.database.deleteScheduledQuestionChannel(scheduledQuestionChannel.id);
+          else
+            this.client.console.warn(
+              `Failed to send a scheduled question with status code ${err.status}`
+            );
+        });
     }
   }
 

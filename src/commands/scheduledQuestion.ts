@@ -57,9 +57,14 @@ const options = [
     name: 'remove',
     description: 'Remove a scheduled question set in the channel.',
   },
+  {
+    type: ApplicationCommandOptionType.Subcommand,
+    name: 'view',
+    description: 'See all scheduled question channels you have set up.',
+  },
 ] as const;
 
-const serverSettings: Command = {
+const scheduledQuestion: Command = {
   name: 'scheduledquestion',
   description: 'Automatically post a question every certain amount of time!',
   options,
@@ -106,8 +111,36 @@ const serverSettings: Command = {
       return ctx.reply(
         `${ctx.client.EMOTES.checkmark} Removed the scheduled question in this channel.`
       );
+    } else if (ctx.args[0] === 'view') {
+      const scheduledQuestionsForGuild =
+        await ctx.client.database.getGuildScheduledQuestionChannels(ctx.guildId);
+
+      if (!scheduledQuestionsForGuild.length)
+        return ctx.reply(
+          `${ctx.client.EMOTES.xmark} There are no scheduled question channels set up in this server.`
+        );
+
+      ctx.reply({
+        embeds: [
+          {
+            title: `${ctx.client.EMOTES.time} Scheduled Question Channel List`,
+            color: ctx.client.COLORS.BLUE,
+            description: scheduledQuestionsForGuild
+              .map(
+                sc =>
+                  `• **${ctx.client.functions.titleCase(sc.schedule)}:** <#${sc.id}> - ${
+                    sc.type || ''
+                  } ${sc.rating || ''} ${sc.role ? `Pings <@&${sc.role}>` : ''}`
+              )
+              .join('\n'),
+            footer: {
+              text: "Remove a scheduled question channel by running '/scheduledquestion remove' in it",
+            },
+          },
+        ],
+      });
     }
   },
 };
 
-export default serverSettings;
+export default scheduledQuestion;

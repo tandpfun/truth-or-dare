@@ -386,6 +386,10 @@ export default class Database {
     return await this.db.scheduledQuestionChannel.findUnique({ where: { id } });
   }
 
+  async getGuildScheduledQuestionChannels(guildId: string) {
+    return await this.db.scheduledQuestionChannel.findMany({ where: { guildId } });
+  }
+
   async createScheduledQuestionChannel(data: ScheduledQuestionChannel) {
     await this.db.scheduledQuestionChannel.create({ data });
   }
@@ -401,7 +405,7 @@ export default class Database {
 
   async fetchDiscordPremiumGuilds() {
     const guilds = await fetchApplicationEntitlements();
-    return guilds.map(g => g.guild_id);
+    return guilds?.map(g => g.guild_id);
   }
 
   async getPremiumUser(id: string) {

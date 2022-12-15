@@ -178,8 +178,7 @@ export async function sendMessage(
     )
     .send(data)
     .set('Authorization', `Bot ${token}`)
-    .then(res => res.body)
-    .catch(_ => null);
+    .then(res => res.body);
 }
 
 export async function editMessage(
@@ -247,7 +246,7 @@ export async function fetchGuildChannels(
 export async function fetchApplicationEntitlements(
   guildId?: string,
   excludeEnded = true
-): Promise<RESTGetAPIApplicationEntitlementsResult> {
+): Promise<RESTGetAPIApplicationEntitlementsResult | null> {
   return await superagent
     .get(
       `${process.env.DISCORD_API_URL || 'https://discord.com'}/api/applications/${
