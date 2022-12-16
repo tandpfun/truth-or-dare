@@ -70,9 +70,15 @@ export default class ButtonContext implements Context {
   }
 
   replyUpsell() {
-    this.response.send({
-      type: 10,
-    });
+    if (!this.client.enableR) {
+      this.response.send({
+        type: 10, // Only use type 10 if bot has Discord premium
+      });
+    } else {
+      this.reply(
+        'This command requires Truth or Dare Premium. Upgrade now to unlock these features at <https://truthordarebot.xyz/premium>.'
+      );
+    }
   }
 
   defer() {
