@@ -7,9 +7,10 @@ import {
   QuestionType,
   Question,
   Rating,
+  ScheduledQuestionChannel,
 } from '@prisma/client';
 
-import { fetchApplicationEntitlementsForGuild } from './Functions';
+import { fetchApplicationEntitlements } from './Functions';
 import type Metrics from './Metrics';
 import Logger from './Logger';
 
@@ -377,9 +378,34 @@ export default class Database {
     await this.db.paranoiaQuestion.update({ where: { id }, data: { dmMessageId } });
   }
 
+  async fetchAllScheduledQuestionChannels() {
+    return await this.db.scheduledQuestionChannel.findMany();
+  }
+
+  async getScheduledQuestionChannel(id: string) {
+    return await this.db.scheduledQuestionChannel.findUnique({ where: { id } });
+  }
+
+  async getGuildScheduledQuestionChannels(guildId: string) {
+    return await this.db.scheduledQuestionChannel.findMany({ where: { guildId } });
+  }
+
+  async createScheduledQuestionChannel(data: ScheduledQuestionChannel) {
+    await this.db.scheduledQuestionChannel.create({ data });
+  }
+
+  async deleteScheduledQuestionChannel(id: string) {
+    return await this.db.scheduledQuestionChannel.delete({ where: { id } }).catch(_ => null);
+  }
+
   async fetchChargebeePremiumGuilds() {
     const users = await this.db.premiumUser.findMany();
     this.chargebeePremiumGuilds = new Set(users.flatMap(user => user.premiumServers));
+  }
+
+  async fetchDiscordPremiumGuilds() {
+    const guilds = await fetchApplicationEntitlements();
+    return guilds?.map(g => g.guild_id);
   }
 
   async getPremiumUser(id: string) {
@@ -393,7 +419,7 @@ export default class Database {
   async isPremiumGuild(guildId: string): Promise<boolean> {
     return (
       this.isChargebeePremiumGuild(guildId) ||
-      !!(await fetchApplicationEntitlementsForGuild(guildId))?.length
+      !!(await fetchApplicationEntitlements(guildId))?.length
     );
   }
 

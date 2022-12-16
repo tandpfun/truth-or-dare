@@ -42,6 +42,11 @@ type QuestionTranslation {
   tl String?
 }
 
+enum ScheduleType {
+  DAILY
+  HOURLY
+}
+
 model ChannelSettings {
   id              String   @id @map("_id")
   disabledRatings Rating[]
@@ -83,6 +88,16 @@ model CustomQuestion {
   type     QuestionType
   rating   Rating
   question String
+}
+
+model ScheduledQuestionChannel {
+  id       String        @id @map("_id")
+  botId    String
+  guildId  String
+  schedule ScheduleType
+  role     String?
+  type     QuestionType?
+  rating   Rating?
 }
 
 model PremiumUser {

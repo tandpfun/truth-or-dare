@@ -54,24 +54,26 @@ const skip: Command = {
     if (!guild) ctx.client.console.warn(`Failed to fetch guild: ${nextParanoia.guildId}`);
 
     // send next question in DMs
-    const nextMessage = await ctx.client.functions.sendMessage(
-      {
-        embeds: [
-          {
-            title: nextParanoia.questionText,
-            color: ctx.client.COLORS.BLUE,
-            description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
-              guild ? guild.name : `Unknown Guild (${nextParanoia.guildId})`
-            }** <#${nextParanoia.channelId}>.`,
-            footer: {
-              text: `Type: PARANOIA | Rating: ${nextParanoia.questionRating} | ID: ${nextParanoia.questionId}`,
+    const nextMessage = await ctx.client.functions
+      .sendMessage(
+        {
+          embeds: [
+            {
+              title: nextParanoia.questionText,
+              color: ctx.client.COLORS.BLUE,
+              description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
+                guild ? guild.name : `Unknown Guild (${nextParanoia.guildId})`
+              }** <#${nextParanoia.channelId}>.`,
+              footer: {
+                text: `Type: PARANOIA | Rating: ${nextParanoia.questionRating} | ID: ${nextParanoia.questionId}`,
+              },
             },
-          },
-        ],
-      },
-      ctx.channelId,
-      ctx.client.token
-    );
+          ],
+        },
+        ctx.channelId,
+        ctx.client.token
+      )
+      .catch(_ => null);
     if (!nextMessage) {
       ctx.reply(
         `${ctx.client.EMOTES.xmark} Something went wrong trying to send you the next question.`
