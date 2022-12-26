@@ -122,9 +122,13 @@ export default class CommandContext implements Context {
   }
 
   replyUpsell() {
-    this.response.send({
-      type: 10,
-    });
+    if (!this.client.enableR) {
+      this.response.send({
+        type: 10, // Only use type 10 if bot has Discord premium
+      });
+    } else {
+      this.reply(this.client.functions.legacyPremiumAd());
+    }
   }
 
   get channelSettings(): Promise<ChannelSettings> {

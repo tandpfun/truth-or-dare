@@ -128,14 +128,8 @@ export function titleCase(str: string): string {
 
 export function legacyPremiumAd(): APIInteractionResponseCallbackData {
   return {
-    embeds: [
-      {
-        color: Client.COLORS.YELLOW,
-        title: `${Client.EMOTES.sparkles} Truth or Dare Premium`,
-        description:
-          'This command requires premium. Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!',
-      },
-    ],
+    content:
+      'This command requires Truth or Dare Premium! Upgrade now to get access to these features!',
     components: [
       {
         type: ComponentType.ActionRow,
