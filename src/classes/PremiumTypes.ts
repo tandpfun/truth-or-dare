@@ -1,12 +1,17 @@
 import {
   APIChatInputApplicationCommandInteraction,
   APIMessageComponentInteraction,
+  APIModalSubmitInteraction,
 } from 'discord-api-types/v9';
 
 export type APIChatInputApplicationCommandInteractionWithEntitlements =
   APIChatInputApplicationCommandInteraction & { entitlement_sku_ids?: string[] };
 
 export type APIMessageComponentInteractionWithEntitlements = APIMessageComponentInteraction & {
+  entitlement_sku_ids?: string[];
+};
+
+export type APIModalSubmitInteractionWithEntitlements = APIModalSubmitInteraction & {
   entitlement_sku_ids?: string[];
 };
 

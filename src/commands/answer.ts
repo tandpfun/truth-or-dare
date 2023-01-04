@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -122,12 +122,25 @@ const answer: Command = {
             {
               title: nextQuestion.questionText,
               color: ctx.client.COLORS.BLUE,
-              description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${
+              description: `Press the answer button below to answer this question.\n\nQuestion sent from **${
                 guild ? guild.name : `Unknown Guild (${nextQuestion.guildId})`
               }** <#${nextQuestion.channelId}>.`,
               footer: {
                 text: `Type: PARANOIA | Rating: ${nextQuestion.questionRating} | ID: ${nextQuestion.questionId}`,
               },
+            },
+          ],
+          components: [
+            {
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  custom_id: 'ANSWER',
+                  label: 'Answer',
+                  style: ButtonStyle.Primary,
+                },
+              ],
             },
           ],
         },

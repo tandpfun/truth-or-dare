@@ -145,8 +145,11 @@ export default class Database {
     );
   }
 
-  fetchSpecificQuestion(id: string) {
-    return this.questionCache.find(q => q.id === id);
+  fetchSpecificQuestion(id: string, includeCustom = false) {
+    return (
+      this.questionCache.find(q => q.id === id) ||
+      (includeCustom ? this.customQuestions.find(q => q.id === id) : undefined)
+    );
   }
 
   async getRandomQuestion(

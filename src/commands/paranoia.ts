@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -38,6 +38,8 @@ const paranoia: Command = {
 
     const paranoia = await ctx.client.getQuestion(ctx, 'PARANOIA', rating);
     if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
+
+    // Send like regular question if no target
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
         content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
@@ -63,14 +65,14 @@ const paranoia: Command = {
         `${ctx.client.EMOTES.xmark} Bots can't answer paranoia questions, no matter how hard they try.`
       );
 
-    const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
+    // const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
 
-    if (!status.guildOpen)
-      return ctx.reply(
-        `${ctx.client.EMOTES.xmark} That user already has an active question sent from this server.`
-      );
+    // if (!status.guildOpen)
+    //   return ctx.reply(
+    //     `${ctx.client.EMOTES.xmark} That user already has an active question sent from this server.`
+    //   );
 
-    // create dm channel
+    // Create dm channel
     const dmChannel = await ctx.client.functions.createDMChannel(targetUserId, ctx.client.token);
     if (!dmChannel)
       return ctx.reply({
@@ -79,7 +81,7 @@ const paranoia: Command = {
         ],
       });
 
-    // fetch guild name
+    // Fetch guild name
     const guild = await ctx.client.functions.fetchGuild(ctx.guildId, ctx.client.token);
     if (!guild)
       return ctx.reply({
@@ -92,24 +94,32 @@ const paranoia: Command = {
         ],
       });
 
-    // send message
+    // Send question to target
     const message = await ctx.client.functions
       .sendMessage(
         {
           embeds: [
-            status.queueEmpty
-              ? {
-                  title: paranoia.question,
-                  color: ctx.client.COLORS.BLUE,
-                  description: `Use \`/answer\` to answer this question.\n\nQuestion sent from **${guild.name}** <#${ctx.channelId}>.`,
-                  footer: {
-                    text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
-                  },
-                }
-              : {
-                  description: `${ctx.client.EMOTES.warning} You received a question from ${guild.name}, but you need to answer the current question to see it.`,
-                  color: ctx.client.COLORS.BLUE,
+            {
+              title: paranoia.question,
+              color: ctx.client.COLORS.BLUE,
+              description: `Press the answer button below to answer this question.\n\nQuestion sent from **${guild.name}** <#${ctx.channelId}>.`,
+              footer: {
+                text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
+              },
+            },
+          ],
+          components: [
+            {
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  custom_id: `ANSWER:${paranoia.id}:${ctx.channelId}:${ctx.guildId}`,
+                  label: 'Answer',
+                  style: ButtonStyle.Primary,
                 },
+              ],
+            },
           ],
         },
         dmChannel.id,
@@ -127,33 +137,8 @@ const paranoia: Command = {
         ],
       });
 
-    // create db object
-    const createQuestion = await ctx.client.database
-      .addParanoiaQuestion({
-        userId: targetUserId,
-        questionText: paranoia.question,
-        questionRating: paranoia.rating,
-        questionId: paranoia.id,
-        guildId: ctx.guildId,
-        channelId: ctx.channelId,
-        dmMessageId: status.queueEmpty ? message.id : null,
-      })
-      .then(_ => true)
-      .catch(_ => null);
-
-    if (!createQuestion) {
-      ctx.client.console.error(
-        `Paranoia uniqueness failed with document ID "${targetUserId}-${ctx.guildId}" and channel id "${ctx.channelId}"`
-      );
-      return ctx.reply(
-        `${ctx.client.EMOTES.xmark} An internal error occurred while saving the question. Help us resolve this issue by reaching out in our Support Server: https://discord.gg/vBERMvVaRt`
-      );
-    }
-
     ctx.reply(
-      status.queueEmpty
-        ? `${ctx.client.EMOTES.checkmark} **Question sent!** Their answer will be sent here once they reply.`
-        : `${ctx.client.EMOTES.checkmark} That user already has a question from another server, but I'll send them this one after they reply to that.`
+      `${ctx.client.EMOTES.checkmark} **Question sent!** Their answer will be sent here once they reply.`
     );
   },
 };
