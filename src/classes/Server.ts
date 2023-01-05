@@ -126,13 +126,10 @@ export default class Server {
 
     const interaction = req.body;
 
-    // If interaction is a ping (url verification)
     if (interaction.type === InteractionType.Ping)
-      return res.send({ type: InteractionResponseType.Pong });
-
-    this.metrics.trackUserLocale(interaction.locale);
-
-    if (
+      // If interaction is a ping (url verification)
+      res.send({ type: InteractionResponseType.Pong });
+    else if (
       interaction.type === InteractionType.ApplicationCommand &&
       interaction.data.type === ApplicationCommandType.ChatInput
     ) {
