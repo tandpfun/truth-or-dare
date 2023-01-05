@@ -98,7 +98,7 @@ export default class ParanoiaHandler {
         `Paranoia message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${ctx.messageId}`
       );
 
-    ctx.reply(`${ctx.client.EMOTES.checkmark} Answer sent!`);
+    ctx.defer();
   }
 
   async handleParanoiaModalButton(ctx: ButtonContext) {
