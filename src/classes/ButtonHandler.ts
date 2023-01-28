@@ -34,6 +34,9 @@ export default class ButtonHandler {
     // Premium upsell button
     if (ctx.data.custom_id === 'upsell') return ctx.replyUpsell();
 
+    if (ctx.data.custom_id.startsWith('ANSWER'))
+      return ctx.client.paranoiaHandler.handleParanoiaModalButton(ctx);
+
     const customId = ctx.data.custom_id as ButtonIdWithState;
     const [id, rating] = customId.split(':') as [ButtonIds, Rating | 'NONE' | undefined];
     if (!this.buttonIds.includes(id))

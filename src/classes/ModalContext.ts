@@ -1,43 +1,42 @@
 import {
   APIInteractionResponseCallbackData,
-  APIMessageButtonInteractionData,
-  APIMessageComponentInteraction,
   APIApplicationCommandOption,
   APIInteractionGuildMember,
   InteractionResponseType,
-  ComponentType,
   APIUser,
   APIModalInteractionResponseCallbackData,
+  APIModalSubmitInteraction,
+  APIModalSubmission,
+  InteractionType,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import { APIMessageComponentInteractionWithEntitlements } from './PremiumTypes';
+import { APIModalSubmitInteractionWithEntitlements } from './PremiumTypes';
 import type { OptionType } from './OptionTypes';
-import type Context from './Context';
 import type Client from './Client';
 
-export default class ButtonContext implements Context {
-  interaction: APIMessageComponentInteraction;
-  data: APIMessageButtonInteractionData;
+export default class ModalContext {
+  interaction: APIModalSubmitInteraction;
+  data: APIModalSubmission;
   response: FastifyReply;
   client: Client;
   applicationId: string;
-  channelId: string;
+  channelId?: string;
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
-  messageId: string;
+  messageId?: string;
   args: (string | number | boolean)[] = [];
   entitlements?: string[];
   premium: boolean;
 
   constructor(
-    interaction: APIMessageComponentInteractionWithEntitlements,
+    interaction: APIModalSubmitInteractionWithEntitlements,
     client: Client,
     response: FastifyReply
   ) {
-    if (interaction.data.component_type !== ComponentType.Button)
+    if (interaction.type !== InteractionType.ModalSubmit)
       throw new Error('The component type is not a button.');
 
     this.interaction = interaction;
@@ -46,7 +45,7 @@ export default class ButtonContext implements Context {
     this.client = client;
 
     this.applicationId = interaction.application_id;
-    this.messageId = interaction.message.id;
+    this.messageId = interaction.message?.id;
     this.channelId = interaction.channel_id;
     this.guildId = interaction.guild_id;
 
@@ -94,6 +93,6 @@ export default class ButtonContext implements Context {
   }
 
   get channelSettings(): Promise<ChannelSettings> {
-    return this.client.database.fetchChannelSettings(this.channelId, !this.guildId);
+    return this.client.database.fetchChannelSettings(this.channelId!, !this.guildId);
   }
 }

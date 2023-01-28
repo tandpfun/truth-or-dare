@@ -20,6 +20,7 @@ import type Metrics from './Metrics';
 import type Command from './Command';
 import Logger from './Logger';
 import ScheduledQuestionHandler from './ScheduledQuestionHandler';
+import ParanoiaHandler from './ParanoiaHandler';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
 
@@ -35,6 +36,7 @@ export default class Client {
   metrics: Metrics;
   database: Database;
   buttonHandler: ButtonHandler;
+  paranoiaHandler: ParanoiaHandler;
   scheduledQuestionHandler: ScheduledQuestionHandler;
   functions: typeof functions;
 
@@ -130,6 +132,7 @@ export default class Client {
     this.functions = functions;
     this.database = database;
     this.buttonHandler = new ButtonHandler(this);
+    this.paranoiaHandler = new ParanoiaHandler(this);
     this.scheduledQuestionHandler = new ScheduledQuestionHandler(this);
   }
 

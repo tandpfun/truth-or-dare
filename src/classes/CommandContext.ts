@@ -12,6 +12,7 @@ import {
   InteractionResponseType,
   ApplicationCommandType,
   APIUser,
+  APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
@@ -129,6 +130,13 @@ export default class CommandContext implements Context {
     } else {
       this.reply(this.client.functions.legacyPremiumAd());
     }
+  }
+
+  replyModal(data: APIModalInteractionResponseCallbackData) {
+    this.response.send({
+      type: InteractionResponseType.Modal,
+      data,
+    });
   }
 
   get channelSettings(): Promise<ChannelSettings> {

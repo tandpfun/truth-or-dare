@@ -6,6 +6,7 @@ import {
   InteractionType,
   APIInteraction,
   ComponentType,
+  APIModalSubmitInteraction,
 } from 'discord-api-types/v9';
 import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyRateLimit, { RateLimitOptions } from '@fastify/rate-limit';
@@ -24,6 +25,7 @@ import type Client from './Client';
 import Database from './Database';
 import Metrics from './Metrics';
 import Logger from './Logger';
+import ModalContext from './ModalContext';
 
 const rateLimitConfig: RateLimitOptions = {
   max: 5,
@@ -153,6 +155,9 @@ export default class Server {
         res
       );
       await client.handleButton(ctx);
+    } else if (interaction.type === InteractionType.ModalSubmit) {
+      const ctx = new ModalContext(interaction as APIModalSubmitInteraction, client, res);
+      await client.paranoiaHandler.handleModal(ctx);
     }
   }
 
