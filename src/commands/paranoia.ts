@@ -23,6 +23,8 @@ const options = [
   },
 ] as const;
 
+const paranoiaCooldown = new Set(); // Prevent paranoia spam
+
 const paranoia: Command = {
   name: 'paranoia',
   description: 'Gives a paranoia question or sends one to a user.',
@@ -65,6 +67,11 @@ const paranoia: Command = {
         `${ctx.client.EMOTES.xmark} Bots can't answer paranoia questions, no matter how hard they try.`
       );
 
+    if (paranoiaCooldown.has(`${ctx.user.id}:${targetUserId}`))
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} Please wait a few seconds before sending that user another question.`
+      );
+
     // const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
 
     // if (!status.guildOpen)
@@ -102,7 +109,7 @@ const paranoia: Command = {
             {
               title: paranoia.question,
               color: ctx.client.COLORS.BLUE,
-              description: `Press the answer button below to answer this question.\n\nQuestion sent from **${guild.name}** <#${ctx.channelId}>.`,
+              description: `Press the answer button below to answer this question.\n\nQuestion sent by **${ctx.user.username}#${ctx.user.discriminator}** in **${guild.name}** <#${ctx.channelId}>.`,
               footer: {
                 text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
               },
@@ -140,6 +147,11 @@ const paranoia: Command = {
     ctx.reply(
       `${ctx.client.EMOTES.checkmark} **Question sent!** Their answer will be sent here once they reply.`
     );
+
+    paranoiaCooldown.add(`${ctx.user.id}:${targetUserId}`);
+    setTimeout(() => {
+      paranoiaCooldown.delete(`${ctx.user.id}:${targetUserId}`);
+    }, 10_000);
   },
 };
 

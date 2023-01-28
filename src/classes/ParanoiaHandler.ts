@@ -80,7 +80,7 @@ export default class ParanoiaHandler {
             {
               title: fetchedQuestion.question,
               color: ctx.client.COLORS.GREEN,
-              description: `Question answered: Check it out in <#${channelId}>.`,
+              description: `Question answered, check it out in <#${channelId}>!`,
               footer: {
                 text: `Type: PARANOIA | Rating: ${fetchedQuestion.rating} | ID: ${fetchedQuestion.id}`,
               },
