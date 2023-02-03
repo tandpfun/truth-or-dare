@@ -38,6 +38,7 @@ export default class CommandContext implements Context {
   user: APIUser;
   entitlements?: string[];
   premium: boolean;
+  appPermissions?: string;
 
   constructor(
     interaction: APIChatInputApplicationCommandInteractionWithEntitlements,
@@ -63,6 +64,7 @@ export default class CommandContext implements Context {
         : o.value
     );
     this.resolved = interaction.data.resolved;
+    this.appPermissions = interaction.app_permissions;
 
     this.applicationId = interaction.application_id;
     this.channelId = interaction.channel_id;

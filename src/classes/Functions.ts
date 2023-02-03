@@ -5,7 +5,6 @@ import {
   RESTPatchAPIChannelMessageResult,
   RESTPostAPIChannelMessageResult,
   RESTGetAPIGuildChannelsResult,
-  APIInteractionGuildMember,
   RESTGetAPIChannelResult,
   RESTGetAPIGuildResult,
   PermissionFlagsBits,
@@ -52,10 +51,10 @@ export function checkPerms(command: Command, ctx: Context) {
   return true;
 }
 
-export function hasPermission(permission: Permission, member?: APIInteractionGuildMember) {
-  if (!member) return true;
+export function hasPermission(permission: Permission, permissions?: string) {
+  if (!permissions) return true;
   const required = typeof permission === 'bigint' ? permission : PermissionFlagsBits[permission];
-  const missing = required & ~BigInt(member.permissions);
+  const missing = required & ~BigInt(permissions);
   return !missing;
 }
 

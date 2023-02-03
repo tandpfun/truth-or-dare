@@ -51,7 +51,8 @@ export default class ButtonHandler {
 
     // Cooldown + Perm checks
     if (this.buttonCooldown.has(ctx.channelId)) return ctx.defer();
-    if (!this.client.functions.hasPermission('SendMessages', ctx.member)) return ctx.defer();
+    if (!this.client.functions.hasPermission('SendMessages', ctx.member?.permissions))
+      return ctx.defer();
 
     // Statistics
     const buttonName = id.toLowerCase();

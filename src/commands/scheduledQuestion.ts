@@ -82,6 +82,14 @@ const scheduledQuestion: Command = {
           `${ctx.client.EMOTES.xmark} There's already a scheduled question in this channel. Please remove the old one with \`/scheduledquestion remove\` before creating a new one!`
         );
 
+      if (
+        !ctx.client.functions.hasPermission('ViewChannel', ctx.appPermissions) ||
+        !ctx.client.functions.hasPermission('SendMessages', ctx.appPermissions)
+      )
+        return ctx.reply(
+          `${ctx.client.EMOTES.xmark} It doesn't look like I can send messages in this channel! Make sure I have the "View Channel" and "Send Messages" permissions in this channel.`
+        );
+
       const frequency = ctx.getOption<Mutable<typeof options[0]['options'][0]>>('frequency')!.value;
       let questionType =
         ctx.getOption<Mutable<typeof options[0]['options'][1]>>('type')?.value || null;

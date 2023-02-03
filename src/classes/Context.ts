@@ -18,6 +18,7 @@ export default interface Context {
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
+  appPermissions?: string;
   entitlements?: string[];
   premium: boolean;
 
