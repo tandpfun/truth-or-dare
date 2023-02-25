@@ -23,7 +23,7 @@ export default interface Context {
   premium: boolean;
 
   getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined;
-  reply(data: string | APIInteractionResponseCallbackData, ephemeral?: boolean): void;
+  reply(data: string | APIInteractionResponseCallbackData, options?: { ephemeral?: boolean }): void;
   replyUpsell(): void;
   get channelSettings(): Promise<ChannelSettings>;
 }

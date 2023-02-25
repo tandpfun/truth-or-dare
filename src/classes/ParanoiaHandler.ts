@@ -1,4 +1,12 @@
-import { ComponentType, TextInputStyle } from 'discord-api-types/v9';
+import { CustomQuestion, Question } from '@prisma/client';
+import {
+  APIChannel,
+  APIGuild,
+  APIUser,
+  ButtonStyle,
+  ComponentType,
+  TextInputStyle,
+} from 'discord-api-types/v9';
 import ButtonContext from './ButtonContext';
 import Client from './Client';
 import ModalContext from './ModalContext';
@@ -7,6 +15,50 @@ export default class ParanoiaHandler {
   client: Client;
   constructor(client: Client) {
     this.client = client;
+  }
+
+  async sendParanoiaDM({
+    dmChannel,
+    question,
+    sender,
+    channelId,
+    guild,
+  }: {
+    dmChannel: APIChannel;
+    question: Question | CustomQuestion;
+    sender: APIUser;
+    channelId: string;
+    guild: APIGuild;
+  }) {
+    return this.client.functions.sendMessage(
+      {
+        embeds: [
+          {
+            title: question.question,
+            color: this.client.COLORS.BLUE,
+            description: `Press the answer button below to answer this question.\n\nQuestion sent by **${sender.username}#${sender.discriminator}** in **${guild.name}** <#${channelId}>.`,
+            footer: {
+              text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${question.id}`,
+            },
+          },
+        ],
+        components: [
+          {
+            type: ComponentType.ActionRow,
+            components: [
+              {
+                type: ComponentType.Button,
+                custom_id: `ANSWER:${question.id}:${channelId}:${guild.id}`,
+                label: 'Answer',
+                style: ButtonStyle.Primary,
+              },
+            ],
+          },
+        ],
+      },
+      dmChannel.id,
+      this.client.token
+    );
   }
 
   async handleModal(ctx: ModalContext) {
@@ -52,6 +104,19 @@ export default class ParanoiaHandler {
                 {
                   name: `${ctx.user.username}'s Answer:`,
                   value: answer.slice(0, 1021) + (answer.length > 1021 ? '...' : ''),
+                },
+              ],
+            },
+          ],
+          components: [
+            {
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  custom_id: `PARANOIA:${fetchedQuestion.rating}:${ctx.user.id}`,
+                  label: 'Send Another',
+                  style: ButtonStyle.Primary,
                 },
               ],
             },

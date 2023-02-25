@@ -13,6 +13,7 @@ import {
   ApplicationCommandType,
   APIUser,
   APIModalInteractionResponseCallbackData,
+  MessageFlags,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
@@ -116,8 +117,11 @@ export default class CommandContext implements Context {
     return;
   }
 
-  reply(data: string | APIInteractionResponseCallbackData) {
+  reply(data: string | APIInteractionResponseCallbackData, options?: { ephemeral?: boolean }) {
     if (typeof data === 'string') data = { content: data };
+    if (options?.ephemeral) {
+      data.flags = (data.flags || 0) | MessageFlags.Ephemeral;
+    }
     this.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data,

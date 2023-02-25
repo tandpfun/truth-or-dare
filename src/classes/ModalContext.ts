@@ -8,6 +8,7 @@ import {
   APIModalSubmitInteraction,
   APIModalSubmission,
   InteractionType,
+  MessageFlags,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
@@ -61,8 +62,12 @@ export default class ModalContext {
     return;
   }
 
-  reply(data: string | APIInteractionResponseCallbackData) {
+  reply(data: string | APIInteractionResponseCallbackData, options?: { ephemeral?: boolean }) {
     if (typeof data === 'string') data = { content: data };
+    if (options?.ephemeral) {
+      if (data.flags) data.flags |= MessageFlags.Ephemeral;
+      else data.flags = MessageFlags.Ephemeral;
+    }
     this.response.send({
       type: InteractionResponseType.ChannelMessageWithSource,
       data,

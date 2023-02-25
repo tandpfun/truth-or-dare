@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
@@ -72,77 +72,36 @@ const paranoia: Command = {
         `${ctx.client.EMOTES.xmark} Please wait a few seconds before sending that user another question.`
       );
 
-    // const status = await ctx.client.database.checkParanoiaStatus(targetUserId, ctx.guildId);
-
-    // if (!status.guildOpen)
-    //   return ctx.reply(
-    //     `${ctx.client.EMOTES.xmark} That user already has an active question sent from this server.`
-    //   );
+    // Fetch guild name and check for scope
+    const guild = await ctx.client.functions.fetchGuild(ctx.guildId, ctx.client.token);
+    if (!guild)
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} I can't get this guild. Was I authorized with the bot scope?`,
+        { ephemeral: true }
+      );
 
     // Create dm channel
     const dmChannel = await ctx.client.functions.createDMChannel(targetUserId, ctx.client.token);
     if (!dmChannel)
-      return ctx.reply({
-        embeds: [
-          ctx.client.functions.embed('Failed to create a DM with the user.', ctx.user, true),
-        ],
+      return ctx.reply(`${ctx.client.EMOTES.xmark} I failed to create a DM with that user.`, {
+        ephemeral: true,
       });
 
-    // Fetch guild name
-    const guild = await ctx.client.functions.fetchGuild(ctx.guildId, ctx.client.token);
-    if (!guild)
-      return ctx.reply({
-        embeds: [
-          ctx.client.functions.embed(
-            "I can't get this guild. Was I authorized with the bot scope?",
-            ctx.user,
-            true
-          ),
-        ],
-      });
-
-    // Send question to target
-    const message = await ctx.client.functions
-      .sendMessage(
-        {
-          embeds: [
-            {
-              title: paranoia.question,
-              color: ctx.client.COLORS.BLUE,
-              description: `Press the answer button below to answer this question.\n\nQuestion sent by **${ctx.user.username}#${ctx.user.discriminator}** in **${guild.name}** <#${ctx.channelId}>.`,
-              footer: {
-                text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
-              },
-            },
-          ],
-          components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  custom_id: `ANSWER:${paranoia.id}:${ctx.channelId}:${ctx.guildId}`,
-                  label: 'Answer',
-                  style: ButtonStyle.Primary,
-                },
-              ],
-            },
-          ],
-        },
-        dmChannel.id,
-        ctx.client.token
-      )
+    const sendParanoia = await ctx.client.paranoiaHandler
+      .sendParanoiaDM({
+        dmChannel,
+        question: paranoia,
+        sender: ctx.user,
+        guild,
+        channelId: ctx.channelId,
+      })
       .catch(_ => null);
-    if (!message)
-      return ctx.reply({
-        embeds: [
-          ctx.client.functions.embed(
-            'I was unable to send a DM to that user. Do they have DMs enabled?',
-            ctx.user,
-            true
-          ),
-        ],
-      });
+
+    if (!sendParanoia)
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} I failed to send that user a DM. Are their DMs open?`,
+        { ephemeral: true }
+      );
 
     ctx.reply(
       `${ctx.client.EMOTES.checkmark} **Question sent!** Their answer will be sent here once they reply.`

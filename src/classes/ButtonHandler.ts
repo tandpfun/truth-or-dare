@@ -38,7 +38,11 @@ export default class ButtonHandler {
       return ctx.client.paranoiaHandler.handleParanoiaModalButton(ctx);
 
     const customId = ctx.data.custom_id as ButtonIdWithState;
-    const [id, rating] = customId.split(':') as [ButtonIds, Rating | 'NONE' | undefined];
+    const [id, rating, targetUserId] = customId.split(':') as [
+      ButtonIds,
+      Rating | 'NONE' | undefined,
+      string | undefined
+    ];
     if (!this.buttonIds.includes(id))
       return this.client.console.error(
         `Button ${ctx.data.custom_id} was pressed with no corresponding question type.`
@@ -79,25 +83,65 @@ export default class ButtonHandler {
 
     const result = await ctx.client.getQuestion(ctx, type, rating);
 
-    ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
-      embeds: [
-        {
-          author: {
-            name: `Requested by ${ctx.user.username}#${ctx.user.discriminator}`,
-            icon_url: `${avatarURL(ctx.user)}`,
+    if (targetUserId && ctx.guildId && result.id) {
+      // For paranoia target questions
+
+      // Fetch guild name and check for scope
+      const guild = await ctx.client.functions.fetchGuild(ctx.guildId, ctx.client.token);
+      if (!guild)
+        return ctx.reply(
+          `${ctx.client.EMOTES.xmark} I can't get this guild. Was I authorized with the bot scope?`,
+          { ephemeral: true }
+        );
+
+      // Create dm channel
+      const dmChannel = await ctx.client.functions.createDMChannel(targetUserId, ctx.client.token);
+      if (!dmChannel)
+        return ctx.reply(`${ctx.client.EMOTES.xmark} I failed to create a DM with that user.`, {
+          ephemeral: true,
+        });
+
+      const sendParanoia = await ctx.client.paranoiaHandler
+        .sendParanoiaDM({
+          dmChannel,
+          question: result,
+          sender: ctx.user,
+          guild,
+          channelId: ctx.channelId,
+        })
+        .catch(_ => null);
+
+      if (!sendParanoia)
+        return ctx.reply(
+          `${ctx.client.EMOTES.xmark} I failed to send that user a DM. Are their DMs open?`,
+          { ephemeral: true }
+        );
+
+      ctx.reply({
+        content: `${ctx.client.EMOTES.checkmark} **<@${ctx.user.id}> sent them another question!** Their answer will be sent here once they reply.`,
+        allowed_mentions: { parse: [] },
+      });
+    } else {
+      ctx.reply({
+        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
+        embeds: [
+          {
+            author: {
+              name: `Requested by ${ctx.user.username}#${ctx.user.discriminator}`,
+              icon_url: `${avatarURL(ctx.user)}`,
+            },
+            title: result.question,
+            color: ctx.client.COLORS.BLUE,
+            footer: result.id
+              ? {
+                  text: `Type: ${result.type} | Rating: ${result.rating} | ID: ${result.id}`,
+                }
+              : undefined,
           },
-          title: result.question,
-          color: ctx.client.COLORS.BLUE,
-          footer: result.id
-            ? {
-                text: `Type: ${result.type} | Rating: ${result.rating} | ID: ${result.id}`,
-              }
-            : undefined,
-        },
-      ],
-      components: settings?.disableButtons ? [] : this.components(buttonCommandType, rating),
-    });
+        ],
+        components: settings?.disableButtons ? [] : this.components(buttonCommandType, rating),
+      });
+    }
 
     ctx.client.functions
       .editMessage(
