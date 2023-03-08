@@ -11,6 +11,7 @@ import {
   ComponentType,
   ButtonStyle,
   APIEmbed,
+  RESTPatchAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
@@ -193,6 +194,22 @@ export async function editMessage(
     )
     .send(data)
     .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
+}
+
+export async function editInteractionResponse(
+  data: RESTPatchAPIInteractionFollowupJSONBody,
+  applicationId: string,
+  interactionToken: string,
+  messageId: string
+): Promise<RESTPatchAPIChannelMessageResult | null> {
+  return await superagent
+    .patch(
+      `${
+        process.env.DISCORD_API_URL || 'https://discord.com'
+      }/api/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`
+    )
+    .send(data)
     .then(res => res.body);
 }
 
