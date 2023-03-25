@@ -83,7 +83,7 @@ export default class ButtonHandler {
 
     const result = await ctx.client.getQuestion(ctx, type, rating);
 
-    if (targetUserId && ctx.guildId && result.id) {
+    if (targetUserId && targetUserId !== 'NONE' && ctx.guildId && result.id) {
       // For paranoia target questions
 
       // Fetch guild name and check for scope
@@ -122,6 +122,8 @@ export default class ButtonHandler {
         allowed_mentions: { parse: [] },
       });
     } else {
+      // For all other types of games
+
       ctx.reply({
         content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
         embeds: [
@@ -139,7 +141,30 @@ export default class ButtonHandler {
               : undefined,
           },
         ],
-        components: settings?.disableButtons ? [] : this.components(buttonCommandType, rating),
+        components:
+          targetUserId === 'NONE'
+            ? [
+                {
+                  type: ComponentType.ActionRow,
+                  components: [
+                    {
+                      type: ComponentType.Button,
+                      custom_id: `ANSWER:${result.id}:${ctx.channelId}:${ctx.guildId}`,
+                      label: 'Answer',
+                      style: ButtonStyle.Primary,
+                    },
+                    {
+                      type: ComponentType.Button,
+                      custom_id: `${result.type}:${rating || 'NONE'}:NONE`,
+                      label: 'New Question',
+                      style: ButtonStyle.Secondary,
+                    },
+                  ],
+                },
+              ]
+            : settings?.disableButtons
+            ? []
+            : this.components(buttonCommandType, rating),
       });
     }
 
@@ -153,6 +178,7 @@ export default class ButtonHandler {
         ctx.client.token
       )
       .catch(err => {
+        console.log(err.status);
         if (err.status !== 403)
           this.client.console.warn(
             `Button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`

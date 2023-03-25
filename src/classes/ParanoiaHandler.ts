@@ -76,94 +76,133 @@ export default class ParanoiaHandler {
     if (!fetchedQuestion)
       return ctx.reply(`${ctx.client.EMOTES.xmark} That question doesn't exist anymore.`);
 
-    const showFreq = (await ctx.client.database.isPremiumGuild(guildId))
-      ? (await ctx.client.database.fetchGuildSettings(guildId)).showParanoiaFrequency
-      : ctx.client.database.defaultGuildSettings(ctx.guildId!).showParanoiaFrequency;
-
     const answer = ctx.data.components[0].components[0].value;
 
-    const message = await ctx.client.functions
-      .sendMessage(
-        {
-          embeds: [
-            {
-              author: {
-                name: `${ctx.user.username}#${ctx.user.discriminator}`,
-                icon_url: ctx.client.functions.avatarURL(ctx.user),
-              },
-              title: `Paranoia Answer`,
-              color: ctx.client.COLORS.BLUE,
-              fields: [
-                {
-                  name: 'Question:',
-                  value:
-                    Math.random() < showFreq / 100
-                      ? fetchedQuestion.question
-                      : `The user got lucky, and the question wasn't shared.`,
-                },
-                {
-                  name: `${ctx.user.username}'s Answer:`,
-                  value: answer.slice(0, 1021) + (answer.length > 1021 ? '...' : ''),
-                },
-              ],
-            },
-          ],
-          components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  custom_id: `PARANOIA:${fetchedQuestion.rating}:${ctx.user.id}`,
-                  label: 'Send Another',
-                  style: ButtonStyle.Primary,
-                },
-              ],
-            },
-          ],
-        },
-        channelId,
-        ctx.client.token
-      )
-      .catch(_ => null);
-
-    if (!message)
-      return ctx.reply({
+    if (ctx.channelId === channelId) {
+      // If interactive game question
+      ctx.reply({
         embeds: [
-          ctx.client.functions.embed(
-            `Message failed to send, please make sure I can send messages in <#${channelId}> and then try again. If that's not the issue, have them send you another question.`,
-            ctx.user,
-            true
-          ),
+          {
+            author: {
+              name: `${ctx.user.username}#${ctx.user.discriminator} Answered`,
+              icon_url: ctx.client.functions.avatarURL(ctx.user),
+            },
+            color: ctx.client.COLORS.BLUE,
+            fields: [
+              {
+                name: fetchedQuestion.question,
+                value: answer.slice(0, 1021) + (answer.length > 1021 ? '...' : ''),
+              },
+            ],
+            footer: {
+              text: `Type: ${fetchedQuestion.type} | Rating: ${fetchedQuestion.rating} | ID: ${fetchedQuestion.id}`,
+            },
+          },
+        ],
+        components: [
+          {
+            type: ComponentType.ActionRow,
+            components: [
+              {
+                type: ComponentType.Button,
+                custom_id: `${fetchedQuestion.type}:${fetchedQuestion.rating}:NONE`,
+                label: 'New Question',
+                style: ButtonStyle.Secondary,
+              },
+            ],
+          },
         ],
       });
+    } else {
+      // If paranoia question
 
-    const editedMessage = await ctx.client.functions
-      .editMessage(
-        {
-          embeds: [
-            {
-              title: fetchedQuestion.question,
-              color: ctx.client.COLORS.GREEN,
-              description: `Question answered, check it out in <#${channelId}>!`,
-              footer: {
-                text: `Type: PARANOIA | Rating: ${fetchedQuestion.rating} | ID: ${fetchedQuestion.id}`,
+      const showFreq = (await ctx.client.database.isPremiumGuild(guildId))
+        ? (await ctx.client.database.fetchGuildSettings(guildId)).showParanoiaFrequency
+        : ctx.client.database.defaultGuildSettings(ctx.guildId!).showParanoiaFrequency;
+
+      const message = await ctx.client.functions
+        .sendMessage(
+          {
+            embeds: [
+              {
+                author: {
+                  name: `${ctx.user.username}#${ctx.user.discriminator}`,
+                  icon_url: ctx.client.functions.avatarURL(ctx.user),
+                },
+                title: `Paranoia Answer`,
+                color: ctx.client.COLORS.BLUE,
+                fields: [
+                  {
+                    name: 'Question:',
+                    value:
+                      Math.random() < showFreq / 100
+                        ? fetchedQuestion.question
+                        : `The user got lucky, and the question wasn't shared.`,
+                  },
+                  {
+                    name: `${ctx.user.username}'s Answer:`,
+                    value: answer.slice(0, 1021) + (answer.length > 1021 ? '...' : ''),
+                  },
+                ],
               },
-            },
-          ],
-          components: [],
-        },
-        ctx.channelId!,
-        ctx.messageId!,
-        ctx.client.token
-      )
-      .catch(_ => null);
-    if (!editedMessage)
-      ctx.client.console.warn(
-        `Paranoia message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${ctx.messageId}`
-      );
+            ],
+            components: [
+              {
+                type: ComponentType.ActionRow,
+                components: [
+                  {
+                    type: ComponentType.Button,
+                    custom_id: `PARANOIA:${fetchedQuestion.rating}:${ctx.user.id}`,
+                    label: 'Send Another',
+                    style: ButtonStyle.Primary,
+                  },
+                ],
+              },
+            ],
+          },
+          channelId,
+          ctx.client.token
+        )
+        .catch(_ => null);
 
-    ctx.defer();
+      if (!message)
+        return ctx.reply({
+          embeds: [
+            ctx.client.functions.embed(
+              `Message failed to send, please make sure I can send messages in <#${channelId}> and then try again. If that's not the issue, have them send you another question.`,
+              ctx.user,
+              true
+            ),
+          ],
+        });
+
+      const editedMessage = await ctx.client.functions
+        .editMessage(
+          {
+            embeds: [
+              {
+                title: fetchedQuestion.question,
+                color: ctx.client.COLORS.GREEN,
+                description: `Question answered, check it out in <#${channelId}>!`,
+                footer: {
+                  text: `Type: PARANOIA | Rating: ${fetchedQuestion.rating} | ID: ${fetchedQuestion.id}`,
+                },
+              },
+            ],
+            components: [],
+          },
+          ctx.channelId!,
+          ctx.messageId!,
+          ctx.client.token
+        )
+        .catch(_ => null);
+      if (!editedMessage)
+        ctx.client.console.warn(
+          `Paranoia message edit failed in channel: ${ctx.channelId} with user: ${ctx.user.id} on message: ${ctx.messageId}`
+        );
+
+      ctx.defer();
+    }
   }
 
   async handleParanoiaModalButton(ctx: ButtonContext) {
@@ -181,7 +220,7 @@ export default class ParanoiaHandler {
     }
 
     return ctx.replyModal({
-      title: 'Answer Paranoia',
+      title: 'Answer Question',
       custom_id: ctx.data.custom_id,
       components: [
         {

@@ -112,9 +112,6 @@ const settings: Command = {
   perms: ['ManageChannels'],
   options,
   run: async (ctx: Context): Promise<void> => {
-    if (!ctx.guildId)
-      return ctx.reply(`${ctx.client.EMOTES.xmark} Settings cannot be configured in DMs.`);
-
     const channelId =
       ctx.getOption<Mutable<typeof options[0]['options'][0]>>('channel')?.value ?? ctx.channelId;
 
@@ -165,6 +162,9 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToEnable} rating was enabled here!`);
     } else if (ctx.args[0] === 'mute') {
+      if (!ctx.guildId)
+        return ctx.reply(`${ctx.client.EMOTES.xmark} This cannot be configured in DMs.`);
+
       if (channelSettings.muted)
         return ctx.reply(ctx.client.EMOTES.xmark + ' I am already muted here.');
 
@@ -172,6 +172,9 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(ctx.client.EMOTES.checkmark + ' Muted, use `/settings unmute` to unmute.');
     } else if (ctx.args[0] === 'unmute') {
+      if (!ctx.guildId)
+        return ctx.reply(`${ctx.client.EMOTES.xmark} This cannot be configured in DMs.`);
+
       if (!channelSettings.muted)
         return ctx.reply(ctx.client.EMOTES.xmark + ' I am already unmuted here.');
 
@@ -179,6 +182,9 @@ const settings: Command = {
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted, use `/settings mute` to mute.');
     } else if (ctx.args[0] === 'muteserver') {
+      if (!ctx.guildId)
+        return ctx.reply(`${ctx.client.EMOTES.xmark} This cannot be configured in DMs.`);
+
       const allChannels = await ctx.client.functions.fetchGuildChannels(
         ctx.guildId,
         ctx.client.token
@@ -208,6 +214,9 @@ const settings: Command = {
           ' Muted in all channels serverwide. Use `/settings unmuteserver` to unmute.'
       );
     } else if (ctx.args[0] === 'unmuteserver') {
+      if (!ctx.guildId)
+        return ctx.reply(`${ctx.client.EMOTES.xmark} This cannot be configured in DMs.`);
+
       const allChannels = await ctx.client.functions.fetchGuildChannels(
         ctx.guildId,
         ctx.client.token
