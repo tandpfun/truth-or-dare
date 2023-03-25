@@ -72,7 +72,9 @@ const scheduledQuestion: Command = {
   perms: ['ManageGuild'],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
-      return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');
+      return ctx.reply(
+        ctx.client.EMOTES.xmark + ' For now, scheduled questions are only available in servers.'
+      );
 
     if (!ctx.premium) return ctx.replyUpsell();
 

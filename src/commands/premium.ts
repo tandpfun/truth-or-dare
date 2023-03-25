@@ -57,7 +57,9 @@ const premium: Command = {
 
     if (ctx.args[0] === 'check') {
       if (!ctx.guildId)
-        return ctx.reply(`${ctx.client.EMOTES.xmark} This command cannot be run in a DM.`);
+        return ctx.reply(
+          `${ctx.client.EMOTES.xmark} Premium is only available in servers at the moment, not DMs.`
+        );
 
       if (premiumGuild)
         return ctx.reply({
@@ -132,7 +134,7 @@ const premium: Command = {
     } else if (ctx.args[0] === 'activate') {
       if (!ctx.guildId)
         return ctx.reply(
-          `${ctx.client.EMOTES.xmark} Run this in the server you want to activate premium for!`
+          `${ctx.client.EMOTES.xmark} Premium is only available in servers at the moment. If you're trying to activate, run this in the server you want to activate premium for!`
         );
 
       if (premiumUser!.premiumServers.includes(ctx.guildId))
