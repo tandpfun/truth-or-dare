@@ -168,20 +168,41 @@ export default class ButtonHandler {
       });
     }
 
-    ctx
-      .editResponse(
-        {
-          components: [],
-        },
-        ctx.messageId
-      )
-      .catch(err => {
-        console.log(err.status);
-        if (err.status !== 403)
-          this.client.console.warn(
-            `Button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`
-          );
-      });
+    if (!ctx.guildId) {
+      // In a dm or group dm
+      ctx
+        .editResponse(
+          {
+            components: [],
+          },
+          ctx.messageId
+        )
+        .catch(err => {
+          console.log(err.status);
+          if (err.status !== 403)
+            this.client.console.warn(
+              `DM button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`
+            );
+        });
+    } else {
+      // In a server (regular edits are faster for now)
+      ctx.client.functions
+        .editMessage(
+          {
+            components: [],
+          },
+          ctx.channelId,
+          ctx.messageId,
+          ctx.client.token
+        )
+        .catch(err => {
+          console.log(err.status);
+          if (err.status !== 403)
+            this.client.console.warn(
+              `Server button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`
+            );
+        });
+    }
   }
 
   components(
