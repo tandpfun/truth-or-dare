@@ -210,12 +210,12 @@ export default class ParanoiaHandler {
 
     const fetchedQuestion = ctx.client.database.fetchSpecificQuestion(questionId, true);
     if (!fetchedQuestion) {
-      ctx.client.functions.editMessage(
-        { components: [] },
-        ctx.channelId,
-        ctx.messageId,
-        ctx.client.token
-      );
+      ctx.editResponse({ components: [] }, ctx.messageId).catch(err => {
+        if (err.status !== 403)
+          this.client.console.warn(
+            `Paranoia modal button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`
+          );
+      });
       return ctx.reply(`${ctx.client.EMOTES.xmark} That question doesn't exist anymore.`);
     }
 

@@ -129,7 +129,8 @@ const premium: Command = {
             }`,
           },
         ],
-        flags: ctx.guildId ? 1 << 6 : 0,
+        // TODO: No group dm detection yet => flags: ctx.guildId ? 1 << 6 : 0,
+        flags: 1 << 6,
       });
     } else if (ctx.args[0] === 'activate') {
       if (!ctx.guildId)

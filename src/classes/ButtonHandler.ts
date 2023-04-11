@@ -178,7 +178,6 @@ export default class ButtonHandler {
           ctx.messageId
         )
         .catch(err => {
-          console.log(err.status);
           if (err.status !== 403)
             this.client.console.warn(
               `DM button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`
@@ -196,7 +195,6 @@ export default class ButtonHandler {
           ctx.client.token
         )
         .catch(err => {
-          console.log(err.status);
           if (err.status !== 403)
             this.client.console.warn(
               `Server button failed to edit with ${err.status}: ${err.message} (${ctx.guildId}-${ctx.channelId}-${ctx.user.id})`

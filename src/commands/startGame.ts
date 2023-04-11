@@ -54,7 +54,7 @@ const truth: Command = {
       embeds: [
         {
           title: question.question,
-          description: 'Click the button below to answer!',
+          description: question.id ? 'Click the button below to answer!' : undefined,
           color: ctx.client.COLORS.BLUE,
           footer: question.id
             ? {
@@ -63,25 +63,27 @@ const truth: Command = {
             : undefined,
         },
       ],
-      components: [
-        {
-          type: ComponentType.ActionRow,
-          components: [
+      components: question.id
+        ? [
             {
-              type: ComponentType.Button,
-              custom_id: `ANSWER:${question.id}:${ctx.channelId}:${ctx.guildId}`,
-              label: 'Answer',
-              style: ButtonStyle.Primary,
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  custom_id: `ANSWER:${question.id}:${ctx.channelId}:${ctx.guildId}`,
+                  label: 'Answer',
+                  style: ButtonStyle.Primary,
+                },
+                {
+                  type: ComponentType.Button,
+                  custom_id: `${question.type}:${rating || 'NONE'}:NONE`,
+                  label: 'New Question',
+                  style: ButtonStyle.Secondary,
+                },
+              ],
             },
-            {
-              type: ComponentType.Button,
-              custom_id: `${question.type}:${rating || 'NONE'}:NONE`,
-              label: 'New Question',
-              style: ButtonStyle.Secondary,
-            },
-          ],
-        },
-      ],
+          ]
+        : [],
     });
   },
 };
