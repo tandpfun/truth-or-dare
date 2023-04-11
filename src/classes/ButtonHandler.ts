@@ -168,14 +168,12 @@ export default class ButtonHandler {
       });
     }
 
-    ctx.client.functions
-      .editMessage(
+    ctx
+      .editResponse(
         {
           components: [],
         },
-        ctx.channelId,
-        ctx.messageId,
-        ctx.client.token
+        ctx.messageId
       )
       .catch(err => {
         console.log(err.status);

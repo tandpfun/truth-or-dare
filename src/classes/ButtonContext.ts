@@ -9,6 +9,7 @@ import {
   APIUser,
   APIModalInteractionResponseCallbackData,
   MessageFlags,
+  RESTPatchAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
@@ -21,6 +22,7 @@ import type Client from './Client';
 export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;
   data: APIMessageButtonInteractionData;
+  token: string;
   response: FastifyReply;
   client: Client;
   applicationId: string;
@@ -43,6 +45,7 @@ export default class ButtonContext implements Context {
 
     this.interaction = interaction;
     this.data = interaction.data;
+    this.token = interaction.token;
     this.response = response;
     this.client = client;
 
@@ -90,6 +93,16 @@ export default class ButtonContext implements Context {
       type: InteractionResponseType.Modal,
       data,
     });
+  }
+
+  editResponse(data: string | RESTPatchAPIInteractionFollowupJSONBody, messageId = '@original') {
+    if (typeof data === 'string') data = { content: data };
+    return this.client.functions.editInteractionResponse(
+      data,
+      this.client.id,
+      this.token,
+      messageId
+    );
   }
 
   defer() {
