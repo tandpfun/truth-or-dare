@@ -157,7 +157,9 @@ const questions: Command = {
   options,
   run: async (ctx: Context) => {
     if (!ctx.guildId)
-      return ctx.reply(`${ctx.client.EMOTES.xmark} Custom questions cannot be edited in DMs.`);
+      return ctx.reply(
+        `${ctx.client.EMOTES.xmark} For now, custom questions are only available in servers.`
+      );
 
     if (!ctx.premium) return ctx.replyUpsell();
 

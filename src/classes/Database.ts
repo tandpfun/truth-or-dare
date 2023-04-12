@@ -86,7 +86,7 @@ export default class Database {
   }
 
   async fetchChannelSettings(id: string, dm = false) {
-    if (!dm && !(id in this.channelCache))
+    if (!(id in this.channelCache))
       this.channelCache[id] = await this.db.channelSettings.findUnique({ where: { id } });
     return this.channelCache[id] ?? this.defaultChannelSettings(id, dm);
   }

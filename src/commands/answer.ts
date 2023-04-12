@@ -19,12 +19,6 @@ const answer: Command = {
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {
-    if (ctx.guildId)
-      return ctx.reply({
-        content: `${ctx.client.EMOTES.xmark} Paranoia questions can only be answered in DMs.`,
-        flags: 1 << 6,
-      });
-
     ctx.reply(
       `${ctx.client.EMOTES.xmark} We recently updated how paranoia works, switching away from using using commands to answer questions. To answer a paranoia question, press the "answer" button below the question DMed to you. If there is no button, have them send you another question.`
     );

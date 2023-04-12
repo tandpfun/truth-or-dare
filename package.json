@@ -9,6 +9,7 @@
   "scripts": {
     "start": "tsc && node . ",
     "dev": "tsc && node --trace-warnings . dev ",
+    "tunnel": "cloudflared tunnel --url localhost:1000",
     "format": "prettier . --write",
     "generate": "prisma generate"
   },

@@ -89,7 +89,9 @@ const serverSettings: Command = {
   perms: ['ManageGuild'],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
-      return ctx.reply(ctx.client.EMOTES.xmark + ' This command cannot be run in DMs.');
+      return ctx.reply(
+        ctx.client.EMOTES.xmark + ' Server settings can only be managed in servers.'
+      );
     if (
       !ctx.premium &&
       ctx.args[0] !== 'view' &&
