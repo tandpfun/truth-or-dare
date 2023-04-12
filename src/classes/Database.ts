@@ -173,7 +173,7 @@ export default class Database {
         type: type ?? 'RANDOM',
         rating: 'NONE',
         question:
-          'That rating is disabled in this channel.\nUse "/settings enablerating" to enable it.',
+          'That rating is disabled in this channel.\nUse "/settings enable-rating" to enable it.',
       };
 
     const guildSettings = guildId ? await this.fetchGuildSettings(guildId) : null;

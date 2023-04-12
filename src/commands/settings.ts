@@ -21,7 +21,7 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'disablerating',
+    name: 'disable-rating',
     description: 'Disable a question rating for a channel.',
     options: [
       {
@@ -45,7 +45,7 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'enablerating',
+    name: 'enable-rating',
     description: 'Enable a question rating for a channel.',
     options: [
       {
@@ -95,12 +95,12 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'muteserver',
+    name: 'mute-server',
     description: 'Disable all commands in all channels serverwide.',
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'unmuteserver',
+    name: 'unmute-server',
     description: 'Reenable all commands in all channels serverwide.',
   },
 ] as const;
@@ -139,7 +139,7 @@ const settings: Command = {
           },
         ],
       });
-    } else if (ctx.args[0] === 'disablerating') {
+    } else if (ctx.args[0] === 'disable-rating') {
       const ratingToDisable =
         ctx.getOption<Mutable<typeof options[1]['options'][0]>>('rating')!.value;
 
@@ -149,7 +149,7 @@ const settings: Command = {
       channelSettings.disabledRatings.push(ratingToDisable);
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(`${ctx.client.EMOTES.checkmark} The ${ratingToDisable} rating was disabled here!`);
-    } else if (ctx.args[0] === 'enablerating') {
+    } else if (ctx.args[0] === 'enable-rating') {
       const ratingToEnable =
         ctx.getOption<Mutable<typeof options[2]['options'][0]>>('rating')!.value;
 
@@ -181,7 +181,7 @@ const settings: Command = {
       channelSettings.muted = false;
       await ctx.client.database.updateChannelSettings(channelSettings);
       ctx.reply(ctx.client.EMOTES.checkmark + ' Unmuted, use `/settings mute` to mute.');
-    } else if (ctx.args[0] === 'muteserver') {
+    } else if (ctx.args[0] === 'mute-server') {
       if (!ctx.guildId)
         return ctx.reply(`${ctx.client.EMOTES.xmark} This cannot be configured in DMs.`);
 
@@ -211,9 +211,9 @@ const settings: Command = {
 
       ctx.reply(
         ctx.client.EMOTES.checkmark +
-          ' Muted in all channels serverwide. Use `/settings unmuteserver` to unmute.'
+          ' Muted in all channels serverwide. Use `/settings unmute-server` to unmute.'
       );
-    } else if (ctx.args[0] === 'unmuteserver') {
+    } else if (ctx.args[0] === 'unmute-server') {
       if (!ctx.guildId)
         return ctx.reply(`${ctx.client.EMOTES.xmark} This cannot be configured in DMs.`);
 
@@ -243,7 +243,7 @@ const settings: Command = {
 
       ctx.reply(
         ctx.client.EMOTES.checkmark +
-          ' Unmuted in all channels serverwide. Use `/settings unmuteserver` to unmute.'
+          ' Unmuted in all channels serverwide. Use `/settings unmute-server` to unmute.'
       );
     }
   },

@@ -65,7 +65,7 @@ const options = [
 ] as const;
 
 const scheduledQuestion: Command = {
-  name: 'scheduledquestion',
+  name: 'scheduled-question',
   description: 'Automatically post a question every certain amount of time!',
   options,
   category: 'control',
@@ -81,7 +81,7 @@ const scheduledQuestion: Command = {
     if (ctx.args[0] === 'create') {
       if (await ctx.client.database.getScheduledQuestionChannel(ctx.channelId))
         return ctx.reply(
-          `${ctx.client.EMOTES.xmark} There's already a scheduled question in this channel. Please remove the old one with \`/scheduledquestion remove\` before creating a new one!`
+          `${ctx.client.EMOTES.xmark} There's already a scheduled question in this channel. Please remove the old one with \`/scheduled-question remove\` before creating a new one!`
         );
 
       if (
@@ -144,7 +144,7 @@ const scheduledQuestion: Command = {
               )
               .join('\n'),
             footer: {
-              text: "Remove a scheduled question channel by running '/scheduledquestion remove' in it",
+              text: "Remove a scheduled question channel by running '/scheduled-question remove' in it",
             },
           },
         ],

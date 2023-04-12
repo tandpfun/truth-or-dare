@@ -14,7 +14,7 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'showparanoia',
+    name: 'show-paranoia',
     description: 'Set how often paranoia questions are shown.',
     options: [
       {
@@ -28,7 +28,7 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'disablequestion',
+    name: 'disable-question',
     description: 'Disable a global question from being shown in this server.',
     options: [
       {
@@ -41,7 +41,7 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'enablequestion',
+    name: 'enable-question',
     description: 'Enable a global question that has been disabled.',
     options: [
       {
@@ -54,7 +54,7 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'setlanguage',
+    name: 'set-language',
     description: 'Set the language of questions in the server.',
     options: [
       {
@@ -71,18 +71,18 @@ const options = [
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'toggleglobals',
+    name: 'toggle-globals',
     description: 'Disable/enable all global questions in this server.',
   },
   {
     type: ApplicationCommandOptionType.Subcommand,
-    name: 'togglebuttons',
+    name: 'toggle-buttons',
     description: 'Disable/enable buttons showing on question messages.',
   },
 ] as const;
 
 const serverSettings: Command = {
-  name: 'serversettings',
+  name: 'server-settings',
   description: 'View and change the premium server settings.',
   options,
   category: 'control',
@@ -95,8 +95,8 @@ const serverSettings: Command = {
     if (
       !ctx.premium &&
       ctx.args[0] !== 'view' &&
-      ctx.args[0] !== 'togglebuttons' &&
-      ctx.args[0] !== 'setlanguage'
+      ctx.args[0] !== 'toggle-buttons' &&
+      ctx.args[0] !== 'set-language'
     )
       return ctx.replyUpsell();
 
@@ -108,15 +108,15 @@ const serverSettings: Command = {
           {
             title: ctx.client.EMOTES.gear + ' Server Settings',
             description:
-              'Configure how the bot functions on a server-wide level.\nModify a setting with `/serversettings <setting>`',
+              'Configure how the bot functions on a server-wide level.\nModify a setting with `/server-settings <setting>`',
             fields: [
               {
                 name: `• Paranoia Frequency: ${settings.showParanoiaFrequency}%`,
-                value: `How often the question is shown in the paranoia game.\n\`/serversettings showparanoia\``,
+                value: `How often the question is shown in the paranoia game.\n\`/server-settings show-paranoia\``,
               },
               {
                 name: `• Question Buttons: ${settings.disableButtons ? 'Disabled' : 'Enabled'}`,
-                value: `Add buttons to question messages to get another question.\n\`/serversettings togglebuttons\``,
+                value: `Add buttons to question messages to get another question.\n\`/server-settings toggle-buttons\``,
               },
               {
                 name: `• Disabled Questions:`,
@@ -124,14 +124,14 @@ const serverSettings: Command = {
                   (settings.disableGlobals
                     ? 'All global questions'
                     : settings.disabledQuestions.map(id => '`' + id + '`').join(', ') || 'None') +
-                  '\n`/serversettings disablequestion`',
+                  '\n`/server-settings disable-question`',
               },
             ],
             color: ctx.client.COLORS.BLUE,
           },
         ],
       });
-    } else if (ctx.args[0] === 'showparanoia') {
+    } else if (ctx.args[0] === 'show-paranoia') {
       const freq = ctx.getOption<Mutable<typeof options[1]['options'][0]>>('frequency')!.value;
 
       if (freq < 0 || freq > 100)
@@ -152,7 +152,7 @@ const serverSettings: Command = {
           ),
         ],
       });
-    } else if (ctx.args[0] === 'disablequestion') {
+    } else if (ctx.args[0] === 'disable-question') {
       const id = ctx.getOption<Mutable<typeof options[2]['options'][0]>>('id')!.value;
       const question = ctx.client.database.fetchSpecificQuestion(id);
       if (!question)
@@ -167,7 +167,7 @@ const serverSettings: Command = {
 
       await ctx.client.database.addDisabledQuestion(ctx.guildId, id);
       return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully disabled question: ' + id);
-    } else if (ctx.args[0] === 'enablequestion') {
+    } else if (ctx.args[0] === 'enable-question') {
       const id = ctx.getOption<Mutable<typeof options[3]['options'][0]>>('id')!.value;
 
       if (settings.disableGlobals)
@@ -183,7 +183,7 @@ const serverSettings: Command = {
       });
 
       return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again.');
-    } else if (ctx.args[0] === 'setlanguage') {
+    } else if (ctx.args[0] === 'set-language') {
       const lang = ctx.getOption<Mutable<typeof options[4]['options'][0]>>('language')!.value;
       const dbLang = lang === 'en' ? null : lang;
 
@@ -195,7 +195,7 @@ const serverSettings: Command = {
       return ctx.reply(
         ctx.client.EMOTES.checkmark + ' Question language set to ' + ctx.client.LANGUAGES[lang]
       );
-    } else if (ctx.args[0] === 'toggleglobals') {
+    } else if (ctx.args[0] === 'toggle-globals') {
       await ctx.client.database.updateGuildSettings({
         id: ctx.guildId,
         disableGlobals: !settings.disableGlobals,
@@ -205,7 +205,7 @@ const serverSettings: Command = {
           settings.disableGlobals ? 'Enabled' : 'Disabled'
         } global questions in this server.`
       );
-    } else if (ctx.args[0] === 'togglebuttons') {
+    } else if (ctx.args[0] === 'toggle-buttons') {
       await ctx.client.database.updateGuildSettings({
         id: ctx.guildId,
         disableButtons: !settings.disableButtons,

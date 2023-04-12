@@ -30,9 +30,9 @@ const options = [
   },
 ] as const;
 
-const truth: Command = {
-  name: 'startgame',
-  description: 'Start an interactive game of Truth or Dare',
+const game: Command = {
+  name: 'start-game',
+  description: 'Start an interactive game.',
   category: 'question',
   options,
   perms: [],
@@ -88,4 +88,4 @@ const truth: Command = {
   },
 };
 
-export default truth;
+export default game;
