@@ -5,6 +5,7 @@ import type Command from '../classes/Command';
 import type Context from '../classes/Context';
 import { Translation } from '@prisma/client';
 import Client from '../classes/Client';
+import { ApplicationCommandContext } from '../classes/Command';
 
 const options = [
   {
@@ -87,6 +88,7 @@ const serverSettings: Command = {
   options,
   category: 'control',
   perms: ['ManageGuild'],
+  contexts: [ApplicationCommandContext.Guild],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
       return ctx.reply(

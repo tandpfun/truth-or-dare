@@ -8,6 +8,7 @@ import {
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+import { ApplicationCommandContext } from '../classes/Command';
 
 const options = [
   {
@@ -46,6 +47,7 @@ const premium: Command = {
   category: 'control',
   options,
   perms: [],
+  contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
   run: async (ctx: Context): Promise<void> => {
     const premiumGuild = ctx.premium;
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
@@ -129,8 +131,8 @@ const premium: Command = {
             }`,
           },
         ],
-        // TODO: No group dm detection yet => flags: ctx.guildId ? 1 << 6 : 0,
-        flags: 1 << 6,
+        flags: ctx.guildId ? 1 << 6 : 0,
+        // flags: 1 << 6,
       });
     } else if (ctx.args[0] === 'activate') {
       if (!ctx.guildId)
