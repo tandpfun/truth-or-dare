@@ -13,7 +13,7 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import { APIModalSubmitInteractionWithEntitlements } from './PremiumTypes';
+import { APIModalSubmitInteractionWithEntitlements } from '../types/premium';
 import type { OptionType } from './OptionTypes';
 import type Client from './Client';
 

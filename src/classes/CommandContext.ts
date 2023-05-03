@@ -19,7 +19,7 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import { APIChatInputApplicationCommandInteractionWithEntitlements } from './PremiumTypes';
+import { APIChatInputApplicationCommandInteractionWithEntitlements } from '../types/premium';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';

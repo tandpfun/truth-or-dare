@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from 'discor
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+import { ApplicationCommandContext } from '../classes/Command';
 
 const options = [
   {
@@ -32,10 +33,15 @@ const options = [
 
 const game: Command = {
   name: 'start-game',
-  description: 'Start an interactive game.',
+  description: 'Start an interactive question game!',
   category: 'question',
   options,
   perms: [],
+  contexts: [
+    ApplicationCommandContext.Guild,
+    ApplicationCommandContext.BotDM,
+    ApplicationCommandContext.PrivateChannel,
+  ],
   run: async (ctx: Context): Promise<void> => {
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')?.value;
     const specifiedQuestionType = ctx.getOption<Mutable<typeof options[0]>>('type')?.value;

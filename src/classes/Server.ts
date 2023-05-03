@@ -18,7 +18,7 @@ import { register } from 'prom-client';
 import {
   APIChatInputApplicationCommandInteractionWithEntitlements,
   APIMessageComponentInteractionWithEntitlements,
-} from './PremiumTypes';
+} from '../types/premium';
 import CommandContext from './CommandContext';
 import ButtonContext from './ButtonContext';
 import type Client from './Client';

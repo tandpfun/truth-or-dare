@@ -15,7 +15,7 @@ import {
 } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
-import { RESTGetAPIApplicationEntitlementsResult } from './PremiumTypes';
+import { RESTGetAPIApplicationEntitlementsResult } from '../types/premium';
 import type Command from './Command';
 import type Context from './Context';
 import Client from './Client';
