@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+import { ApplicationCommandContext } from '../classes/Command';
 
 const options = [
   {
@@ -31,6 +32,11 @@ const paranoia: Command = {
   category: 'question',
   options,
   perms: [],
+  contexts: [
+    ApplicationCommandContext.Guild,
+    ApplicationCommandContext.BotDM,
+    ApplicationCommandContext.PrivateChannel,
+  ],
   run: async (ctx: Context): Promise<void> => {
     const serverSettings = ctx.guildId
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)

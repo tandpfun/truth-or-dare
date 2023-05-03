@@ -2,14 +2,12 @@ import { QuestionType, Rating } from '@prisma/client';
 
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import { ApplicationCommandContext } from '../classes/Command';
 
 const stats: Command = {
   name: 'stats',
   description: 'List some statistics on the bot!',
   category: 'control',
   perms: [],
-  contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({
       embeds: [

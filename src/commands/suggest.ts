@@ -3,7 +3,6 @@ import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import { ApplicationCommandContext } from '../classes/Command';
 
 const options = [
   {
@@ -44,7 +43,6 @@ const suggest: Command = {
   category: 'control',
   options,
   perms: [],
-  contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
   run: async (ctx: Context): Promise<void> => {
     const type = ctx.getOption<Mutable<typeof options[0]>>('type')!.value;
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')!.value;

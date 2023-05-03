@@ -2,14 +2,12 @@ import { ButtonStyle, ComponentType } from 'discord-api-types/v9';
 
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import { ApplicationCommandContext } from '../classes/Command';
 
 const invite: Command = {
   name: 'invite',
   description: 'Add the bot to another server.',
   category: 'control',
   perms: [],
-  contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({
       embeds: [

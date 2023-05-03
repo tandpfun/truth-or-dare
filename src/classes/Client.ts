@@ -279,8 +279,8 @@ export default class Client {
         commandFile.contexts = [
           ApplicationCommandContext.Guild,
           ApplicationCommandContext.BotDM,
-          ApplicationCommandContext.PrivateChannel,
-        ]; // Enables for guilds, bot-user DMs, and group/user-user DMs by default
+          // ApplicationCommandContext.PrivateChannel,
+        ]; // Enables for guilds and bot-user DMs by default
       if (commandFile.options)
         this.removeRatings(commandFile.options as APIApplicationCommandOption[]);
       this.commands.push(commandFile);
@@ -340,8 +340,6 @@ export default class Client {
       )
       .set('Authorization', 'Bot ' + this.token)
       .then(res => res.body);
-
-    this.console.log(commands);
 
     return commands.some(
       com =>
