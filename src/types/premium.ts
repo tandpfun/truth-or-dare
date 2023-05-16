@@ -5,14 +5,14 @@ import {
 } from 'discord-api-types/v9';
 
 export type APIChatInputApplicationCommandInteractionWithEntitlements =
-  APIChatInputApplicationCommandInteraction & { entitlement_sku_ids?: string[] };
+  APIChatInputApplicationCommandInteraction & { entitlements?: APIApplicationEntitlement[] };
 
 export type APIMessageComponentInteractionWithEntitlements = APIMessageComponentInteraction & {
-  entitlement_sku_ids?: string[];
+  entitlements?: APIApplicationEntitlement[];
 };
 
 export type APIModalSubmitInteractionWithEntitlements = APIModalSubmitInteraction & {
-  entitlement_sku_ids?: string[];
+  entitlements?: APIApplicationEntitlement[];
 };
 
 export type APIApplicationEntitlement = {

@@ -14,7 +14,10 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import { APIMessageComponentInteractionWithEntitlements } from '../types/premium';
+import {
+  APIApplicationEntitlement,
+  APIMessageComponentInteractionWithEntitlements,
+} from '../types/premium';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
@@ -32,7 +35,7 @@ export default class ButtonContext implements Context {
   user: APIUser;
   messageId: string;
   args: (string | number | boolean)[] = [];
-  entitlements?: string[];
+  entitlements?: APIApplicationEntitlement[];
   premium: boolean;
 
   constructor(
@@ -57,7 +60,7 @@ export default class ButtonContext implements Context {
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
 
-    this.entitlements = interaction.entitlement_sku_ids;
+    this.entitlements = interaction.entitlements;
     this.premium =
       !!this.guildId &&
       (!!this.entitlements?.length || this.client.database.isChargebeePremiumGuild(this.guildId));
