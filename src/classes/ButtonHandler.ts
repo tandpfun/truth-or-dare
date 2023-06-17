@@ -154,7 +154,7 @@ export default class ButtonHandler {
                     },
                     {
                       type: ComponentType.Button,
-                      custom_id: `${type ?? 'NONE'}:${rating || 'NONE'}:NONE`,
+                      custom_id: `${result.type}:${rating || 'NONE'}:NONE`,
                       label: 'New Question',
                       style: ButtonStyle.Secondary,
                     },

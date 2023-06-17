@@ -82,7 +82,7 @@ const game: Command = {
                 },
                 {
                   type: ComponentType.Button,
-                  custom_id: `${specifiedQuestionType ?? 'NONE'}:${rating ?? 'NONE'}:NONE`,
+                  custom_id: `${question.type}:${rating || 'NONE'}:NONE`,
                   label: 'New Question',
                   style: ButtonStyle.Secondary,
                 },
