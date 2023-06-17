@@ -200,7 +200,7 @@ export default class Client {
       // Track error with Sentry
       Sentry.withScope(scope => {
         scope.setExtras({
-          user: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
+          user: `${functions.userTag(ctx.user)} (${ctx.user.id})`,
           command: command.name,
           args: JSON.stringify(ctx.options),
           channelId: ctx.channelId,

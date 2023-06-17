@@ -92,7 +92,7 @@ const suggest: Command = {
       });
 
     await ctx.client.webhookLog('suggest', {
-      username: `${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`,
+      username: `${ctx.client.functions.userTag(ctx.user)} (${ctx.user.id})`,
       avatar_url: ctx.client.functions.avatarURL(ctx.user),
       embeds: [
         {

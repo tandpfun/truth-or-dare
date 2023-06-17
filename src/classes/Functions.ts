@@ -59,6 +59,10 @@ export function hasPermission(permission: Permission, permissions?: string) {
   return !missing;
 }
 
+export function userTag({ username, discriminator }: { username: string; discriminator: string }) {
+  return discriminator === '0' ? username : `${username}#${discriminator}`;
+}
+
 export function avatarURL({
   id,
   avatar,
@@ -87,7 +91,7 @@ export function embed(
     } ${description}`,
     author: user
       ? {
-          name: `${user.username}#${user.discriminator}`,
+          name: userTag(user),
           icon_url: avatarURL(user),
         }
       : undefined,

@@ -7,7 +7,6 @@ import {
 import { QuestionType, Rating } from '@prisma/client';
 
 import type ButtonContext from './ButtonContext';
-import { avatarURL } from './Functions';
 import type Client from './Client';
 
 type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
@@ -129,8 +128,8 @@ export default class ButtonHandler {
         embeds: [
           {
             author: {
-              name: `Requested by ${ctx.user.username}#${ctx.user.discriminator}`,
-              icon_url: `${avatarURL(ctx.user)}`,
+              name: `Requested by ${ctx.client.functions.userTag(ctx.user)}`,
+              icon_url: `${ctx.client.functions.avatarURL(ctx.user)}`,
             },
             title: result.question,
             color: ctx.client.COLORS.BLUE,

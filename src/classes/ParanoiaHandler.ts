@@ -36,7 +36,9 @@ export default class ParanoiaHandler {
           {
             title: question.question,
             color: this.client.COLORS.BLUE,
-            description: `Press the answer button below to answer this question.\n\nQuestion sent by **${sender.username}#${sender.discriminator}** in **${guild.name}** <#${channelId}>.`,
+            description: `Press the answer button below to answer this question.\n\nQuestion sent by **${this.client.functions.userTag(
+              sender
+            )}** in **${guild.name}** <#${channelId}>.`,
             footer: {
               text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${question.id}`,
             },
@@ -84,7 +86,7 @@ export default class ParanoiaHandler {
         embeds: [
           {
             author: {
-              name: `${ctx.user.username}#${ctx.user.discriminator} Answered`,
+              name: `${ctx.client.functions.userTag(ctx.user)} Answered`,
               icon_url: ctx.client.functions.avatarURL(ctx.user),
             },
             color: ctx.client.COLORS.BLUE,
@@ -126,7 +128,7 @@ export default class ParanoiaHandler {
             embeds: [
               {
                 author: {
-                  name: `${ctx.user.username}#${ctx.user.discriminator}`,
+                  name: ctx.client.functions.userTag(ctx.user),
                   icon_url: ctx.client.functions.avatarURL(ctx.user),
                 },
                 title: `Paranoia Answer`,

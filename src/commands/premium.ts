@@ -179,7 +179,7 @@ const premium: Command = {
           {
             color: ctx.client.COLORS.GREEN,
             author: {
-              name: `${ctx.user.username}#${ctx.user.discriminator}`,
+              name: ctx.client.functions.userTag(ctx.user),
               icon_url: ctx.client.functions.avatarURL(ctx.user),
             },
             title: `Premium Activated`,
@@ -227,7 +227,7 @@ const premium: Command = {
           {
             color: ctx.client.COLORS.RED,
             author: {
-              name: `${ctx.user.username}#${ctx.user.discriminator}`,
+              name: ctx.client.functions.userTag(ctx.user),
               icon_url: ctx.client.functions.avatarURL(ctx.user),
             },
             title: `Premium Deactivated`,
