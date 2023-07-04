@@ -9,6 +9,7 @@ import {
   APIModalSubmission,
   InteractionType,
   MessageFlags,
+  APIChannel,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
@@ -34,6 +35,7 @@ export default class ModalContext {
   args: (string | number | boolean)[] = [];
   entitlements?: APIApplicationEntitlement[];
   premium: boolean;
+  channel?: Partial<APIChannel> & Pick<APIChannel, 'id' | 'type'>;
 
   constructor(
     interaction: APIModalSubmitInteractionWithEntitlements,
@@ -55,6 +57,8 @@ export default class ModalContext {
 
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
+
+    this.channel = interaction.channel;
 
     this.entitlements = interaction.entitlements;
     this.premium =

@@ -1,18 +1,18 @@
 import { collectDefaultMetrics, Gauge } from 'prom-client';
 import { Rating } from '@prisma/client';
-import { LocaleString } from 'discord-api-types/v9';
+import { ChannelType, LocaleString } from 'discord-api-types/v9';
 
 export default class Metrics {
   readonly commandsUsed = new Gauge({
     name: 'commands_used',
     help: 'The usage of each command',
-    labelNames: ['command', 'success'],
+    labelNames: ['command', 'channelType'],
   });
 
   readonly buttonsPressed = new Gauge({
     name: 'buttons_pressed',
     help: 'The number of buttons pressed',
-    labelNames: ['type'],
+    labelNames: ['type', 'channelType'],
   });
 
   readonly userLocales = new Gauge({
@@ -56,12 +56,12 @@ export default class Metrics {
     collectDefaultMetrics();
   }
 
-  trackCommandUse(command: string, success: boolean) {
-    this.commandsUsed.labels(command, String(success)).inc();
+  trackCommandUse(command: string, channelType: ChannelType) {
+    this.commandsUsed.labels(command, String(channelType)).inc();
   }
 
-  trackButtonPress(type: string) {
-    this.buttonsPressed.labels(type).inc();
+  trackButtonPress(type: string, channelType: ChannelType) {
+    this.buttonsPressed.labels(type, String(channelType)).inc();
   }
 
   trackUserLocale(locale: LocaleString) {

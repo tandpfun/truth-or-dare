@@ -190,11 +190,9 @@ export default class Client {
     this.stats.commands[command.name]++;
     this.stats.minuteCommands[command.name]++;
 
-    let commandErrored;
     try {
       await command.run(ctx);
     } catch (err) {
-      commandErrored = true;
       this.console.error(err);
 
       // Track error with Sentry
@@ -213,7 +211,7 @@ export default class Client {
       });
     }
 
-    this.metrics.trackCommandUse(command.name, !commandErrored);
+    this.metrics.trackCommandUse(command.name, ctx.channel?.type || 0);
   }
 
   async handleButton(ctx: ButtonContext) {

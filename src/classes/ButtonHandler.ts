@@ -62,7 +62,7 @@ export default class ButtonHandler {
     this.client.stats.minuteCommandCount++;
     this.client.stats.commands[`${buttonName}-button`]++;
     this.client.stats.minuteCommands[`${buttonName}-button`]++;
-    this.client.metrics.trackButtonPress(buttonName);
+    this.client.metrics.trackButtonPress(buttonName, ctx.channel?.type || 0);
 
     this.buttonCooldown.add(ctx.channelId);
     setTimeout(() => {

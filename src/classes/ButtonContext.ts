@@ -10,6 +10,7 @@ import {
   APIModalInteractionResponseCallbackData,
   MessageFlags,
   RESTPatchAPIInteractionFollowupJSONBody,
+  APIChannel,
 } from 'discord-api-types/v9';
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
@@ -37,6 +38,7 @@ export default class ButtonContext implements Context {
   args: (string | number | boolean)[] = [];
   entitlements?: APIApplicationEntitlement[];
   premium: boolean;
+  channel?: Partial<APIChannel> & Pick<APIChannel, 'id' | 'type'>;
 
   constructor(
     interaction: APIMessageComponentInteractionWithEntitlements,
@@ -59,6 +61,8 @@ export default class ButtonContext implements Context {
 
     this.member = interaction.member;
     this.user = interaction.user || interaction.member!.user;
+
+    this.channel = interaction.channel;
 
     this.entitlements = interaction.entitlements;
     this.premium =
