@@ -50,7 +50,10 @@ const paranoia: Command = {
     // Send like regular question if no target
     if (!ctx.guildId || !targetUserId || !paranoia.id) {
       return ctx.reply({
-        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
+        content: ctx.client.functions.promoMessage(
+          ctx.premium || !ctx.guildId,
+          !ctx.client.enableR
+        ),
         embeds: [
           {
             title: paranoia.question,

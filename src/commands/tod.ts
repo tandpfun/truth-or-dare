@@ -39,7 +39,7 @@ const tod: Command = {
     const result = await ctx.client.getQuestion(ctx, type, rating);
     if (result.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
+      content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
           title: result.question,

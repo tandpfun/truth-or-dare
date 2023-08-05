@@ -124,7 +124,10 @@ export default class ButtonHandler {
       // For all other types of games
 
       ctx.reply({
-        content: ctx.client.functions.promoMessage(ctx.client, ctx.premium),
+        content: ctx.client.functions.promoMessage(
+          ctx.premium || !ctx.guildId,
+          !ctx.client.enableR
+        ),
         embeds: [
           {
             author: {

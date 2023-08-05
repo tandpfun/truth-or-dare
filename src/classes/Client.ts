@@ -84,6 +84,7 @@ export default class Client {
     technologist: ':technologist:',
     heart: ':heart:',
     bank: ':bank:',
+    open_mouth: ':open_mouth:',
   } as const;
   static LANGUAGES = {
     en: 'English',
