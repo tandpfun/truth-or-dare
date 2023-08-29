@@ -451,11 +451,11 @@ export default class Database {
     return user;
   }
 
-  async addDisabledQuestion(guild: string, questionId: string) {
-    return await this.db.guildSettings.upsert({
-      where: { id: guild },
+  async addDisabledQuestion(guildId: string, questionId: string) {
+    return (this.guildCache[guildId] = await this.db.guildSettings.upsert({
+      where: { id: guildId },
       update: { disabledQuestions: { push: questionId } },
-      create: { ...this.defaultGuildSettings(guild), disabledQuestions: [questionId] },
-    });
+      create: { ...this.defaultGuildSettings(guildId), disabledQuestions: [questionId] },
+    }));
   }
 }
