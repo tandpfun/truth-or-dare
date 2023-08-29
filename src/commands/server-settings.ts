@@ -184,7 +184,7 @@ const serverSettings: Command = {
         disabledQuestions: settings.disabledQuestions.filter(q => q !== id),
       });
 
-      return ctx.reply(ctx.client.EMOTES.checkmark + ' That question is now enabled again.');
+      return ctx.reply(ctx.client.EMOTES.checkmark + ' Successfully re-enabled question: ' + id);
     } else if (ctx.args[0] === 'set-language') {
       const lang = ctx.getOption<Mutable<typeof options[4]['options'][0]>>('language')!.value;
       const dbLang = lang === 'en' ? null : lang;
