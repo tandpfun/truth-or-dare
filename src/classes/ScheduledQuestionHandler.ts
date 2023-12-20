@@ -1,7 +1,7 @@
 import type Client from './Client';
 
 import schedule from 'node-schedule';
-import { ScheduledQuestionChannel, ScheduleType } from '@prisma/client';
+import { QuestionType, ScheduledQuestionChannel, ScheduleType } from '@prisma/client';
 import { RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v9';
 
 export default class ScheduledQuestionHandler {
@@ -54,6 +54,10 @@ export default class ScheduledQuestionHandler {
       false
     );
 
+    // Get a random non-dare question type
+    const questionTypes = Object.values(QuestionType).filter(type => type !== QuestionType.DARE);
+    const randomType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+
     const question = await this.client.getQuestion(
       {
         channelSettings,
@@ -61,7 +65,7 @@ export default class ScheduledQuestionHandler {
         channelId: scheduledQuestionChannel.id,
         guildId: scheduledQuestionChannel.guildId,
       },
-      scheduledQuestionChannel.type || undefined,
+      scheduledQuestionChannel.type || randomType,
       scheduledQuestionChannel.rating || undefined
     );
 
