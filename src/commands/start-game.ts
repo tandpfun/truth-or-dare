@@ -59,9 +59,7 @@ const game: Command = {
       content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
-          description: `**${question.question}**\n\n${
-            question.id ? 'Click the button below to answer!' : ''
-          }`,
+          description: `**${question.question}**`,
           color: ctx.client.COLORS.BLUE,
           footer: question.id
             ? {
