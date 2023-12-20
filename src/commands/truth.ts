@@ -41,7 +41,7 @@ const truth: Command = {
       content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
-          title: truth.question,
+          description: `**${truth.question}**`,
           color: ctx.client.COLORS.BLUE,
           footer: truth.id
             ? {

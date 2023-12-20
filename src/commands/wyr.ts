@@ -41,7 +41,7 @@ const wyr: Command = {
       content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
-          title: wyr.question,
+          description: `**${wyr.question}**`,
           color: ctx.client.COLORS.BLUE,
           footer: wyr.id
             ? {

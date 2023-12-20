@@ -271,7 +271,7 @@ const questions: Command = {
         embeds: [
           question
             ? {
-                title: question.question,
+                description: `**${question.question}**`,
                 color: ctx.client.COLORS.BLUE,
                 footer: {
                   text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${question.id}`,
