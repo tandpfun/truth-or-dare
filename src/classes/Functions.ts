@@ -155,12 +155,13 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
 
   const premiumSuffix = inAppPremium
     ? 'Tap "Upgrade" on my profile for more info.'
-    : 'Check it out at <https://truthordarebot.xyz/premium>.';
+    : 'Get [**25% off**](https://truthordarebot.xyz/premium) yearly with code `HOLIDAYS23`. Check it out [here](https://truthordarebot.xyz/premium)!';
 
   const promoMessages = [
-    `${Client.EMOTES.earth} You can now play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
+    `${Client.EMOTES.earth} You can play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
     `${Client.EMOTES.arrowUp} Enjoying the bot? Consider [upvoting me](https://top.gg/bot/692045914436796436/vote)!`,
     `${Client.EMOTES.sparkles} Want to stop repeating questions? Repeat prevention is a premium feature. ${premiumSuffix}`,
+    `${Client.EMOTES.time} Create automatic question of the day channels with premium! ${premiumSuffix}`,
     `${Client.EMOTES.shushing_face} You can hide these messages with premium. ${premiumSuffix}`,
     `${Client.EMOTES.running} Help us keep the bot up and running with premium! ${premiumSuffix}`,
     `${Client.EMOTES.technologist} Having fun? Support the development of new features with premium! ${premiumSuffix}`,
