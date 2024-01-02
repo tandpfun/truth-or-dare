@@ -155,7 +155,7 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
 
   const premiumSuffix = inAppPremium
     ? 'Tap "Upgrade" on my profile for more info.'
-    : 'Check it out at <https://truthordarebot.xyz/premium>.';
+    : 'For 2024, get [**24% off**](https://truthordarebot.xyz/premium) monthly & yearly with code `NEW2024`. Check it out [here](https://truthordarebot.xyz/premium)!';
 
   const promoMessages = [
     `${Client.EMOTES.earth} You can play Truth or Dare in [7 languages](https://docs.truthordarebot.xyz/setting-question-language)!`,
