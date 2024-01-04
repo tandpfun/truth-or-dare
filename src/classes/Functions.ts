@@ -12,6 +12,7 @@ import {
   ButtonStyle,
   APIEmbed,
   RESTPatchAPIInteractionFollowupJSONBody,
+  RESTPostAPIChannelThreadsJSONBody,
 } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
@@ -200,6 +201,23 @@ export async function editMessage(
       `${
         process.env.DISCORD_API_URL || 'https://discord.com'
       }/api/channels/${channelId}/messages/${messageId}`
+    )
+    .send(data)
+    .set('Authorization', `Bot ${token}`)
+    .then(res => res.body);
+}
+
+export async function startThreadFromMessage(
+  data: RESTPostAPIChannelThreadsJSONBody,
+  channelId: string,
+  messageId: string,
+  token: string
+) {
+  return await superagent
+    .post(
+      `${
+        process.env.DISCORD_API_URL || 'https://discord.com'
+      }/api/channels/${channelId}/messages/${messageId}/threads`
     )
     .send(data)
     .set('Authorization', `Bot ${token}`)
