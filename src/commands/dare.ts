@@ -37,7 +37,7 @@ const dare: Command = {
       content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
-          description: `**${dare.question}**`,
+          title: dare.question,
           color: ctx.client.COLORS.BLUE,
           footer: dare.id
             ? {

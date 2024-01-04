@@ -52,7 +52,7 @@ const paranoia: Command = {
         ),
         embeds: [
           {
-            description: `**${paranoia.question}**`,
+            title: paranoia.question,
             color: ctx.client.COLORS.BLUE,
             footer: paranoia.id
               ? {

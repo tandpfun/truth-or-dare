@@ -34,10 +34,9 @@ export default class ParanoiaHandler {
       {
         embeds: [
           {
+            title: question.question,
             color: this.client.COLORS.BLUE,
-            description: `**${
-              question.question
-            }**\n\nPress the answer button below to answer this question.\n\nSent by **${this.client.functions.userTag(
+            description: `Press the answer button below to answer this question.\n\nSent by **${this.client.functions.userTag(
               sender
             )}** in <#${channelId}>.`,
             footer: {

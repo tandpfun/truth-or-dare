@@ -37,7 +37,7 @@ const tod: Command = {
       content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
-          description: `**${result.question}**`,
+          title: result.question,
           color: ctx.client.COLORS.BLUE,
           footer: result.id
             ? {

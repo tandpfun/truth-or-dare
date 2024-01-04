@@ -37,7 +37,7 @@ const nhie: Command = {
       content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
       embeds: [
         {
-          description: `**${nhie.question}**`,
+          title: nhie.question,
           color: ctx.client.COLORS.BLUE,
           footer: nhie.id
             ? {

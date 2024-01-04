@@ -89,7 +89,7 @@ export default class ScheduledQuestionHandler {
       } ${this.client.functions.titleCase(scheduledQuestionChannel.schedule)} question:`,
       embeds: [
         {
-          description: `**${question.question}**`,
+          title: question.question,
           color: this.client.COLORS.BLUE,
           footer: question.id
             ? {

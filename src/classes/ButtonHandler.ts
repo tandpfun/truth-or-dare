@@ -134,7 +134,7 @@ export default class ButtonHandler {
               name: `Requested by ${ctx.client.functions.userTag(ctx.user)}`,
               icon_url: `${ctx.client.functions.avatarURL(ctx.user)}`,
             },
-            description: `**${result.question}**`,
+            title: result.question,
             color: ctx.client.COLORS.BLUE,
             footer: result.id
               ? {
