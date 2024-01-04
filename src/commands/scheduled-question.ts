@@ -140,7 +140,7 @@ const scheduledQuestion: Command = {
             description: scheduledQuestionsForGuild
               .map(
                 sc =>
-                  `• **${ctx.client.functions.titleCase(sc.schedule)}:** <#${sc.id}> - ${
+                  `- **${ctx.client.functions.titleCase(sc.schedule)}:** <#${sc.id}> - ${
                     sc.type || ''
                   } ${sc.rating || ''} ${sc.role ? `Pings <@&${sc.role}>` : ''}`
               )

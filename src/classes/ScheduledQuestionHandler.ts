@@ -29,28 +29,34 @@ export default class ScheduledQuestionHandler {
 
     for (const scheduledQuestionChannel of scheduledQuestionsByType) {
       if (!premiumGuilds.has(scheduledQuestionChannel.guildId)) continue;
-      this.client.functions
-        .sendMessage(
-          await this.questionMessage(scheduledQuestionChannel),
-          scheduledQuestionChannel.id,
-          this.client.token
-        )
-        .then(m => {
-          this.client.functions.startThreadFromMessage(
-            { name: 'Thread', auto_archive_duration: 1440 },
-            scheduledQuestionChannel.id,
-            m?.id || 'stop yelling at me',
-            this.client.token
-          );
-        })
+
+      const questionMessageData = await this.questionMessage(scheduledQuestionChannel);
+      const sentMessage = await this.client.functions
+        .sendMessage(questionMessageData, scheduledQuestionChannel.id, this.client.token)
         .catch(err => {
           if (err.response.body.code === 10003)
+            // "Unknown channel". Remove from DB if channel is deleted.
             this.client.database.deleteScheduledQuestionChannel(scheduledQuestionChannel.id);
           else
             this.client.console.warn(
               `Failed to send a scheduled question with status code ${err.status}`
             );
         });
+
+      if (sentMessage != null) {
+        const threadTitle =
+          questionMessageData.embeds?.[0].title ??
+          questionMessageData.embeds?.[0].description ??
+          'Thread';
+        this.client.functions
+          .startThreadFromMessage(
+            { name: threadTitle },
+            scheduledQuestionChannel.id,
+            sentMessage.id,
+            this.client.token
+          )
+          .catch(_ => null);
+      }
     }
   }
 
