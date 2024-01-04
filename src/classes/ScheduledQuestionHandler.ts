@@ -50,7 +50,7 @@ export default class ScheduledQuestionHandler {
           'Thread';
         this.client.functions
           .startThreadFromMessage(
-            { name: threadTitle },
+            { name: threadTitle, auto_archive_duration: 1440 },
             scheduledQuestionChannel.id,
             sentMessage.id,
             this.client.token
