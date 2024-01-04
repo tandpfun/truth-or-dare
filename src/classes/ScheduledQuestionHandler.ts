@@ -35,6 +35,14 @@ export default class ScheduledQuestionHandler {
           scheduledQuestionChannel.id,
           this.client.token
         )
+        .then(m => {
+          this.client.functions.startThreadFromMessage(
+            { name: 'Thread', auto_archive_duration: 1440 },
+            scheduledQuestionChannel.id,
+            m?.id || 'stop yelling at me',
+            this.client.token
+          );
+        })
         .catch(err => {
           if (err.response.body.code === 10003)
             this.client.database.deleteScheduledQuestionChannel(scheduledQuestionChannel.id);
