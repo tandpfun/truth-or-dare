@@ -37,11 +37,7 @@ const game: Command = {
   category: 'question',
   options,
   perms: [],
-  contexts: [
-    ApplicationCommandContext.Guild,
-    ApplicationCommandContext.BotDM,
-    ApplicationCommandContext.PrivateChannel,
-  ],
+  contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
   run: async (ctx: Context): Promise<void> => {
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')?.value;
     const specifiedQuestionType = ctx.getOption<Mutable<typeof options[0]>>('type')?.value;
