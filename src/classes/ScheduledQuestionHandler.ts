@@ -39,7 +39,7 @@ export default class ScheduledQuestionHandler {
             this.client.database.deleteScheduledQuestionChannel(scheduledQuestionChannel.id);
           else
             this.client.console.warn(
-              `Failed to send a scheduled question with status code ${err.status}`
+              `Failed to send a scheduled question with status code ${err.status} ${err.response.body.code}`
             );
         });
 
