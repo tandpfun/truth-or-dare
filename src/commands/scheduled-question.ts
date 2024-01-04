@@ -51,6 +51,15 @@ const options = [
         name: 'role',
         description: 'The role to ping whenever a question is sent.',
       },
+      {
+        type: ApplicationCommandOptionType.String,
+        name: 'auto-thread',
+        description: 'Automatically create a thread under each question.',
+        choices: [
+          { name: 'Enabled', value: 'TRUE' },
+          { name: 'Disabled', value: 'FALSE' },
+        ],
+      },
     ],
   },
   {
@@ -100,6 +109,9 @@ const scheduledQuestion: Command = {
       let rating = ctx.getOption<Mutable<typeof options[0]['options'][2]>>('rating')?.value || null;
       const pingRole =
         ctx.getOption<Mutable<typeof options[0]['options'][3]>>('role')?.value || null;
+      const autoThreadEnabled =
+        ctx.getOption<Mutable<typeof options[0]['options'][3]>>('auto-thread')?.value === 'TRUE' ||
+        false;
 
       if (questionType === 'NONE') questionType = null;
       if (rating === 'NONE') rating = null;
@@ -112,6 +124,7 @@ const scheduledQuestion: Command = {
         type: questionType,
         rating,
         role: pingRole,
+        autoThread: autoThreadEnabled,
       });
 
       return ctx.reply(
@@ -142,7 +155,9 @@ const scheduledQuestion: Command = {
                 sc =>
                   `- **${ctx.client.functions.titleCase(sc.schedule)}:** <#${sc.id}> - ${
                     sc.type || ''
-                  } ${sc.rating || ''} ${sc.role ? `Pings <@&${sc.role}>` : ''}`
+                  } ${sc.rating || ''} ${sc.autoThread ? 'Auto-thread enabled' : ''} ${
+                    sc.role ? `Pings <@&${sc.role}>` : ''
+                  }`
               )
               .join('\n'),
             footer: {

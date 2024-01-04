@@ -91,13 +91,14 @@ model CustomQuestion {
 }
 
 model ScheduledQuestionChannel {
-  id       String        @id @map("_id")
-  botId    String
-  guildId  String
-  schedule ScheduleType
-  role     String?
-  type     QuestionType?
-  rating   Rating?
+  id         String        @id @map("_id")
+  botId      String
+  guildId    String
+  schedule   ScheduleType
+  role       String?
+  type       QuestionType?
+  rating     Rating?
+  autoThread Boolean
 }
 
 model PremiumUser {

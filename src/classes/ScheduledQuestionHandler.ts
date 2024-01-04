@@ -43,7 +43,7 @@ export default class ScheduledQuestionHandler {
             );
         });
 
-      if (sentMessage != null) {
+      if (scheduledQuestionChannel.autoThread && sentMessage != null) {
         const threadTitle =
           questionMessageData.embeds?.[0].title ??
           questionMessageData.embeds?.[0].description ??
