@@ -275,11 +275,7 @@ export default class Client {
               .toString()
           : null;
       if (typeof commandFile.contexts === 'undefined')
-        commandFile.contexts = [
-          ApplicationCommandContext.Guild,
-          ApplicationCommandContext.BotDM,
-          // ApplicationCommandContext.PrivateChannel,
-        ]; // Enables for guilds and bot-user DMs by default
+        commandFile.contexts = [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM]; // Enables for guilds and bot-user DMs by default
       if (commandFile.options)
         this.removeRatings(commandFile.options as APIApplicationCommandOption[]);
       this.commands.push(commandFile);

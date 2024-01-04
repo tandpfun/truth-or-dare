@@ -25,11 +25,7 @@ const nhie: Command = {
   category: 'question',
   options: options,
   perms: [],
-  contexts: [
-    ApplicationCommandContext.Guild,
-    ApplicationCommandContext.BotDM,
-    ApplicationCommandContext.PrivateChannel,
-  ],
+  contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
   run: async (ctx: Context): Promise<void> => {
     const serverSettings = ctx.guildId
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)

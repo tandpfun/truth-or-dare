@@ -7,7 +7,7 @@ import type Context from './Context';
 export enum ApplicationCommandContext {
   Guild = 0, // Allow command in guilds
   BotDM = 1, // Allow command in user-bot DMs
-  PrivateChannel = 2, // Allow command in user-user or group DMs
+  // PrivateChannel = 2, // Allow command in user-user or group DMs (not currently supported)
 }
 
 export default interface Command {
