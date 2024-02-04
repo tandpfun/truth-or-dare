@@ -12,9 +12,9 @@ const invite: Command = {
     ctx.reply({
       embeds: [
         {
-          title: `Invite Truth or Dare`,
+          title: `Add Truth or Dare`,
           description: `Click the button below to invite Truth or Dare to your server!`,
-          color: ctx.client.COLORS.BLUE,
+          color: ctx.client.COLORS.BLURPLE,
         },
       ],
       components: [
@@ -23,13 +23,13 @@ const invite: Command = {
           components: [
             {
               type: ComponentType.Button,
-              label: 'Invite Truth or Dare',
+              label: 'Add Truth or Dare',
               url: ctx.client.inviteUrl,
               style: ButtonStyle.Link,
             },
             {
               type: ComponentType.Button,
-              label: 'Support Server',
+              label: 'Support',
               url: 'https://discord.gg/vBERMvVaRt',
               style: ButtonStyle.Link,
             },
