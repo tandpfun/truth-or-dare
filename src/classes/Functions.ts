@@ -20,6 +20,8 @@ import { RESTGetAPIApplicationEntitlementsResult } from '../types/premium';
 import type Command from './Command';
 import type Context from './Context';
 import Client from './Client';
+import { CustomQuestion, GuildSettings, Question, QuestionType, Rating } from '@prisma/client';
+import { CommandComponentTypes } from './ButtonHandler';
 
 export type Permission =
   | keyof typeof PermissionFlagsBits
@@ -176,6 +178,45 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
     : '';
 }
 
+type QuestionEmbedArgs = {
+  question:
+    | Question
+    | CustomQuestion
+    | { id: null; type: QuestionType | 'RANDOM'; rating: Rating | 'NONE'; question: string };
+  serverSettings: GuildSettings | null;
+  rating: Rating | 'NONE' | undefined;
+  componentType: CommandComponentTypes;
+  premium: boolean;
+  client: Client;
+};
+export function questionEmbed({
+  question,
+  rating,
+  componentType,
+  serverSettings,
+  premium,
+  client,
+}: QuestionEmbedArgs) {
+  return {
+    content: promoMessage(premium || !serverSettings, !client.enableR),
+    embeds: [
+      {
+        title: question.question,
+        color: client.COLORS.BLUE,
+        footer: question.id
+          ? {
+              text: `Type: ${question.type} | Rating: ${question.rating} | ID: ${question.id}`,
+            }
+          : undefined,
+      },
+    ],
+    components: serverSettings?.disableButtons
+      ? []
+      : client.buttonHandler.components(componentType, rating),
+  };
+}
+
+// HTTP Requests
 export async function sendMessage(
   data: RESTPostAPIChannelMessageJSONBody,
   channelId: string,

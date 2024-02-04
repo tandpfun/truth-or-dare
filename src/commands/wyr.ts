@@ -31,25 +31,19 @@ const wyr: Command = {
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const wyr = await ctx.client.getQuestion(ctx, 'WYR', rating);
-    if (wyr.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
-    ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
-      embeds: [
-        {
-          title: wyr.question,
-          color: ctx.client.COLORS.BLUE,
-          footer: wyr.id
-            ? {
-                text: `Type: ${wyr.type} | Rating: ${wyr.rating} | ID: ${wyr.id}`,
-              }
-            : undefined,
-        },
-      ],
-      components: serverSettings?.disableButtons
-        ? []
-        : ctx.client.buttonHandler.components('WYR', rating),
-    });
+    const question = await ctx.client.getQuestion(ctx, 'WYR', rating);
+    if (question.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
+
+    ctx.reply(
+      ctx.client.functions.questionEmbed({
+        question,
+        rating,
+        componentType: 'WYR',
+        premium: ctx.premium,
+        serverSettings,
+        client: ctx.client,
+      })
+    );
   },
 };
 

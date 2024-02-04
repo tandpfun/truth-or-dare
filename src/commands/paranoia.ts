@@ -40,31 +40,21 @@ const paranoia: Command = {
     const targetUserId = ctx.getOption<Mutable<typeof options[0]>>('target')?.value;
     const rating = ctx.getOption<Mutable<typeof options[1]>>('rating')?.value;
 
-    const paranoia = await ctx.client.getQuestion(ctx, 'PARANOIA', rating);
-    if (paranoia.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
+    const question = await ctx.client.getQuestion(ctx, 'PARANOIA', rating);
+    if (question.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
 
     // Send like regular question if no target
-    if (!ctx.guildId || !targetUserId || !paranoia.id) {
-      return ctx.reply({
-        content: ctx.client.functions.promoMessage(
-          ctx.premium || !ctx.guildId,
-          !ctx.client.enableR
-        ),
-        embeds: [
-          {
-            title: paranoia.question,
-            color: ctx.client.COLORS.BLUE,
-            footer: paranoia.id
-              ? {
-                  text: `Type: ${paranoia.type} | Rating: ${paranoia.rating} | ID: ${paranoia.id}`,
-                }
-              : undefined,
-          },
-        ],
-        components: serverSettings?.disableButtons
-          ? []
-          : ctx.client.buttonHandler.components('PARANOIA', rating),
-      });
+    if (!ctx.guildId || !targetUserId || !question.id) {
+      return ctx.reply(
+        ctx.client.functions.questionEmbed({
+          question,
+          rating,
+          componentType: 'PARANOIA',
+          premium: ctx.premium,
+          serverSettings,
+          client: ctx.client,
+        })
+      );
     }
 
     if (ctx.resolved!.users![targetUserId].bot)
@@ -95,7 +85,7 @@ const paranoia: Command = {
     const sendParanoia = await ctx.client.paranoiaHandler
       .sendParanoiaDM({
         dmChannel,
-        question: paranoia,
+        question,
         sender: ctx.user,
         guild,
         channelId: ctx.channelId,

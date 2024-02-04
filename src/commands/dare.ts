@@ -31,25 +31,19 @@ const dare: Command = {
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const dare = await ctx.client.getQuestion(ctx, 'DARE', rating);
-    if (dare.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
-    ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
-      embeds: [
-        {
-          title: dare.question,
-          color: ctx.client.COLORS.BLUE,
-          footer: dare.id
-            ? {
-                text: `Type: ${dare.type} | Rating: ${dare.rating} | ID: ${dare.id}`,
-              }
-            : undefined,
-        },
-      ],
-      components: serverSettings?.disableButtons
-        ? []
-        : ctx.client.buttonHandler.components('TOD', rating),
-    });
+    const question = await ctx.client.getQuestion(ctx, 'DARE', rating);
+    if (question.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
+
+    ctx.reply(
+      ctx.client.functions.questionEmbed({
+        question,
+        rating,
+        componentType: 'TOD',
+        premium: ctx.premium,
+        serverSettings,
+        client: ctx.client,
+      })
+    );
   },
 };
 

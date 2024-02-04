@@ -31,25 +31,19 @@ const tod: Command = {
       ? await ctx.client.database.fetchGuildSettings(ctx.guildId)
       : null;
     const rating = ctx.getOption<Mutable<typeof options[0]>>('rating')?.value;
-    const result = await ctx.client.getQuestion(ctx, undefined, rating);
-    if (result.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
-    ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
-      embeds: [
-        {
-          title: result.question,
-          color: ctx.client.COLORS.BLUE,
-          footer: result.id
-            ? {
-                text: `Type: ${result.type} | Rating: ${result.rating} | ID: ${result.id}`,
-              }
-            : undefined,
-        },
-      ],
-      components: serverSettings?.disableButtons
-        ? []
-        : ctx.client.buttonHandler.components('RANDOM', rating),
-    });
+    const question = await ctx.client.getQuestion(ctx, undefined, rating);
+    if (question.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
+
+    ctx.reply(
+      ctx.client.functions.questionEmbed({
+        question,
+        rating,
+        componentType: 'RANDOM',
+        premium: ctx.premium,
+        serverSettings,
+        client: ctx.client,
+      })
+    );
   },
 };
 

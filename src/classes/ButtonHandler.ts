@@ -10,7 +10,7 @@ import type ButtonContext from './ButtonContext';
 import type Client from './Client';
 
 type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
-type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
+export type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
 type ButtonIdWithState = ButtonIds | `${ButtonIds}:${Rating | 'NONE'}`;
 
 export default class ButtonHandler {
