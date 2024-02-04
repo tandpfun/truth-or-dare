@@ -40,7 +40,7 @@ const options = [
 const suggest: Command = {
   name: 'suggest',
   description: 'Suggest a question to be added to the bot.',
-  category: 'control',
+  category: 'config',
   options,
   perms: [],
   run: async (ctx: Context): Promise<void> => {

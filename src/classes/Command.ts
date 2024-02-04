@@ -13,7 +13,7 @@ export enum ApplicationCommandContext {
 export default interface Command {
   name: string;
   description: string;
-  category: 'question' | 'control';
+  category: 'question' | 'config' | 'premium';
   options?: ReadOnly<APIApplicationCommandOption[]>;
   perms: Permission[];
   contexts?: ApplicationCommandContext[];

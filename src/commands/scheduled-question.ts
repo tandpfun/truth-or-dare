@@ -78,7 +78,7 @@ const scheduledQuestion: Command = {
   name: 'scheduled-question',
   description: 'Automatically post a question every certain amount of time!',
   options,
-  category: 'control',
+  category: 'premium',
   perms: ['ManageGuild'],
   contexts: [ApplicationCommandContext.Guild],
   run: async (ctx: Context) => {

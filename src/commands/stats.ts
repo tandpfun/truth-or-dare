@@ -6,7 +6,7 @@ import type Context from '../classes/Context';
 const stats: Command = {
   name: 'stats',
   description: 'List some statistics on the bot!',
-  category: 'control',
+  category: 'config',
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     ctx.reply({

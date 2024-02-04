@@ -108,7 +108,7 @@ const options = [
 const settings: Command = {
   name: 'settings',
   description: 'Show and configure the channel settings of a channel.',
-  category: 'control',
+  category: 'config',
   perms: ['ManageChannels'],
   options,
   run: async (ctx: Context): Promise<void> => {

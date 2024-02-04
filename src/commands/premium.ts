@@ -44,7 +44,7 @@ const options = [
 const premium: Command = {
   name: 'premium',
   description: 'Manage your premium servers for the bot.',
-  category: 'control',
+  category: 'premium',
   options,
   perms: [],
   contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],

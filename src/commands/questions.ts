@@ -153,7 +153,7 @@ const options = [
 const questions: Command = {
   name: 'questions',
   description: 'List, add, and remove custom questions for this server.',
-  category: 'control',
+  category: 'premium',
   perms: ['ManageGuild'],
   options,
   contexts: [ApplicationCommandContext.Guild],

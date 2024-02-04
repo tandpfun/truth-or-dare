@@ -4,7 +4,7 @@ import type Context from '../classes/Context';
 const ping: Command = {
   name: 'ping',
   description: 'Check if the bot is online.',
-  category: 'control',
+  category: 'config',
   perms: [],
   run: async (ctx: Context): Promise<void> => {
     return ctx.reply({

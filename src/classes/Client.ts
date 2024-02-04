@@ -67,8 +67,8 @@ export default class Client {
     xmark: ':x:',
     time: ':stopwatch:',
     trackball: ':trackball:',
-    question: ':question:',
-    gear: ':gear:',
+    question: '<:qmark_blurple:1203771072197955636>',
+    gear: '<:gear_blurple:1203771800996155472>',
     warning: ':warning:',
     graph: ':chart_with_upwards_trend:',
     sparkles: ':sparkles:',
@@ -85,6 +85,8 @@ export default class Client {
     heart: ':heart:',
     bank: ':bank:',
     open_mouth: ':open_mouth:',
+    logo: '<:tod_logo:1203770064826794065>',
+    premium: '<:premium:1203772737630511145>',
   } as const;
   static LANGUAGES = {
     en: 'English',

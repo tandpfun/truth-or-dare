@@ -86,7 +86,7 @@ const serverSettings: Command = {
   name: 'server-settings',
   description: 'View and change the premium server settings.',
   options,
-  category: 'control',
+  category: 'config',
   perms: ['ManageGuild'],
   contexts: [ApplicationCommandContext.Guild],
   run: async (ctx: Context) => {
