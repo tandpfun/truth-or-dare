@@ -44,10 +44,11 @@ export default class ScheduledQuestionHandler {
         });
 
       if (scheduledQuestionChannel.autoThread && sentMessage != null) {
-        const threadTitle =
+        const threadTitle = (
           questionMessageData.embeds?.[0].title ??
           questionMessageData.embeds?.[0].description ??
-          'Thread';
+          'Thread'
+        ).substring(0, 100);
         this.client.functions
           .startThreadFromMessage(
             { name: threadTitle, auto_archive_duration: 1440 },
