@@ -12,7 +12,7 @@ const stats: Command = {
     ctx.reply({
       embeds: [
         {
-          color: ctx.client.COLORS.BLUE,
+          color: ctx.client.COLORS.BLURPLE,
           title: ctx.client.EMOTES.graph + ' Statistics',
           description: `Last Restart: <t:${
             (Date.now() / 1000 - process.uptime()) | 0

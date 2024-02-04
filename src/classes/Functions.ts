@@ -135,8 +135,20 @@ export function titleCase(str: string): string {
 
 export function legacyPremiumAd(): APIInteractionResponseCallbackData {
   return {
-    content:
-      'This command requires Truth or Dare Premium! Upgrade now to get access to these features!',
+    embeds: [
+      {
+        title: `${Client.EMOTES.premium} This is a Truth or Dare premium feature!`,
+        description:
+          'Upgrade to premium to unlock exclusive perks and help support the development of Truth or Dare!',
+        fields: [
+          {
+            name: 'Premium Perks:',
+            value: `:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${Client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
+          },
+        ],
+        color: Client.COLORS.BLURPLE,
+      },
+    ],
     components: [
       {
         type: ComponentType.ActionRow,

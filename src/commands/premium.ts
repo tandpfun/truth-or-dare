@@ -82,7 +82,13 @@ const premium: Command = {
               {
                 title: `${ctx.client.EMOTES.xmark} Basic Server`,
                 description:
-                  "This server doesn't have premium. Unlock additional perks and help support the development of Truth or Dare with Truth or Dare Premium.\n\nClick the button below to upgrade!",
+                  "This server doesn't have premium. Upgrade to premium to unlock exclusive perks and help support the development of Truth or Dare!",
+                fields: [
+                  {
+                    name: 'Premium Perks:',
+                    value: `:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${ctx.client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
+                  },
+                ],
                 color: ctx.client.COLORS.RED,
               },
             ],

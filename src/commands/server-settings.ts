@@ -129,7 +129,7 @@ const serverSettings: Command = {
                   '\n`/server-settings disable-question`',
               },
             ],
-            color: ctx.client.COLORS.BLUE,
+            color: ctx.client.COLORS.BLURPLE,
           },
         ],
       });
