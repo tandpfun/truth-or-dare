@@ -186,7 +186,6 @@ export default class Client {
       return this.console.error(
         `Command ${ctx.command.name} was run with no corresponding command file.`
       );
-    if (!this.functions.checkPerms(command, ctx)) return;
 
     // Statistics
     this.stats.minuteCommandCount++;
