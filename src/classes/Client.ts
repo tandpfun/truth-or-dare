@@ -72,6 +72,7 @@ export default class Client {
     warning: ':warning:',
     graph: ':chart_with_upwards_trend:',
     sparkles: ':sparkles:',
+    animated_sparkles: '<a:animated_sparkles:1204952794772279336>',
     info: ':information_source:',
     arrowUp: ':arrow_up:',
     star: ':star:',

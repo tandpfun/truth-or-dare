@@ -35,8 +35,8 @@ const help: Command = {
               value: `${
                 !ctx.premium
                   ? ctx.client.enableR
-                    ? '[Upgrade](https://truthordarebot.xyz/premium) to unlock.\n'
-                    : 'Tap "Upgrade" on my profile to unlock.\n'
+                    ? '↳ [Upgrade](https://truthordarebot.xyz/premium) to unlock.\n'
+                    : '↳ Tap "Upgrade" on my profile to unlock.\n'
                   : ''
               }${ctx.client.commands
                 .filter(c => c.category === 'premium')
