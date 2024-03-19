@@ -8,7 +8,10 @@ import {
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import { ApplicationCommandContext } from '../classes/Command';
+import {
+  ApplicationCommandContext,
+  ApplicationCommandInstallationContext,
+} from '../classes/Command';
 
 const options = [
   {
@@ -48,6 +51,7 @@ const premium: Command = {
   options,
   perms: [],
   contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
+  integration_types: [ApplicationCommandInstallationContext.GuildInstall],
   run: async (ctx: Context): Promise<void> => {
     const premiumGuild = ctx.premium;
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);

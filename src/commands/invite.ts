@@ -13,7 +13,7 @@ const invite: Command = {
       embeds: [
         {
           title: `Add Truth or Dare`,
-          description: `Click the button below to invite Truth or Dare to your server!`,
+          description: `Click the button below to add Truth or Dare!`,
           color: ctx.client.COLORS.BLURPLE,
         },
       ],

@@ -2,7 +2,10 @@ import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import { ApplicationCommandContext } from '../classes/Command';
+import {
+  ApplicationCommandContext,
+  ApplicationCommandInstallationContext,
+} from '../classes/Command';
 import { Mutable } from '../classes/OptionTypes';
 
 const options = [
@@ -81,6 +84,7 @@ const scheduledQuestion: Command = {
   category: 'premium',
   perms: ['ManageGuild'],
   contexts: [ApplicationCommandContext.Guild],
+  integration_types: [ApplicationCommandInstallationContext.GuildInstall],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
       return ctx.reply(

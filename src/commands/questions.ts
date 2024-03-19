@@ -4,7 +4,10 @@ import { QuestionType, Question } from '.prisma/client';
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import { ApplicationCommandContext } from '../classes/Command';
+import {
+  ApplicationCommandContext,
+  ApplicationCommandInstallationContext,
+} from '../classes/Command';
 
 const { MAIN_GUILD } = process.env;
 const PER_PAGE = 15;
@@ -157,6 +160,7 @@ const questions: Command = {
   perms: ['ManageGuild'],
   options,
   contexts: [ApplicationCommandContext.Guild],
+  integration_types: [ApplicationCommandInstallationContext.GuildInstall],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
       return ctx.reply(

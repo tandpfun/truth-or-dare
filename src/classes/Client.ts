@@ -21,7 +21,7 @@ import type Command from './Command';
 import Logger from './Logger';
 import ScheduledQuestionHandler from './ScheduledQuestionHandler';
 import ParanoiaHandler from './ParanoiaHandler';
-import { ApplicationCommandContext } from './Command';
+import { ApplicationCommandContext, ApplicationCommandInstallationContext } from './Command';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
 
@@ -277,7 +277,16 @@ export default class Client {
               .toString()
           : null;
       if (typeof commandFile.contexts === 'undefined')
-        commandFile.contexts = [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM]; // Enables for guilds and bot-user DMs by default
+        commandFile.contexts = [
+          ApplicationCommandContext.Guild,
+          ApplicationCommandContext.BotDM,
+          ApplicationCommandContext.PrivateChannel,
+        ]; // Enables for guilds, bot-user DMs, and group DMs by default
+      if (typeof commandFile.integration_types === 'undefined')
+        commandFile.integration_types = [
+          ApplicationCommandInstallationContext.GuildInstall,
+          ApplicationCommandInstallationContext.UserInstall,
+        ]; // Enables for both guilds and users by default
       if (commandFile.options)
         this.removeRatings(commandFile.options as APIApplicationCommandOption[]);
       this.commands.push(commandFile);

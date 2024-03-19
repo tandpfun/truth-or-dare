@@ -7,7 +7,12 @@ import type Context from './Context';
 export enum ApplicationCommandContext {
   Guild = 0, // Allow command in guilds
   BotDM = 1, // Allow command in user-bot DMs
-  // PrivateChannel = 2, // Allow command in user-user or group DMs (not currently supported)
+  PrivateChannel = 2, // Allow command in user-user or group DMs
+}
+
+export enum ApplicationCommandInstallationContext {
+  GuildInstall = 0, // Command is installable to servers
+  UserInstall = 1, // Command is installable to users
 }
 
 export default interface Command {
@@ -17,6 +22,7 @@ export default interface Command {
   options?: ReadOnly<APIApplicationCommandOption[]>;
   perms: Permission[];
   contexts?: ApplicationCommandContext[];
+  integration_types?: ApplicationCommandInstallationContext[];
   guildId?: string[];
   mainBotOnly?: boolean;
   rBotOnly?: boolean;
