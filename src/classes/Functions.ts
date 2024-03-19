@@ -16,12 +16,12 @@ import {
 } from 'discord-api-types/v9';
 import superagent from 'superagent';
 
-import { RESTGetAPIApplicationEntitlementsResult } from '../types/premium';
 import type Command from './Command';
 import type Context from './Context';
 import Client from './Client';
 import { CustomQuestion, GuildSettings, Question, QuestionType, Rating } from '@prisma/client';
 import { CommandComponentTypes } from './ButtonHandler';
+import { RESTGetAPIEntitlementsResult } from 'discord-api-types/v10';
 
 export type Permission =
   | keyof typeof PermissionFlagsBits
@@ -349,7 +349,7 @@ export async function fetchGuildChannels(
 export async function fetchApplicationEntitlements(
   guildId?: string,
   excludeEnded = true
-): Promise<RESTGetAPIApplicationEntitlementsResult | null> {
+): Promise<RESTGetAPIEntitlementsResult | null> {
   return await superagent
     .get(
       `${process.env.DISCORD_API_URL || 'https://discord.com'}/api/applications/${

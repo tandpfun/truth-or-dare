@@ -15,13 +15,10 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import {
-  APIApplicationEntitlement,
-  APIMessageComponentInteractionWithEntitlements,
-} from '../types/premium';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
+import { APIEntitlement } from 'discord-api-types/v10';
 
 export default class ButtonContext implements Context {
   interaction: APIMessageComponentInteraction;
@@ -36,15 +33,11 @@ export default class ButtonContext implements Context {
   user: APIUser;
   messageId: string;
   args: (string | number | boolean)[] = [];
-  entitlements?: APIApplicationEntitlement[];
+  entitlements?: APIEntitlement[];
   premium: boolean;
   channel?: Partial<APIChannel> & Pick<APIChannel, 'id' | 'type'>;
 
-  constructor(
-    interaction: APIMessageComponentInteractionWithEntitlements,
-    client: Client,
-    response: FastifyReply
-  ) {
+  constructor(interaction: APIMessageComponentInteraction, client: Client, response: FastifyReply) {
     if (interaction.data.component_type !== ComponentType.Button)
       throw new Error('The component type is not a button.');
 

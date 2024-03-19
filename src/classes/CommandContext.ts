@@ -20,13 +20,10 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import {
-  APIApplicationEntitlement,
-  APIChatInputApplicationCommandInteractionWithEntitlements,
-} from '../types/premium';
 import type { OptionType } from './OptionTypes';
 import type Context from './Context';
 import type Client from './Client';
+import { APIChatInputApplicationCommandInteraction, APIEntitlement } from 'discord-api-types/v10';
 
 export default class CommandContext implements Context {
   rawInteraction: APIApplicationCommandInteraction;
@@ -43,13 +40,13 @@ export default class CommandContext implements Context {
   guildId?: string;
   member?: APIInteractionGuildMember;
   user: APIUser;
-  entitlements?: APIApplicationEntitlement[];
+  entitlements?: APIEntitlement[];
   premium: boolean;
   appPermissions?: string;
   channel?: Partial<APIChannel> & Pick<APIChannel, 'id' | 'type'>;
 
   constructor(
-    interaction: APIChatInputApplicationCommandInteractionWithEntitlements,
+    interaction: APIChatInputApplicationCommandInteraction,
     client: Client,
     response: FastifyReply
   ) {

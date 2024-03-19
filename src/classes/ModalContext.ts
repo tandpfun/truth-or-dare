@@ -14,12 +14,9 @@ import {
 import type { ChannelSettings } from '@prisma/client';
 import type { FastifyReply } from 'fastify';
 
-import {
-  APIApplicationEntitlement,
-  APIModalSubmitInteractionWithEntitlements,
-} from '../types/premium';
 import type { OptionType } from './OptionTypes';
 import type Client from './Client';
+import { APIEntitlement } from 'discord-api-types/v10';
 
 export default class ModalContext {
   interaction: APIModalSubmitInteraction;
@@ -33,15 +30,11 @@ export default class ModalContext {
   user: APIUser;
   messageId?: string;
   args: (string | number | boolean)[] = [];
-  entitlements?: APIApplicationEntitlement[];
+  entitlements?: APIEntitlement[];
   premium: boolean;
   channel?: Partial<APIChannel> & Pick<APIChannel, 'id' | 'type'>;
 
-  constructor(
-    interaction: APIModalSubmitInteractionWithEntitlements,
-    client: Client,
-    response: FastifyReply
-  ) {
+  constructor(interaction: APIModalSubmitInteraction, client: Client, response: FastifyReply) {
     if (interaction.type !== InteractionType.ModalSubmit)
       throw new Error('The component type is not a button.');
 

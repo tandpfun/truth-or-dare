@@ -10,7 +10,7 @@ import type { ChannelSettings } from '@prisma/client';
 
 import { OptionType } from './OptionTypes';
 import type Client from './Client';
-import { APIApplicationEntitlement } from '../types/premium';
+import { APIEntitlement } from 'discord-api-types/v10';
 
 export default interface Context {
   client: Client;
@@ -21,7 +21,7 @@ export default interface Context {
   member?: APIInteractionGuildMember;
   user: APIUser;
   appPermissions?: string;
-  entitlements?: APIApplicationEntitlement[];
+  entitlements?: APIEntitlement[];
   premium: boolean;
 
   getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined;

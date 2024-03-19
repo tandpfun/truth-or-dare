@@ -15,10 +15,6 @@ import { verify } from 'discord-verify/node';
 import metricsPlugin from 'fastify-metrics';
 import { register } from 'prom-client';
 
-import {
-  APIChatInputApplicationCommandInteractionWithEntitlements,
-  APIMessageComponentInteractionWithEntitlements,
-} from '../types/premium';
 import CommandContext from './CommandContext';
 import ButtonContext from './ButtonContext';
 import type Client from './Client';
@@ -26,6 +22,10 @@ import Database from './Database';
 import Metrics from './Metrics';
 import Logger from './Logger';
 import ModalContext from './ModalContext';
+import {
+  APIChatInputApplicationCommandDMInteraction,
+  APIMessageComponentInteraction,
+} from 'discord-api-types/v10';
 
 const rateLimitConfig: RateLimitOptions = {
   max: 5,
@@ -139,7 +139,7 @@ export default class Server {
       // If interaction is a slash command
       if (interaction.data.type !== ApplicationCommandType.ChatInput) return;
       const ctx = new CommandContext(
-        interaction as APIChatInputApplicationCommandInteractionWithEntitlements,
+        interaction as APIChatInputApplicationCommandDMInteraction,
         client,
         res
       );
@@ -149,11 +149,7 @@ export default class Server {
       interaction.data.component_type === ComponentType.Button
     ) {
       // If interaction is a button
-      const ctx = new ButtonContext(
-        interaction as APIMessageComponentInteractionWithEntitlements,
-        client,
-        res
-      );
+      const ctx = new ButtonContext(interaction as APIMessageComponentInteraction, client, res);
       await client.handleButton(ctx);
     } else if (interaction.type === InteractionType.ModalSubmit) {
       const ctx = new ModalContext(interaction as APIModalSubmitInteraction, client, res);
