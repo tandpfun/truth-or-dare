@@ -21,7 +21,11 @@ import type Context from './Context';
 import Client from './Client';
 import { CustomQuestion, GuildSettings, Question, QuestionType, Rating } from '@prisma/client';
 import { CommandComponentTypes } from './ButtonHandler';
-import { RESTGetAPIEntitlementsResult } from 'discord-api-types/v10';
+import {
+  APIActionRowComponent,
+  APIButtonComponent,
+  RESTGetAPIEntitlementsResult,
+} from 'discord-api-types/v10';
 
 export type Permission =
   | keyof typeof PermissionFlagsBits
@@ -133,6 +137,21 @@ export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
 
+export function premiumUpsellButton(skuId?: string): APIButtonComponent {
+  return skuId
+    ? {
+        type: ComponentType.Button,
+        style: ButtonStyle.Premium,
+        sku_id: skuId,
+      }
+    : {
+        label: 'Upgrade',
+        type: ComponentType.Button,
+        url: 'https://truthordarebot.xyz/premium',
+        style: ButtonStyle.Link,
+      };
+}
+
 export function premiumUpsell(skuId?: string): APIInteractionResponseCallbackData {
   return {
     embeds: [
@@ -152,20 +171,7 @@ export function premiumUpsell(skuId?: string): APIInteractionResponseCallbackDat
     components: [
       {
         type: ComponentType.ActionRow,
-        components: [
-          skuId
-            ? {
-                type: ComponentType.Button,
-                style: ButtonStyle.Premium,
-                sku_id: skuId,
-              }
-            : {
-                label: 'Upgrade',
-                type: ComponentType.Button,
-                url: 'https://truthordarebot.xyz/premium',
-                style: ButtonStyle.Link,
-              },
-        ],
+        components: [premiumUpsellButton(skuId)],
       },
     ],
   };
@@ -189,9 +195,7 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
 
   let selectedMessage = promoMessages[Math.floor(Math.random() * promoMessages.length)];
   if (selectedMessage.includes('premium')) {
-    if (inAppPremium) {
-      selectedMessage += ' Tap "Upgrade" on my profile.';
-    } else {
+    if (!inAppPremium) {
       selectedMessage = selectedMessage.replace(
         'premium',
         '[premium](https://truthordarebot.xyz/premium)'
@@ -223,8 +227,25 @@ export function questionEmbed({
   premium,
   client,
 }: QuestionEmbedArgs) {
+  const promoHeader = promoMessage(premium || !serverSettings, !!client.premiumSKU); // Promotional message above questions, small chance of showing
+  const hasPremiumPromo = promoHeader.includes('premium');
+
+  const replyComponents: APIActionRowComponent<APIButtonComponent>[] =
+    serverSettings?.disableButtons
+      ? hasPremiumPromo
+        ? [{ type: ComponentType.ActionRow, components: [premiumUpsellButton(client.premiumSKU)] }]
+        : []
+      : client.buttonHandler.components(componentType, rating);
+
+  if (hasPremiumPromo) {
+    replyComponents.push({
+      type: ComponentType.ActionRow,
+      components: [premiumUpsellButton(client.premiumSKU)],
+    });
+  }
+
   return {
-    content: promoMessage(premium || !serverSettings, !client.enableR),
+    content: promoHeader,
     embeds: [
       {
         title: question.question,
@@ -236,9 +257,7 @@ export function questionEmbed({
           : undefined,
       },
     ],
-    components: serverSettings?.disableButtons
-      ? []
-      : client.buttonHandler.components(componentType, rating),
+    components: replyComponents,
   };
 }
 

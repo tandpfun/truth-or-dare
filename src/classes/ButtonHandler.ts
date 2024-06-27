@@ -122,12 +122,46 @@ export default class ButtonHandler {
       });
     } else {
       // For all other types of games
+      const promoHeader = ctx.client.functions.promoMessage(
+        ctx.premium || !ctx.guildId,
+        !!ctx.client.premiumSKU
+      ); // Promotional message above questions, small chance of showing
+      const hasPremiumPromo = promoHeader.includes('premium');
+
+      const replyComponents: APIActionRowComponent<APIButtonComponent>[] =
+        targetUserId === 'NONE'
+          ? [
+              {
+                type: ComponentType.ActionRow,
+                components: [
+                  {
+                    type: ComponentType.Button,
+                    custom_id: `ANSWER:${result.id}:${ctx.channelId}:${ctx.guildId}`,
+                    label: 'Answer',
+                    style: ButtonStyle.Primary,
+                  },
+                  {
+                    type: ComponentType.Button,
+                    custom_id: `${type ?? 'RANDOM'}:${rating || 'NONE'}:NONE`,
+                    label: 'New Question',
+                    style: ButtonStyle.Secondary,
+                  },
+                ],
+              },
+            ]
+          : settings?.disableButtons
+          ? []
+          : this.components(buttonCommandType, rating);
+
+      if (hasPremiumPromo) {
+        replyComponents?.push({
+          type: ComponentType.ActionRow,
+          components: [this.client.functions.premiumUpsellButton(this.client.premiumSKU)],
+        });
+      }
 
       ctx.reply({
-        content: ctx.client.functions.promoMessage(
-          ctx.premium || !ctx.guildId,
-          !ctx.client.enableR
-        ),
+        content: promoHeader,
         embeds: [
           {
             author: {
@@ -143,30 +177,7 @@ export default class ButtonHandler {
               : undefined,
           },
         ],
-        components:
-          targetUserId === 'NONE'
-            ? [
-                {
-                  type: ComponentType.ActionRow,
-                  components: [
-                    {
-                      type: ComponentType.Button,
-                      custom_id: `ANSWER:${result.id}:${ctx.channelId}:${ctx.guildId}`,
-                      label: 'Answer',
-                      style: ButtonStyle.Primary,
-                    },
-                    {
-                      type: ComponentType.Button,
-                      custom_id: `${type ?? 'RANDOM'}:${rating || 'NONE'}:NONE`,
-                      label: 'New Question',
-                      style: ButtonStyle.Secondary,
-                    },
-                  ],
-                },
-              ]
-            : settings?.disableButtons
-            ? []
-            : this.components(buttonCommandType, rating),
+        components: replyComponents,
       });
     }
 
@@ -208,7 +219,7 @@ export default class ButtonHandler {
   components(
     type: CommandComponentTypes,
     rating: Rating | 'NONE' | undefined
-  ): APIActionRowComponent<APIButtonComponent>[] | undefined {
+  ): APIActionRowComponent<APIButtonComponent>[] {
     const makeId = (t: ButtonIds) => `${t}${rating ? ':' + rating : ''}`;
     const arr: APIButtonComponent[] = [];
     if (type === 'TOD') {
@@ -261,6 +272,7 @@ export default class ButtonHandler {
         style: ButtonStyle.Primary,
       });
     }
+
     return [{ type: ComponentType.ActionRow, components: arr }];
   }
 }

@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from 'discor
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+import { APIActionRowComponent, APIButtonComponent } from 'discord-api-types/v10';
 
 const options = [
   {
@@ -49,8 +50,43 @@ const game: Command = {
     const question = await ctx.client.getQuestion(ctx, questionType, rating);
     if (question.id) ctx.client.metrics.trackRatingSelection(rating || 'NONE');
 
+    const promoHeader = ctx.client.functions.promoMessage(
+      ctx.premium || !ctx.guildId,
+      !!ctx.client.premiumSKU
+    ); // Promotional message above questions, small chance of showing
+    const hasPremiumPromo = promoHeader.includes('premium');
+
+    const replyComponents: APIActionRowComponent<APIButtonComponent>[] = question.id
+      ? [
+          {
+            type: ComponentType.ActionRow,
+            components: [
+              {
+                type: ComponentType.Button,
+                custom_id: `ANSWER:${question.id}:${ctx.channelId}:${ctx.guildId}`,
+                label: 'Answer',
+                style: ButtonStyle.Primary,
+              },
+              {
+                type: ComponentType.Button,
+                custom_id: `${specifiedQuestionType ?? 'RANDOM'}:${rating || 'NONE'}:NONE`,
+                label: 'New Question',
+                style: ButtonStyle.Secondary,
+              },
+            ],
+          },
+        ]
+      : [];
+
+    if (hasPremiumPromo) {
+      replyComponents.push({
+        type: ComponentType.ActionRow,
+        components: [ctx.client.functions.premiumUpsellButton(ctx.client.premiumSKU)],
+      });
+    }
+
     ctx.reply({
-      content: ctx.client.functions.promoMessage(ctx.premium || !ctx.guildId, !ctx.client.enableR),
+      content: promoHeader,
       embeds: [
         {
           title: question.question,
@@ -62,27 +98,7 @@ const game: Command = {
             : undefined,
         },
       ],
-      components: question.id
-        ? [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  custom_id: `ANSWER:${question.id}:${ctx.channelId}:${ctx.guildId}`,
-                  label: 'Answer',
-                  style: ButtonStyle.Primary,
-                },
-                {
-                  type: ComponentType.Button,
-                  custom_id: `${specifiedQuestionType ?? 'RANDOM'}:${rating || 'NONE'}:NONE`,
-                  label: 'New Question',
-                  style: ButtonStyle.Secondary,
-                },
-              ],
-            },
-          ]
-        : [],
+      components: replyComponents,
     });
   },
 };
