@@ -88,7 +88,7 @@ export default class Client {
     bank: ':bank:',
     open_mouth: ':open_mouth:',
     logo: '<:tod_logo:1203770064826794065>',
-    premium: '<:premium:1203772737630511145>',
+    premium: '<:premium_badge:1255737711063601224> ',
   } as const;
   static LANGUAGES = {
     en: 'English',
