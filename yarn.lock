@@ -363,10 +363,10 @@ dezalgo@1.0.3:
     asap "^2.0.0"
     wrappy "1"
 
-discord-api-types@^0.37.75:
-  version "0.37.75"
-  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.75.tgz#59b6f271d0adbcdea414aa5d573ba1335619c6db"
-  integrity sha512-pnb2iPp63+TqSs+3MCzl47y0CFQYjDDQBmuiCs0LkLoRdFx2dDpjrzJYC7BcHJCa/Xlpf+/JuDT/YADvQLu3yQ==
+discord-api-types@^0.37.90:
+  version "0.37.90"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.90.tgz#84f78ba2de984364b8b6cbc5891be48f9539fa48"
+  integrity sha512-lpOJSGrqHuXoM4FV/2HtjoaJpCClGFHpRNIdZEW8zPINlsCHNSfIwA2EQ8dxeE6k1QhhTuM9ZlOGVYXoU7FLgA==
 
 discord-verify@^1.0.0:
   version "1.0.0"

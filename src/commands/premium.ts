@@ -79,25 +79,34 @@ const premium: Command = {
           ],
         });
 
-      return ctx.entitlements
-        ? ctx.replyUpsell()
-        : ctx.reply({
-            embeds: [
+      return ctx.reply({
+        embeds: [
+          {
+            title: `${ctx.client.EMOTES.xmark} Basic Server`,
+            description:
+              "This server doesn't have premium. Upgrade to premium to unlock exclusive perks and help support the development of Truth or Dare!",
+            fields: [
               {
-                title: `${ctx.client.EMOTES.xmark} Basic Server`,
-                description:
-                  "This server doesn't have premium. Upgrade to premium to unlock exclusive perks and help support the development of Truth or Dare!",
-                fields: [
-                  {
-                    name: 'Premium Perks:',
-                    value: `:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${ctx.client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
-                  },
-                ],
-                color: ctx.client.COLORS.RED,
+                name: 'Premium Perks:',
+                value: `:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${ctx.client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
               },
             ],
-            components: [
-              {
+            color: ctx.client.COLORS.RED,
+          },
+        ],
+        components: [
+          ctx.client.premiumSKU
+            ? {
+                type: ComponentType.ActionRow,
+                components: [
+                  {
+                    type: ComponentType.Button,
+                    style: ButtonStyle.Premium,
+                    sku_id: ctx.client.premiumSKU,
+                  },
+                ],
+              }
+            : {
                 type: ComponentType.ActionRow,
                 components: [
                   {
@@ -108,8 +117,8 @@ const premium: Command = {
                   },
                 ],
               },
-            ],
-          });
+        ],
+      });
     } else if (ctx.args[0] === 'list') {
       const premiumServerData = await Promise.all(
         premiumUser!.premiumServers.map(

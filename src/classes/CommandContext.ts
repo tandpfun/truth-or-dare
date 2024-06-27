@@ -82,9 +82,11 @@ export default class CommandContext implements Context {
     this.channel = interaction.channel;
 
     this.entitlements = interaction.entitlements;
+    if (this.entitlements.length) console.log(this.entitlements); // temp to find sku id
     this.premium =
       !!this.guildId &&
-      (!!this.entitlements?.length || this.client.database.isChargebeePremiumGuild(this.guildId));
+      (!!this.entitlements.some(entitlement => entitlement.sku_id == this.client.premiumSKU) ||
+        this.client.database.isChargebeePremiumGuild(this.guildId));
   }
 
   getOption<O extends APIApplicationCommandOption>(name: string): OptionType<O> | undefined {
@@ -136,13 +138,7 @@ export default class CommandContext implements Context {
   }
 
   replyUpsell() {
-    if (!this.client.enableR) {
-      this.response.send({
-        type: 10, // Only use type 10 if bot has Discord premium
-      });
-    } else {
-      this.reply(this.client.functions.legacyPremiumAd());
-    }
+    this.reply(this.client.functions.premiumUpsell(this.client.premiumSKU));
   }
 
   replyModal(data: APIModalInteractionResponseCallbackData) {

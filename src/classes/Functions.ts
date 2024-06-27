@@ -133,7 +133,7 @@ export function titleCase(str: string): string {
   return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function legacyPremiumAd(): APIInteractionResponseCallbackData {
+export function premiumUpsell(skuId?: string): APIInteractionResponseCallbackData {
   return {
     embeds: [
       {
@@ -153,12 +153,18 @@ export function legacyPremiumAd(): APIInteractionResponseCallbackData {
       {
         type: ComponentType.ActionRow,
         components: [
-          {
-            label: 'Upgrade',
-            type: ComponentType.Button,
-            url: 'https://truthordarebot.xyz/premium',
-            style: ButtonStyle.Link,
-          },
+          skuId
+            ? {
+                type: ComponentType.Button,
+                style: ButtonStyle.Premium,
+                sku_id: skuId,
+              }
+            : {
+                label: 'Upgrade',
+                type: ComponentType.Button,
+                url: 'https://truthordarebot.xyz/premium',
+                style: ButtonStyle.Link,
+              },
         ],
       },
     ],

@@ -30,6 +30,7 @@ export default class Client {
   token: string;
   publicKey: string;
   discordAPIUrl: string;
+  premiumSKU?: string;
   enableR: boolean;
   owners: string[];
   commands: Command[];
@@ -104,6 +105,7 @@ export default class Client {
     token,
     publicKey,
     owners,
+    premiumSKU,
     metrics,
     database,
     enableR,
@@ -112,6 +114,7 @@ export default class Client {
     applicationId: string;
     publicKey: string;
     owners: string[];
+    premiumSKU?: string;
     metrics: Metrics;
     database: Database;
     enableR: boolean;
@@ -122,6 +125,7 @@ export default class Client {
     this.enableR = enableR;
     this.owners = owners;
     this.discordAPIUrl = process.env.DISCORD_API_URL || 'https://discord.com';
+    this.premiumSKU = premiumSKU;
 
     this.suggestCooldowns = {};
     this.stats = {

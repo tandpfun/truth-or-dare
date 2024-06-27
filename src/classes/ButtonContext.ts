@@ -60,7 +60,8 @@ export default class ButtonContext implements Context {
     this.entitlements = interaction.entitlements;
     this.premium =
       !!this.guildId &&
-      (!!this.entitlements?.length || this.client.database.isChargebeePremiumGuild(this.guildId));
+      (!!this.entitlements.some(entitlement => entitlement.sku_id == this.client.premiumSKU) ||
+        this.client.database.isChargebeePremiumGuild(this.guildId));
   }
   getOption<O extends APIApplicationCommandOption>(_name: string): OptionType<O> | undefined {
     return;
@@ -79,13 +80,7 @@ export default class ButtonContext implements Context {
   }
 
   replyUpsell() {
-    if (!this.client.enableR) {
-      this.response.send({
-        type: 10, // Only use type 10 if bot has Discord premium
-      });
-    } else {
-      this.reply(this.client.functions.legacyPremiumAd());
-    }
+    this.reply(this.client.functions.premiumUpsell(this.client.premiumSKU));
   }
 
   replyModal(data: APIModalInteractionResponseCallbackData) {
