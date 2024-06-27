@@ -187,6 +187,8 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
     'Suggest your own questions with `/suggest`.',
     'Create QOTD channels with `/scheduled-question`.',
     'Upgrade to premium to prevent repeated questions!',
+    'Anyone, even server members, can purchase premium for this server.',
+    'Help us keep the bot online by purchasing premium.',
     'You can create question of the day channels with premium.',
     'You can send questions automatically with premium.',
     'You can disable these tips with premium.',
