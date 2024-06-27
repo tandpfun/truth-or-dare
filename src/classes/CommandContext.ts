@@ -82,7 +82,6 @@ export default class CommandContext implements Context {
     this.channel = interaction.channel;
 
     this.entitlements = interaction.entitlements;
-    if (this.entitlements.length) console.log(this.entitlements); // temp to find sku id
     this.premium =
       !!this.guildId &&
       (!!this.entitlements.some(entitlement => entitlement.sku_id == this.client.premiumSKU) ||
