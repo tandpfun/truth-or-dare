@@ -51,7 +51,6 @@ const premium: Command = {
   options,
   perms: [],
   contexts: [ApplicationCommandContext.Guild, ApplicationCommandContext.BotDM],
-  integration_types: [ApplicationCommandInstallationContext.GuildInstall],
   run: async (ctx: Context): Promise<void> => {
     const premiumGuild = ctx.premium;
     const premiumUser = await ctx.client.database.getPremiumUser(ctx.user.id);
