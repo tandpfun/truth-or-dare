@@ -160,6 +160,7 @@ const questions: Command = {
   perms: ['ManageGuild'],
   options,
   contexts: [ApplicationCommandContext.Guild],
+  integration_types: [ApplicationCommandInstallationContext.GuildInstall],
   run: async (ctx: Context) => {
     if (!ctx.guildId)
       return ctx.reply(

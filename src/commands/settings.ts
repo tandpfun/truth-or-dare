@@ -4,6 +4,7 @@ import { Rating } from '.prisma/client';
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
+import { ApplicationCommandInstallationContext } from '../classes/Command';
 
 const options = [
   {
@@ -110,6 +111,7 @@ const settings: Command = {
   description: 'Show and configure the channel settings of a channel.',
   category: 'config',
   perms: ['ManageChannels'],
+  integration_types: [ApplicationCommandInstallationContext.GuildInstall],
   options,
   run: async (ctx: Context): Promise<void> => {
     const channelId =
