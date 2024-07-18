@@ -8,10 +8,7 @@ import {
 import type { Mutable } from '../classes/OptionTypes';
 import type Command from '../classes/Command';
 import type Context from '../classes/Context';
-import {
-  ApplicationCommandContext,
-  ApplicationCommandInstallationContext,
-} from '../classes/Command';
+import { ApplicationCommandContext } from '../classes/Command';
 
 const options = [
   {
