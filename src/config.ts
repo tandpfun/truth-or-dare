@@ -21,7 +21,6 @@ const configuration: BotConfig = {
         applicationId: process.env.R_APPLICATION_ID!,
         token: process.env.R_TOKEN!,
         publicKey: process.env.R_PUBLIC_KEY!,
-        premiumSku: process.env.R_PREMIUM_SKU,
         enableR: true,
       },
     }),
