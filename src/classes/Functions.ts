@@ -229,20 +229,25 @@ export function questionEmbed({
   premium,
   client,
 }: QuestionEmbedArgs) {
-  const promoHeader = promoMessage(premium || !serverSettings, !!client.premiumSKU); // Promotional message above questions, small chance of showing
+  const promoHeader = promoMessage(premium || !serverSettings, !!client.config.premiumSku); // Promotional message above questions, small chance of showing
   const hasPremiumPromo = promoHeader.includes('premium');
 
   const replyComponents: APIActionRowComponent<APIButtonComponent>[] =
     serverSettings?.disableButtons
       ? hasPremiumPromo
-        ? [{ type: ComponentType.ActionRow, components: [premiumUpsellButton(client.premiumSKU)] }]
+        ? [
+            {
+              type: ComponentType.ActionRow,
+              components: [premiumUpsellButton(client.config.premiumSku)],
+            },
+          ]
         : []
       : client.buttonHandler.components(componentType, rating);
 
   if (hasPremiumPromo) {
     replyComponents.push({
       type: ComponentType.ActionRow,
-      components: [premiumUpsellButton(client.premiumSKU)],
+      components: [premiumUpsellButton(client.config.premiumSku)],
     });
   }
 

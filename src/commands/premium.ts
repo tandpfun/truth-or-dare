@@ -91,14 +91,14 @@ const premium: Command = {
           },
         ],
         components: [
-          ctx.client.premiumSKU
+          ctx.client.config.premiumSku
             ? {
                 type: ComponentType.ActionRow,
                 components: [
                   {
                     type: ComponentType.Button,
                     style: ButtonStyle.Premium,
-                    sku_id: ctx.client.premiumSKU,
+                    sku_id: ctx.client.config.premiumSku,
                   },
                 ],
               }

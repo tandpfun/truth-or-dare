@@ -52,7 +52,7 @@ const game: Command = {
 
     const promoHeader = ctx.client.functions.promoMessage(
       ctx.premium || !ctx.guildId,
-      !!ctx.client.premiumSKU
+      !!ctx.client.config.premiumSku
     ); // Promotional message above questions, small chance of showing
     const hasPremiumPromo = promoHeader.includes('premium');
 
@@ -81,7 +81,7 @@ const game: Command = {
     if (hasPremiumPromo) {
       replyComponents.push({
         type: ComponentType.ActionRow,
-        components: [ctx.client.functions.premiumUpsellButton(ctx.client.premiumSKU)],
+        components: [ctx.client.functions.premiumUpsellButton(ctx.client.config.premiumSku)],
       });
     }
 

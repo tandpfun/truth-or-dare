@@ -84,7 +84,9 @@ export default class CommandContext implements Context {
     this.entitlements = interaction.entitlements;
     this.premium =
       !!this.guildId &&
-      (!!this.entitlements.some(entitlement => entitlement.sku_id == this.client.premiumSKU) ||
+      (!!this.entitlements.some(
+        entitlement => entitlement.sku_id == this.client.config.premiumSku
+      ) ||
         this.client.database.isChargebeePremiumGuild(this.guildId));
   }
 
@@ -137,7 +139,7 @@ export default class CommandContext implements Context {
   }
 
   replyUpsell() {
-    this.reply(this.client.functions.premiumUpsell(this.client.premiumSKU));
+    this.reply(this.client.functions.premiumUpsell(this.client.config.premiumSku));
   }
 
   replyModal(data: APIModalInteractionResponseCallbackData) {

@@ -34,7 +34,7 @@ const help: Command = {
               name: `${ctx.client.EMOTES.premium} Premium Commands`,
               value: `${
                 !ctx.premium
-                  ? ctx.client.enableR
+                  ? ctx.client.config.premiumSku == null
                     ? '↳ [Upgrade](https://truthordarebot.xyz/premium) to unlock.\n'
                     : '↳ Tap "Upgrade" on my profile to unlock.\n'
                   : ''

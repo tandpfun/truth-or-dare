@@ -56,7 +56,9 @@ export default class ModalContext {
     this.entitlements = interaction.entitlements;
     this.premium =
       !!this.guildId &&
-      (!!this.entitlements.some(entitlement => entitlement.sku_id == this.client.premiumSKU) ||
+      (!!this.entitlements.some(
+        entitlement => entitlement.sku_id == this.client.config.premiumSku
+      ) ||
         this.client.database.isChargebeePremiumGuild(this.guildId));
   }
   getOption<O extends APIApplicationCommandOption>(_name: string): OptionType<O> | undefined {
@@ -76,7 +78,7 @@ export default class ModalContext {
   }
 
   replyUpsell() {
-    this.reply(this.client.functions.premiumUpsell(this.client.premiumSKU));
+    this.reply(this.client.functions.premiumUpsell(this.client.config.premiumSku));
   }
 
   replyModal(data: APIModalInteractionResponseCallbackData) {

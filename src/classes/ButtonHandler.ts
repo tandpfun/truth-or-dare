@@ -124,7 +124,7 @@ export default class ButtonHandler {
       // For all other types of games
       const promoHeader = ctx.client.functions.promoMessage(
         ctx.premium || !ctx.guildId,
-        !!ctx.client.premiumSKU
+        !!ctx.client.config.premiumSku
       ); // Promotional message above questions, small chance of showing
       const hasPremiumPromo = promoHeader.includes('premium');
 
@@ -156,7 +156,7 @@ export default class ButtonHandler {
       if (hasPremiumPromo) {
         replyComponents?.push({
           type: ComponentType.ActionRow,
-          components: [this.client.functions.premiumUpsellButton(this.client.premiumSKU)],
+          components: [this.client.functions.premiumUpsellButton(this.client.config.premiumSku)],
         });
       }
 

@@ -22,6 +22,7 @@ import Logger from './Logger';
 import ScheduledQuestionHandler from './ScheduledQuestionHandler';
 import ParanoiaHandler from './ParanoiaHandler';
 import { ApplicationCommandContext, ApplicationCommandInstallationContext } from './Command';
+import { InstanceConfig } from '../types/config';
 
 const PASSTHROUGH_COMMANDS = ['settings'];
 
@@ -30,9 +31,8 @@ export default class Client {
   token: string;
   publicKey: string;
   discordAPIUrl: string;
-  premiumSKU?: string;
-  enableR: boolean;
-  owners: string[];
+  config: InstanceConfig;
+
   commands: Command[];
   console: Logger;
   metrics: Metrics;
@@ -101,31 +101,19 @@ export default class Client {
   } as const;
 
   constructor({
-    applicationId,
-    token,
-    publicKey,
-    owners,
-    premiumSKU,
+    config,
     metrics,
     database,
-    enableR,
   }: {
-    token: string;
-    applicationId: string;
-    publicKey: string;
-    owners: string[];
-    premiumSKU?: string;
+    config: InstanceConfig;
     metrics: Metrics;
     database: Database;
-    enableR: boolean;
   }) {
-    this.id = applicationId;
-    this.token = token;
-    this.publicKey = publicKey;
-    this.enableR = enableR;
-    this.owners = owners;
-    this.discordAPIUrl = process.env.DISCORD_API_URL || 'https://discord.com';
-    this.premiumSKU = premiumSKU;
+    this.id = config.applicationId;
+    this.token = config.token;
+    this.publicKey = config.publicKey;
+    this.discordAPIUrl = config.discordApiUrl || 'https://discord.com';
+    this.config = config;
 
     this.suggestCooldowns = {};
     this.stats = {
@@ -136,7 +124,7 @@ export default class Client {
     };
 
     this.commands = [];
-    this.console = new Logger('ToD' + (enableR ? ' R' : ''));
+    this.console = new Logger('ToD' + (config.enableR ? ' R' : ''));
     this.metrics = metrics;
     this.functions = functions;
     this.database = database;
@@ -242,7 +230,7 @@ export default class Client {
     rating?: Rating | 'NONE'
   ) {
     const disabledRatings = [...(await ctx.channelSettings).disabledRatings];
-    if (this.enableR) {
+    if (this.config.enableR) {
       // R bot
       if (rating === 'NONE') rating = undefined;
       else rating = 'R';
@@ -270,7 +258,10 @@ export default class Client {
       const commandFile: Command = this.functions.deepCopy(
         (await import(`../commands/${commandFileName}`)).default
       );
-      if ((commandFile.mainBotOnly && this.enableR) || (commandFile.rBotOnly && !this.enableR)) {
+      if (
+        (commandFile.mainBotOnly && this.config.enableR) ||
+        (commandFile.rBotOnly && !this.config.enableR)
+      ) {
         continue; // ignore main bot commands on r bot & vice versa
       }
       if (typeof commandFile.default_member_permissions === 'undefined')
@@ -328,7 +319,7 @@ export default class Client {
   removeRatings(options: APIApplicationCommandOption[]) {
     for (const option of options) {
       if ('choices' in option && option.type === ApplicationCommandOptionType.String) {
-        if (this.enableR) {
+        if (this.config.enableR) {
           // R bot no pg or pg13
           option.choices = option.choices?.filter(c => c.value !== 'PG' && c.value !== 'PG13');
         } else {

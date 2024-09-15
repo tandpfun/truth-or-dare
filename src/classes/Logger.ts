@@ -13,28 +13,28 @@ export default class Logger {
     return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
 
-  print(content: any, color: string, type: string, typeColor: string) {
+  print(content: any[], color: string, type: string, typeColor: string) {
     console.log(
       chalk`{${color} [${this.getTimestamp()}]} {${typeColor} ${type}} {${color} [${this.prefix}]}`,
-      content
+      ...content
     );
   }
 
   log = this.info;
 
-  info(content: any) {
+  info(...content: any[]) {
     this.print(content, 'cyan.bold', ' INFO ', 'bgCyan.black');
   }
 
-  success(content: any) {
+  success(...content: any[]) {
     this.print(content, 'green.bold', ' INFO ', 'bgGreen.black');
   }
 
-  error(content: any) {
+  error(...content: any[]) {
     this.print(content, 'red.bold', ' ERROR ', 'bgRed.black');
   }
 
-  warn(content: any) {
+  warn(...content: any[]) {
     this.print(content, 'yellow.bold', ' WARN ', 'bgYellow.black');
   }
 }
