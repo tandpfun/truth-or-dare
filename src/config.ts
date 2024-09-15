@@ -16,18 +16,20 @@ const configuration: BotConfig = {
       premiumSku: process.env.PREMIUM_SKU,
       enableR: false,
     },
-    r: {
-      applicationId: process.env.R_APPLICATION_ID!,
-      token: process.env.R_TOKEN!,
-      publicKey: process.env.R_PUBLIC_KEY!,
-      premiumSku: process.env.R_PREMIUM_SKU,
-      enableR: true,
-    },
+    ...(process.env.R_TOKEN != null && {
+      r: {
+        applicationId: process.env.R_APPLICATION_ID!,
+        token: process.env.R_TOKEN!,
+        publicKey: process.env.R_PUBLIC_KEY!,
+        premiumSku: process.env.R_PREMIUM_SKU,
+        enableR: true,
+      },
+    }),
   },
 };
 
 // Functions to handle use of the config above
-const logger = new Logger('config');
+const logger = new Logger('Config');
 
 export function getGlobalConfig(): GlobalConfig {
   return configuration.global;
@@ -49,7 +51,7 @@ export function getConfig(instance: string): InstanceConfig {
     }
   }
   if (missingConfig.length !== 0) {
-    logger.warn('Missing configuration for: ', missingConfig.join(', '));
+    logger.warn('Missing configuration for:', missingConfig.join(', '));
   }
 
   return combinedConfig;
