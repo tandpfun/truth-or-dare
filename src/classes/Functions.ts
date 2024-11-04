@@ -162,7 +162,7 @@ export function premiumUpsell(skuId?: string): APIInteractionResponseCallbackDat
         fields: [
           {
             name: 'Premium Perks:',
-            value: `:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${Client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
+            value: `:closed_lock_with_key: Unlock **2000+ new** questions\n:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${Client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
           },
         ],
         color: Client.COLORS.BLURPLE,
@@ -183,14 +183,12 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
   const promoMessages = [
     "You can change the bot's language with `/server-settings`.",
     'You can find all of our game modes with `/help`.',
-    'Get a random question with `/random`.',
-    'Suggest your own questions with `/suggest`.',
     'Create QOTD channels with `/scheduled-question`.',
     'Upgrade to premium to prevent repeated questions!',
-    'Anyone, even server members, can purchase premium for this server.',
+    'You can unlock 2000+ more questions with premium.',
+    'Unlock 2000+ more questions with premium!',
+    'NEW FEATURE: Premium users get 2000+ more questions!',
     'Help us keep the bot online by purchasing premium.',
-    'You can create question of the day channels with premium.',
-    'You can send questions automatically with premium.',
     'You can disable these tips with premium.',
     'You can add your own questions to the bot with premium!',
   ];
@@ -255,7 +253,9 @@ export function questionEmbed({
     content: promoHeader,
     embeds: [
       {
-        title: question.question,
+        title: `${question.question} ${
+          (question as Question).pack != null ? client.EMOTES.animated_sparkles : ''
+        }`,
         color: client.COLORS.BLUE,
         footer: question.id
           ? {

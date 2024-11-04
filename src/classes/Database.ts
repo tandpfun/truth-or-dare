@@ -113,6 +113,7 @@ export default class Database {
       disabledQuestions: [],
       showParanoiaFrequency: 50,
       language: null,
+      packEntitlements: [],
     };
   }
 
@@ -182,7 +183,9 @@ export default class Database {
     const questionFilter = (q: Omit<Question | CustomQuestion, 'question'>) =>
       (!type || q.type === type) && ratings.includes(q.rating);
     const globalFilter = (q: Question) =>
-      questionFilter(q) && (language ? language in q.translations : true);
+      questionFilter(q) &&
+      (language ? language in q.translations : true) && // Verify that the language set has translations for the given question
+      (!premium ? q.pack == null : true); // Block non-default packs for non-premium guilds
     const customFilter = (q: CustomQuestion) => q.guildId === guildId && questionFilter(q);
 
     let questions: (Question | CustomQuestion)[] =
@@ -239,12 +242,12 @@ export default class Database {
     return question;
   }
 
-  async updateQuestion(id: string, data: Optional<Question, 'id' | 'translations'>) {
+  async updateQuestion(id: string, data: Optional<Question, 'id' | 'translations' | 'pack'>) {
     const oldQuest = this.fetchSpecificQuestion(id);
     const quest = await this.db.question.upsert({
       where: { id },
       update: data,
-      create: { id: this.generateId(), translations: {}, ...data },
+      create: { id: this.generateId(), translations: {}, pack: null, ...data },
     });
 
     const index = oldQuest ? this.questionCache.findIndex(q => q.id === quest.id) : -1;

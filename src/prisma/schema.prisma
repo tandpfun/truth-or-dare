@@ -7,7 +7,7 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native"]
 }
 
@@ -43,6 +43,16 @@ type QuestionTranslation {
   tl String?
 }
 
+enum QuestionPack {
+  BOOST
+  MEMORIES
+  PERSONALITY
+  LIFE
+  FUTURE
+  RELATIONSHIPS
+  OPINIONS
+}
+
 enum ScheduleType {
   DAILY
   HOURLY
@@ -55,12 +65,13 @@ model ChannelSettings {
 }
 
 model GuildSettings {
-  id                    String       @id @map("_id")
+  id                    String         @id @map("_id")
   disableGlobals        Boolean
   disableButtons        Boolean
   disabledQuestions     String[]
   showParanoiaFrequency Int
   language              Translation?
+  packEntitlements      QuestionPack[]
 }
 
 model Question {
@@ -69,6 +80,7 @@ model Question {
   rating       Rating
   question     String
   translations QuestionTranslation
+  pack         QuestionPack?
 }
 
 model ParanoiaQuestion {

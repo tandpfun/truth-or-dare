@@ -175,7 +175,7 @@ const questions: Command = {
       const rating =
         ctx.getOption<Mutable<typeof options[0]['options'][1]>>('rating')?.value ?? 'ALL';
 
-      const questions: Omit<Question, 'translations'>[] =
+      const questions: Omit<Question, 'translations' | 'pack'>[] =
         ctx.guildId === MAIN_GUILD
           ? ctx.client.database.getQuestions({
               type: questionType === 'ALL' ? undefined : questionType,
@@ -229,28 +229,17 @@ const questions: Command = {
         return ctx.reply(ctx.client.EMOTES.xmark + ' Maximum question length is 256 characters.');
 
       const addedQuestion = await (ctx.guildId === MAIN_GUILD
-        ? ctx.client.database.updateQuestion('', { type, rating, question })
+        ? ctx.client.database.updateQuestion('', {
+            type,
+            rating,
+            question,
+          })
         : ctx.client.database.addCustomQuestion({
             guildId: ctx.guildId,
             type,
             rating,
             question,
           }));
-
-      /* Webhook logging for custom questions (depreciated)
-      if (ctx.guildId !== MAIN_GUILD)
-        ctx.client.webhookLog('suggest', {
-          username: `${ctx.client.functions.userTag(ctx.user)} (${ctx.user.id})`,
-          avatar_url: ctx.client.functions.avatarURL(ctx.user),
-          embeds: [
-            {
-              color: ctx.client.COLORS.BLUE,
-              title: question,
-              footer: { text: `Type: ${type} | Rating: ${rating} | ID: ${addedQuestion.id}` },
-            },
-          ],
-        });
-        */
 
       return ctx.reply(`${ctx.client.EMOTES.checkmark} Question Added! ID: ${addedQuestion.id}`);
     } else if (ctx.args[0] === 'remove') {

@@ -84,7 +84,7 @@ const premium: Command = {
             fields: [
               {
                 name: 'Premium Perks:',
-                value: `:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${ctx.client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
+                value: `:closed_lock_with_key: Unlock **2000+ new** questions\n:repeat: No more **repeated questions**\n:stopwatch: Create automated **question of the day** channels\n:art: Add **custom questions** to the bot\n:zap: Set your own **paranoia frequency**\n${ctx.client.EMOTES.logo} Help to keep Truth or Dare bot **online!**\n... and more!`,
               },
             ],
             color: ctx.client.COLORS.RED,
