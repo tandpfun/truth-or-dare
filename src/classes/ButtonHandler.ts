@@ -4,7 +4,7 @@ import {
   ComponentType,
   ButtonStyle,
 } from 'discord-api-types/v9';
-import { QuestionType, Rating } from '@prisma/client';
+import { Question, QuestionType, Rating } from '@prisma/client';
 
 import type ButtonContext from './ButtonContext';
 import type Client from './Client';
@@ -168,7 +168,9 @@ export default class ButtonHandler {
               name: `Requested by ${ctx.client.functions.userTag(ctx.user)}`,
               icon_url: `${ctx.client.functions.avatarURL(ctx.user)}`,
             },
-            title: result.question,
+            title: `${result.question} ${
+              (result as Question).pack != null ? ctx.client.EMOTES.animated_sparkles : ''
+            }`,
             color: ctx.client.COLORS.BLUE,
             footer: result.id
               ? {
