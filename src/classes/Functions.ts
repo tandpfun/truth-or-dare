@@ -182,18 +182,20 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
 
   const promoMessages = [
     "You can change the bot's language with `/server-settings`.",
-    'You can find all of our game modes with `/help`.',
     'Create QOTD channels with `/scheduled-question`.',
+    'Unlock even more customization settings with premium.',
+    'There are so many other games to try out!',
     'Upgrade to premium to prevent repeated questions!',
-    'You can unlock 2000+ more questions with premium.',
-    'Unlock 2000+ more questions with premium!',
-    'NEW FEATURE: Premium users get 2000+ more questions!',
-    'Help us keep the bot online by purchasing premium.',
+    'You can unlock hundreds of extra questions with premium.',
+    'Unlock hundreds of extra questions with premium!',
     'You can disable these tips with premium.',
     'You can add your own questions to the bot with premium!',
   ];
 
   let selectedMessage = promoMessages[Math.floor(Math.random() * promoMessages.length)];
+  if (!inAppPremium) {
+    selectedMessage = 'Happy New Year! Get 30% off premium for life with code `NEWYEAR25`.';
+  }
   if (selectedMessage.includes('premium')) {
     if (!inAppPremium) {
       selectedMessage = selectedMessage.replace(
