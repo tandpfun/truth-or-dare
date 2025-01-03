@@ -160,27 +160,30 @@ export default class ButtonHandler {
         });
       }
 
-      ctx.reply({
-        content: promoHeader,
-        embeds: [
-          {
-            author: {
-              name: `Requested by ${ctx.client.functions.userTag(ctx.user)}`,
-              icon_url: `${ctx.client.functions.avatarURL(ctx.user)}`,
+      ctx.reply(
+        {
+          content: promoHeader,
+          embeds: [
+            {
+              author: {
+                name: `Requested by ${ctx.client.functions.userTag(ctx.user)}`,
+                icon_url: `${ctx.client.functions.avatarURL(ctx.user)}`,
+              },
+              title: `${result.question} ${
+                (result as Question).pack != null ? ctx.client.EMOTES.animated_sparkles : ''
+              }`,
+              color: ctx.client.COLORS.BLUE,
+              footer: result.id
+                ? {
+                    text: `Type: ${result.type} | Rating: ${result.rating} | ID: ${result.id}`,
+                  }
+                : undefined,
             },
-            title: `${result.question} ${
-              (result as Question).pack != null ? ctx.client.EMOTES.animated_sparkles : ''
-            }`,
-            color: ctx.client.COLORS.BLUE,
-            footer: result.id
-              ? {
-                  text: `Type: ${result.type} | Rating: ${result.rating} | ID: ${result.id}`,
-                }
-              : undefined,
-          },
-        ],
-        components: replyComponents,
-      });
+          ],
+          components: replyComponents,
+        },
+        { ephemeral: !result.id }
+      );
     }
 
     if (!ctx.guildId) {
