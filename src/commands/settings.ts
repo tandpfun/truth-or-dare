@@ -132,8 +132,12 @@ const settings: Command = {
       ctx.reply({
         embeds: [
           {
-            title: `${ctx.client.EMOTES.gear} Channel Settings`,
-            description: `__Ratings:__\n${Object.values(Rating)
+            title: `${ctx.client.EMOTES.gear} Channel Settings${
+              channelId === ctx.channelId ? '' : ` for <#${channelId}>`
+            }`,
+            description: `${
+              channelSettings.muted ? `Muted ${ctx.client.EMOTES.mute}\n` : ''
+            }__Ratings:__\n${Object.values(Rating)
               .filter(r => r !== 'R' || ctx.client.config.enableR)
               .map(r => `${ratingEmoji(r)} ${r} Questions`)
               .join('\n')}`,

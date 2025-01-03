@@ -89,6 +89,7 @@ export default class Client {
     open_mouth: ':open_mouth:',
     logo: '<:tod_logo:1203770064826794065>',
     premium: '<:premium_badge:1255737711063601224> ',
+    mute: ':mute:',
   } as const;
   static LANGUAGES = {
     en: 'English',
