@@ -193,9 +193,6 @@ export function promoMessage(hideMessage: boolean, inAppPremium: boolean) {
   ];
 
   let selectedMessage = promoMessages[Math.floor(Math.random() * promoMessages.length)];
-  if (!inAppPremium) {
-    selectedMessage = 'Happy New Year! Get 30% off premium for life with code `NEWYEAR25`.';
-  }
   if (selectedMessage.includes('premium')) {
     if (!inAppPremium) {
       selectedMessage = selectedMessage.replace(
