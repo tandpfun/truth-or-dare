@@ -9,9 +9,10 @@ RUN yarn install
 # Copy source code
 COPY . .
 
-# Build TypeScript and generate Prisma client
+# Generate Prisma client first, then build TypeScript
+ENV PRISMA_CLIENT_ENGINE_TYPE=binary
+RUN npx prisma generate --schema=./src/prisma/schema.prisma
 RUN yarn tsc
-RUN yarn prisma generate
 
 # Start the application
 CMD ["node", "build/index.js"]
