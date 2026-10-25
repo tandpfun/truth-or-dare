@@ -30,6 +30,9 @@ const { SKETCH_BYTES, DAY_SECONDS: DAY } = require('../build/classes/RollingActi
   const snapshotStart = performance.now(),
     snapshot = await h.snapshot(now),
     snapshotMs = performance.now() - snapshotStart;
+  if (process.env.ACTIVE_USERS_SNAPSHOT_FILE) {
+    require('node:fs').writeFileSync(process.env.ACTIVE_USERS_SNAPSHOT_FILE, JSON.stringify(snapshot));
+  }
   const restored = new Rolling(now);
   await restored.restore(snapshot, now);
   assert.deepEqual(restored.counts(now), counts);
