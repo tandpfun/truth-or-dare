@@ -20,6 +20,7 @@ import ButtonContext from './ButtonContext';
 import type Client from './Client';
 import Database from './Database';
 import Metrics from './Metrics';
+import ActiveUsersTracker from './ActiveUsersTracker';
 import Logger from './Logger';
 import ModalContext from './ModalContext';
 import {
@@ -36,14 +37,22 @@ export default class Server {
   port: number;
   database: Database;
   metrics: Metrics;
+  activeUsers: ActiveUsersTracker;
   clients: Client[];
   console: Logger;
   router: FastifyInstance;
 
-  constructor(port: number, database: Database, metrics: Metrics, clients: Client[]) {
+  constructor(
+    port: number,
+    database: Database,
+    metrics: Metrics,
+    activeUsers: ActiveUsersTracker,
+    clients: Client[]
+  ) {
     this.port = port;
     this.database = database;
     this.metrics = metrics;
+    this.activeUsers = activeUsers;
     this.clients = clients;
     this.console = new Logger('Server');
     this.router = fastify({ logger: false, trustProxy: 1 });
@@ -52,6 +61,7 @@ export default class Server {
   async start() {
     this.console.log('Starting ToD Server...');
     await this.database.start();
+    this.activeUsers.start();
     for (const c of this.clients) {
       await c.start();
     }
@@ -131,6 +141,18 @@ export default class Server {
       return res.send({ type: InteractionResponseType.Pong });
 
     this.metrics.trackUserLocale(interaction.locale);
+
+    // Guild interactions carry the invoking user under member; DMs use user.
+    const user = interaction.member?.user ?? interaction.user;
+    if (
+      user &&
+      !user.bot &&
+      ((interaction.type === InteractionType.ApplicationCommand &&
+        interaction.data.type === ApplicationCommandType.ChatInput) ||
+        (interaction.type === InteractionType.MessageComponent &&
+          interaction.data.component_type === ComponentType.Button))
+    )
+      this.activeUsers.trackUser(user.id);
 
     if (
       interaction.type === InteractionType.ApplicationCommand &&

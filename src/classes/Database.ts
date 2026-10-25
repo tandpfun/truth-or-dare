@@ -13,6 +13,7 @@ import {
 import { fetchApplicationEntitlements } from './Functions';
 import type Metrics from './Metrics';
 import Logger from './Logger';
+import type { ActiveUsersSnapshot } from './RollingActiveUsers';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
@@ -460,5 +461,30 @@ export default class Database {
       update: { disabledQuestions: { push: questionId } },
       create: { ...this.defaultGuildSettings(guildId), disabledQuestions: [questionId] },
     }));
+  }
+
+  async loadActiveUsersMetrics(): Promise<ActiveUsersSnapshot | null> {
+    const result = await this.db.$runCommandRaw({
+      find: 'ActiveUsersRollingMetrics',
+      filter: { _id: 'combined-v1' },
+      limit: 1,
+      singleBatch: true,
+      maxTimeMS: 2000,
+    });
+    const cursor = result.cursor as { firstBatch?: unknown[] } | undefined;
+    if (!cursor?.firstBatch) throw new Error('Invalid active-user checkpoint response');
+    return (cursor.firstBatch[0] as ActiveUsersSnapshot | undefined) ?? null;
+  }
+
+  async saveActiveUsersMetrics(data: ActiveUsersSnapshot): Promise<void> {
+    const result = await this.db.$runCommandRaw({
+      update: 'ActiveUsersRollingMetrics',
+      updates: [{ q: { _id: 'combined-v1' }, u: { $set: { ...data } }, upsert: true }],
+      maxTimeMS: 2000,
+      writeConcern: { w: 1, wtimeout: 2000 },
+    });
+    if (result.ok !== 1 || result.writeErrors || result.writeConcernError) {
+      throw new Error('Active-user checkpoint write failed');
+    }
   }
 }
