@@ -1,0 +1,34 @@
+{
+  "node": "v18.20.4",
+  "arch": "arm64",
+  "users": 10000000,
+  "counts": {
+    "week": 2322683,
+    "month": 9858052
+  },
+  "expectedWeek": 2333338,
+  "weekErrorPct": -0.45664194385897083,
+  "monthErrorPct": -1.4194799999999952,
+  "sketchBytes": 6684672,
+  "checkpointBytes": 605183,
+  "ingestionMs": 20853.833041995764,
+  "updatesPerSecond": 479528.15100523003,
+  "countMs": 12.824916005134583,
+  "snapshotMs": 26.21687500178814,
+  "maxBatchMs": 12.985584005713463,
+  "eventLoopP99Ms": 16.531455,
+  "before": {
+    "rss": 49479680,
+    "heapTotal": 6651904,
+    "heapUsed": 3656640,
+    "external": 7352496,
+    "arrayBuffers": 6701258
+  },
+  "after": {
+    "rss": 115146752,
+    "heapTotal": 9895936,
+    "heapUsed": 4824016,
+    "external": 27887386,
+    "arrayBuffers": 27225502
+  }
+}

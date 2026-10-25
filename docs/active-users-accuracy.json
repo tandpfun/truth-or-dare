@@ -1,0 +1,66 @@
+{
+  "usersPerTrial": 1000000,
+  "results": [
+    {
+      "trial": 0,
+      "estimate": 995974,
+      "errorPct": -0.4025999999999974
+    },
+    {
+      "trial": 1,
+      "estimate": 1008108,
+      "errorPct": 0.8108000000000004
+    },
+    {
+      "trial": 2,
+      "estimate": 1002514,
+      "errorPct": 0.2513999999999905
+    },
+    {
+      "trial": 3,
+      "estimate": 995790,
+      "errorPct": -0.4210000000000047
+    },
+    {
+      "trial": 4,
+      "estimate": 991430,
+      "errorPct": -0.8569999999999967
+    },
+    {
+      "trial": 5,
+      "estimate": 1006721,
+      "errorPct": 0.6720999999999977
+    },
+    {
+      "trial": 6,
+      "estimate": 998056,
+      "errorPct": -0.19439999999999458
+    },
+    {
+      "trial": 7,
+      "estimate": 993125,
+      "errorPct": -0.6874999999999964
+    },
+    {
+      "trial": 8,
+      "estimate": 1005475,
+      "errorPct": 0.5474999999999897
+    },
+    {
+      "trial": 9,
+      "estimate": 993535,
+      "errorPct": -0.6465000000000054
+    },
+    {
+      "trial": 10,
+      "estimate": 1005370,
+      "errorPct": 0.5370000000000097
+    },
+    {
+      "trial": 11,
+      "estimate": 998465,
+      "errorPct": -0.1534999999999953
+    }
+  ],
+  "rmsErrorPct": 0.5617080447171813
+}
