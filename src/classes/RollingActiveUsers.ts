@@ -9,6 +9,38 @@ const RANKS = 51; // 50 independent hash bits, plus the all-zero case.
 export const SKETCH_BYTES = REGISTERS * RANKS * 4;
 export const DAY_SECONDS = 86400;
 
+// Ertl's improved raw estimator (arXiv:1702.01284, Algorithm 6).
+// Unlike switching between linear counting and raw HLL, this has no transition bias.
+function estimate(histogram: Uint32Array): number {
+  let x = histogram[0] / REGISTERS;
+  if (x === 1) return 0;
+  let sigma = x;
+  for (let weight = 1; ; weight *= 2) {
+    x *= x;
+    const next = sigma + weight * x;
+    if (next === sigma) break;
+    sigma = next;
+  }
+  x = 1 - histogram[RANKS] / REGISTERS;
+  let tau = 0;
+  if (x > 0 && x < 1) {
+    tau = 1 - x;
+    for (let weight = 0.5; ; weight *= 0.5) {
+      x = Math.sqrt(x);
+      const next = tau - weight * (1 - x) ** 2;
+      if (next === tau) break;
+      tau = next;
+    }
+    tau /= 3;
+  }
+  let denominator = REGISTERS * tau;
+  for (let rank = RANKS - 1; rank >= 1; rank--) {
+    denominator = (denominator + histogram[rank]) / 2;
+  }
+  denominator += REGISTERS * sigma;
+  return Math.round(REGISTERS ** 2 / (2 * Math.LN2 * denominator));
+}
+
 export interface ActiveUsersSnapshot {
   version: number;
   startedAt: number;
@@ -42,8 +74,7 @@ export default class RollingActiveUsers {
 
   counts(now = Math.floor(Date.now() / 1000)): { week: number; month: number } {
     const cutoffs = [now - 7 * DAY_SECONDS, now - 30 * DAY_SECONDS];
-    const sums = [0, 0];
-    const zeros = [0, 0];
+    const histograms = [new Uint32Array(RANKS + 1), new Uint32Array(RANKS + 1)];
     for (let register = 0; register < REGISTERS; register++) {
       const ranks = [0, 0];
       for (let rank = RANKS; rank >= 1; rank--) {
@@ -54,18 +85,10 @@ export default class RollingActiveUsers {
         }
         if (ranks[0] && ranks[1]) break;
       }
-      for (let i = 0; i < 2; i++) {
-        sums[i] += 2 ** -ranks[i];
-        if (!ranks[i]) zeros[i]++;
-      }
+      histograms[0][ranks[0]]++;
+      histograms[1][ranks[1]]++;
     }
-    const estimate = (i: number) => {
-      const raw = ((0.7213 / (1 + 1.079 / REGISTERS)) * REGISTERS ** 2) / sums[i];
-      return Math.round(
-        raw <= 2.5 * REGISTERS && zeros[i] ? REGISTERS * Math.log(REGISTERS / zeros[i]) : raw
-      );
-    };
-    return { week: estimate(0), month: estimate(1) };
+    return { week: estimate(histograms[0]), month: estimate(histograms[1]) };
   }
 
   async snapshot(now = Math.floor(Date.now() / 1000)): Promise<ActiveUsersSnapshot> {

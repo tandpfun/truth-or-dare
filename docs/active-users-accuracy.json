@@ -3,64 +3,64 @@
   "results": [
     {
       "trial": 0,
-      "estimate": 995974,
-      "errorPct": -0.4025999999999974
+      "estimate": 996073,
+      "errorPct": -0.3927000000000014
     },
     {
       "trial": 1,
-      "estimate": 1008108,
-      "errorPct": 0.8108000000000004
+      "estimate": 1008207,
+      "errorPct": 0.8207000000000075
     },
     {
       "trial": 2,
-      "estimate": 1002514,
-      "errorPct": 0.2513999999999905
+      "estimate": 1002613,
+      "errorPct": 0.26129999999999765
     },
     {
       "trial": 3,
-      "estimate": 995790,
-      "errorPct": -0.4210000000000047
+      "estimate": 995889,
+      "errorPct": -0.4110999999999976
     },
     {
       "trial": 4,
-      "estimate": 991430,
-      "errorPct": -0.8569999999999967
+      "estimate": 991528,
+      "errorPct": -0.8472000000000035
     },
     {
       "trial": 5,
-      "estimate": 1006721,
-      "errorPct": 0.6720999999999977
+      "estimate": 1006820,
+      "errorPct": 0.6820000000000048
     },
     {
       "trial": 6,
-      "estimate": 998056,
-      "errorPct": -0.19439999999999458
+      "estimate": 998155,
+      "errorPct": -0.18449999999999855
     },
     {
       "trial": 7,
-      "estimate": 993125,
-      "errorPct": -0.6874999999999964
+      "estimate": 993223,
+      "errorPct": -0.6777000000000033
     },
     {
       "trial": 8,
-      "estimate": 1005475,
-      "errorPct": 0.5474999999999897
+      "estimate": 1005574,
+      "errorPct": 0.5573999999999968
     },
     {
       "trial": 9,
-      "estimate": 993535,
-      "errorPct": -0.6465000000000054
+      "estimate": 993633,
+      "errorPct": -0.6367000000000012
     },
     {
       "trial": 10,
-      "estimate": 1005370,
-      "errorPct": 0.5370000000000097
+      "estimate": 1005469,
+      "errorPct": 0.5468999999999946
     },
     {
       "trial": 11,
-      "estimate": 998465,
-      "errorPct": -0.1534999999999953
+      "estimate": 998564,
+      "errorPct": -0.14359999999999928
     }
   ],
-  "rmsErrorPct": 0.5617080447171813
+  "rmsErrorPct": 0.5610283920325853
 }

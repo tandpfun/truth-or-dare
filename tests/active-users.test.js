@@ -43,12 +43,30 @@ test('window registers match an independently rebuilt conventional HLL', () => {
         const one = remaining.indexOf('1');
         registers[index] = Math.max(registers[index], one < 0 ? 51 : one + 1);
       }
-    const sum = registers.reduce((a, r) => a + 2 ** -r, 0);
-    const zero = registers.filter(r => !r).length;
-    const raw = ((0.7213 / (1 + 1.079 / 32768)) * 32768 ** 2) / sum;
-    return Math.round(raw <= 2.5 * 32768 && zero ? 32768 * Math.log(32768 / zero) : raw);
+    return registers;
   }
-  assert.deepEqual(h.counts(NOW), { week: reference(7), month: reference(30) });
+  for (const window of [7, 30]) {
+    const actual = new Uint8Array(32768);
+    for (let register = 0; register < 32768; register++) {
+      for (let rank = 51; rank >= 1; rank--) {
+        const seen = h.timestamps.readUInt32LE((register * 51 + rank - 1) * 4);
+        if (seen > NOW - window * DAY) {
+          actual[register] = rank;
+          break;
+        }
+      }
+    }
+    assert.deepEqual(actual, reference(window));
+  }
+});
+
+test('no estimator jump around the old linear-counting transition', () => {
+  const h = new Rolling(NOW);
+  const sizes = new Set([100, 1000, 10000, 50000, 75000, 80000, 100000, 200000]);
+  for (let i = 0; i < 200000; i++) {
+    h.track(String(500000000000000000n + BigInt(i)), NOW);
+    if (sizes.has(i + 1)) assert.ok(Math.abs(h.counts(NOW).month / (i + 1) - 1) < 0.02);
+  }
 });
 
 test('checkpoints restore and merge activity received while storage loads', async () => {

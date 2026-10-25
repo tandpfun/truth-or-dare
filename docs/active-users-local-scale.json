@@ -3,32 +3,32 @@
   "arch": "arm64",
   "users": 10000000,
   "counts": {
-    "week": 2322683,
-    "month": 9858052
+    "week": 2322913,
+    "month": 9859026
   },
   "expectedWeek": 2333338,
-  "weekErrorPct": -0.45664194385897083,
-  "monthErrorPct": -1.4194799999999952,
+  "weekErrorPct": -0.44678482071607295,
+  "monthErrorPct": -1.4097400000000038,
   "sketchBytes": 6684672,
   "checkpointBytes": 605183,
-  "ingestionMs": 20853.833041995764,
-  "updatesPerSecond": 479528.15100523003,
-  "countMs": 12.824916005134583,
-  "snapshotMs": 26.21687500178814,
-  "maxBatchMs": 12.985584005713463,
-  "eventLoopP99Ms": 16.531455,
+  "ingestionMs": 20942.88275000453,
+  "updatesPerSecond": 477489.1842431691,
+  "countMs": 11.21891701221466,
+  "snapshotMs": 26.78279100358486,
+  "maxBatchMs": 12.585458010435104,
+  "eventLoopP99Ms": 16.621567,
   "before": {
-    "rss": 49479680,
+    "rss": 49135616,
     "heapTotal": 6651904,
-    "heapUsed": 3656640,
-    "external": 7352496,
+    "heapUsed": 3658504,
+    "external": 7353274,
     "arrayBuffers": 6701258
   },
   "after": {
-    "rss": 115146752,
+    "rss": 107692032,
     "heapTotal": 9895936,
-    "heapUsed": 4824016,
-    "external": 27887386,
+    "heapUsed": 4625048,
+    "external": 27887802,
     "arrayBuffers": 27225502
   }
 }
