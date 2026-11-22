@@ -17,6 +17,7 @@ enum QuestionType {
   TRUTH
   WYR
   PARANOIA
+  HOT_TAKES
 }
 
 enum Rating {

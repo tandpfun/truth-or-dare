@@ -28,6 +28,7 @@ const options = [
           { name: 'wyr', value: 'WYR' },
           { name: 'nhie', value: 'NHIE' },
           { name: 'paranoia', value: 'PARANOIA' },
+          { name: 'hot-takes', value: 'HOT_TAKES' },
         ],
       },
       {
@@ -63,6 +64,7 @@ const options = [
           { name: 'wyr', value: 'WYR' },
           { name: 'nhie', value: 'NHIE' },
           { name: 'paranoia', value: 'PARANOIA' },
+          { name: 'hot-takes', value: 'HOT_TAKES' },
         ],
         required: true,
       },
@@ -132,6 +134,7 @@ const options = [
           { name: 'wyr', value: 'WYR' },
           { name: 'nhie', value: 'NHIE' },
           { name: 'paranoia', value: 'PARANOIA' },
+          { name: 'hot-takes', value: 'HOT_TAKES' },
         ],
       },
       {

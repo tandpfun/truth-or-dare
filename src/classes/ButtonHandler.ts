@@ -9,8 +9,8 @@ import { Question, QuestionType, Rating } from '@prisma/client';
 import type ButtonContext from './ButtonContext';
 import type Client from './Client';
 
-type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
-export type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'RANDOM';
+type ButtonIds = 'TRUTH' | 'DARE' | 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'HOT_TAKES' | 'RANDOM';
+export type CommandComponentTypes = 'TOD' | 'NHIE' | 'WYR' | 'PARANOIA' | 'HOT_TAKES' | 'RANDOM';
 type ButtonIdWithState = ButtonIds | `${ButtonIds}:${Rating | 'NONE'}`;
 
 export default class ButtonHandler {
@@ -20,7 +20,7 @@ export default class ButtonHandler {
 
   constructor(client: Client) {
     this.client = client;
-    this.buttonIds = ['TRUTH', 'DARE', 'TOD', 'WYR', 'NHIE', 'PARANOIA', 'RANDOM'];
+    this.buttonIds = ['TRUTH', 'DARE', 'TOD', 'WYR', 'NHIE', 'PARANOIA', 'HOT_TAKES', 'RANDOM'];
     this.buttonCooldown = new Set();
 
     for (const buttonId of this.buttonIds) {
@@ -264,6 +264,13 @@ export default class ButtonHandler {
         type: ComponentType.Button,
         custom_id: makeId('PARANOIA'),
         label: 'Paranoia',
+        style: ButtonStyle.Primary,
+      });
+    } else if (type === 'HOT_TAKES') {
+      arr.push({
+        type: ComponentType.Button,
+        custom_id: makeId('HOT_TAKES'),
+        label: 'Hot Takes',
         style: ButtonStyle.Primary,
       });
     } else if (type === 'RANDOM') {

@@ -15,6 +15,7 @@ const options = [
       { name: 'WYR', value: 'WYR' },
       { name: 'NHIE', value: 'NHIE' },
       { name: 'PARANOIA', value: 'PARANOIA' },
+      { name: 'HOT TAKES', value: 'HOT_TAKES' },
       { name: 'random', value: 'NONE' },
     ],
   },

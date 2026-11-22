@@ -16,6 +16,7 @@ const options = [
       { name: 'truth', value: 'TRUTH' },
       { name: 'wyr', value: 'WYR' },
       { name: 'paranoia', value: 'PARANOIA' },
+      { name: 'hot-takes', value: 'HOT_TAKES'}
     ],
   },
   {
